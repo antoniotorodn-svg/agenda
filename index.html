@@ -433,6 +433,73 @@
             background: #fafbfc; border: 1px solid #e0e0e0; border-radius: 6px;
         }
 
+        /* Reports modal */
+        .reports-modal { width: 750px; }
+        .report-tabs { display: flex; gap: 0; margin-bottom: 15px; }
+        .report-tab {
+            padding: 8px 16px; border: 1px solid #ccc; background: #f5f5f5;
+            cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
+        }
+        .report-tab:first-child { border-radius: 6px 0 0 6px; }
+        .report-tab:last-child { border-radius: 0 6px 6px 0; }
+        .report-tab.active { background: #7eb8c9; color: #2c3e50; border-color: #7eb8c9; }
+        .report-content { max-height: 500px; overflow-y: auto; }
+
+        /* Bar chart */
+        .chart-container { margin-bottom: 20px; }
+        .chart-bar-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem;
+        }
+        .chart-label { width: 65px; text-align: right; font-weight: 600; color: #2c3e50; flex-shrink: 0; }
+        .chart-bar-bg {
+            flex: 1; background: #eee; border-radius: 4px; height: 24px; position: relative; overflow: hidden;
+        }
+        .chart-bar-fill {
+            height: 100%; border-radius: 4px; display: flex; align-items: center;
+            padding-left: 8px; font-size: 0.72rem; font-weight: 700; color: white;
+            transition: width 0.5s ease; min-width: 0;
+        }
+        .chart-bar-fill.high { background: linear-gradient(90deg, #7eb8c9, #5a9ab5); }
+        .chart-bar-fill.medium { background: linear-gradient(90deg, #a8d8a8, #7cb87c); }
+        .chart-bar-fill.low { background: linear-gradient(90deg, #f0c87a, #d4a84a); }
+        .chart-bar-fill.very-low { background: linear-gradient(90deg, #e8a8a8, #c87878); }
+        .chart-value { width: 55px; font-size: 0.78rem; font-weight: 600; color: #666; flex-shrink: 0; }
+
+        /* Income comparison chart */
+        .income-compare-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.8rem;
+        }
+        .income-compare-row .ic-label { width: 65px; text-align: right; font-weight: 600; color: #2c3e50; flex-shrink: 0; }
+        .income-compare-row .ic-bars { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .income-compare-row .ic-bar {
+            height: 12px; border-radius: 3px; position: relative;
+            transition: width 0.5s ease;
+        }
+        .income-compare-row .ic-bar.expected { background: #d0d0d0; }
+        .income-compare-row .ic-bar.actual { background: #7eb8c9; }
+        .income-compare-row .ic-values { width: 130px; font-size: 0.72rem; color: #666; flex-shrink: 0; }
+        .ic-legend { display: flex; gap: 15px; font-size: 0.75rem; margin-bottom: 12px; }
+        .ic-legend-item { display: flex; align-items: center; gap: 4px; }
+        .ic-legend-color { width: 14px; height: 10px; border-radius: 2px; }
+
+        /* Room ranking */
+        .rank-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .rank-table th {
+            background: #6b9dad; color: white; padding: 8px 10px; text-align: left; font-weight: 600;
+        }
+        .rank-table td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+        .rank-table tr:hover td { background: #f0f8ff; }
+        .rank-table .rank-num { font-weight: 700; color: #2c3e50; width: 30px; text-align: center; }
+        .rank-table .rank-bar-cell { width: 120px; }
+        .rank-mini-bar {
+            height: 8px; border-radius: 4px; background: #7eb8c9;
+            transition: width 0.5s ease;
+        }
+        .rank-mini-bar.top { background: #5a9ab5; }
+        .rank-mini-bar.bottom { background: #e8a8a8; }
+        .report-year-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .report-year-nav h4 { font-size: 0.95rem; color: #2c3e50; min-width: 50px; text-align: center; }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -502,6 +569,7 @@
     <button class="btn-primary" onclick="openBlockModal()">Bloquear Fechas</button>
     <button class="btn-primary" onclick="openClientsModal()">Clientes</button>
     <button class="btn-primary" onclick="openIncomeModal()">Ingresos</button>
+    <button class="btn-primary" onclick="openReportsModal()">Informes</button>
     <button class="btn-secondary" onclick="exportData()">Exportar</button>
     <button class="btn-secondary" onclick="importData()">Importar</button>
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
@@ -849,6 +917,27 @@
             <button class="btn-primary" onclick="copyRules()" style="margin-right:auto;">Copiar normas</button>
             <button class="btn-secondary" onclick="closeRulesModal()">Cerrar</button>
             <button class="btn-success" onclick="saveRules()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Informes -->
+<div class="modal-overlay" id="reportsModal">
+    <div class="modal reports-modal">
+        <h2>Informes y Estadísticas</h2>
+        <div class="report-year-nav">
+            <button class="btn-outline" onclick="changeReportYear(-1)" style="padding:4px 10px;">‹</button>
+            <h4 id="reportYearLabel"></h4>
+            <button class="btn-outline" onclick="changeReportYear(1)" style="padding:4px 10px;">›</button>
+        </div>
+        <div class="report-tabs">
+            <div class="report-tab active" onclick="switchReportTab('occupancy')">Ocupación</div>
+            <div class="report-tab" onclick="switchReportTab('income')">Ingresos</div>
+            <div class="report-tab" onclick="switchReportTab('rooms')">Habitaciones</div>
+        </div>
+        <div class="report-content" id="reportContent"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeReportsModal()">Cerrar</button>
         </div>
     </div>
 </div>
@@ -2531,10 +2620,325 @@ function copyRules() {
     });
 }
 
+// ==================== REPORTS ====================
+
+let reportYear = new Date().getFullYear();
+let currentReportTab = 'occupancy';
+
+function openReportsModal() {
+    reportYear = new Date().getFullYear();
+    currentReportTab = 'occupancy';
+    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.report-tab').classList.add('active');
+    renderReport();
+    document.getElementById('reportsModal').classList.add('active');
+}
+
+function closeReportsModal() {
+    document.getElementById('reportsModal').classList.remove('active');
+}
+
+function changeReportYear(dir) {
+    reportYear += dir;
+    renderReport();
+}
+
+function switchReportTab(tab) {
+    currentReportTab = tab;
+    document.querySelectorAll('.report-tab').forEach(t => {
+        const labels = { occupancy: 'Ocupación', income: 'Ingresos', rooms: 'Habitaciones' };
+        t.classList.toggle('active', t.textContent === labels[tab]);
+    });
+    renderReport();
+}
+
+function renderReport() {
+    document.getElementById('reportYearLabel').textContent = reportYear;
+    const container = document.getElementById('reportContent');
+    if (currentReportTab === 'occupancy') renderOccupancyReport(container);
+    else if (currentReportTab === 'income') renderIncomeReport(container);
+    else renderRoomsReport(container);
+}
+
+function renderOccupancyReport(container) {
+    const totalRooms = ROOMS.length; // 32
+    const monthData = [];
+
+    for (let m = 0; m < 12; m++) {
+        const daysInMonth = new Date(reportYear, m + 1, 0).getDate();
+        let occupiedDays = 0;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const ds = dateStr(new Date(reportYear, m, d));
+            ROOMS.forEach(room => {
+                const hasBooking = bookings.some(b =>
+                    b.room === room.number && ds >= b.checkin && ds < b.checkout
+                );
+                if (hasBooking) occupiedDays++;
+            });
+        }
+
+        const totalSlots = daysInMonth * totalRooms;
+        const occupancy = totalSlots > 0 ? Math.round((occupiedDays / totalSlots) * 100) : 0;
+        const bookingsInMonth = bookings.filter(b => b.checkin.startsWith(reportYear + '-' + String(m + 1).padStart(2, '0'))).length;
+        monthData.push({ month: m, occupancy, bookingsInMonth, occupiedDays, totalSlots });
+    }
+
+    const avgOccupancy = monthData.length > 0 ? Math.round(monthData.reduce((s, d) => s + d.occupancy, 0) / 12) : 0;
+    const bestMonth = monthData.reduce((best, d) => d.occupancy > best.occupancy ? d : best, monthData[0]);
+    const worstMonth = monthData.reduce((worst, d) => d.occupancy < worst.occupancy ? d : worst, monthData[0]);
+    const totalBookings = monthData.reduce((s, d) => s + d.bookingsInMonth, 0);
+
+    let html = `
+        <div class="income-totals" style="margin-bottom:15px;">
+            <div class="income-total-card">
+                <div class="label">Ocupación media</div>
+                <div class="value">${avgOccupancy}%</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Mejor mes</div>
+                <div class="value green">${MONTH_NAMES_FULL[bestMonth.month]} (${bestMonth.occupancy}%)</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Peor mes</div>
+                <div class="value" style="color:#c0392b;">${MONTH_NAMES_FULL[worstMonth.month]} (${worstMonth.occupancy}%)</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Total reservas</div>
+                <div class="value">${totalBookings}</div>
+            </div>
+        </div>
+        <div class="chart-container">`;
+
+    monthData.forEach(d => {
+        const fillClass = d.occupancy >= 75 ? 'high' : d.occupancy >= 50 ? 'medium' : d.occupancy >= 25 ? 'low' : 'very-low';
+        const barLabel = d.occupancy >= 15 ? `${d.occupancy}%` : '';
+        html += `
+            <div class="chart-bar-row">
+                <span class="chart-label">${MONTH_NAMES[d.month]}</span>
+                <div class="chart-bar-bg">
+                    <div class="chart-bar-fill ${fillClass}" style="width:${Math.max(d.occupancy, 1)}%">${barLabel}</div>
+                </div>
+                <span class="chart-value">${d.occupancy}% · ${d.bookingsInMonth}r</span>
+            </div>`;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function renderIncomeReport(container) {
+    const monthData = [];
+    let yearActual = 0, yearExpected = 0;
+
+    for (let m = 0; m < 12; m++) {
+        const prefix = reportYear + '-' + String(m + 1).padStart(2, '0');
+
+        // Expected: sum of booking totals where checkin falls in this month
+        let expected = 0;
+        bookings.forEach(b => {
+            if (b.checkin.startsWith(prefix)) {
+                const nights = nightsBetween(b.checkin, b.checkout);
+                expected += nights * (b.pricePerNight || 0);
+            }
+        });
+
+        // Actual: payments with date in this month
+        let actual = 0;
+        bookings.forEach(b => {
+            (b.payments || []).forEach(p => {
+                if (p.date.startsWith(prefix)) {
+                    actual += p.amount;
+                }
+            });
+        });
+
+        yearActual += actual;
+        yearExpected += expected;
+        monthData.push({ month: m, expected, actual });
+    }
+
+    const yearPending = Math.max(0, yearExpected - yearActual);
+    const collectionRate = yearExpected > 0 ? Math.round((yearActual / yearExpected) * 100) : 0;
+
+    const maxVal = Math.max(...monthData.map(d => Math.max(d.expected, d.actual)), 1);
+
+    let html = `
+        <div class="income-totals" style="margin-bottom:15px;">
+            <div class="income-total-card">
+                <div class="label">Cobrado ${reportYear}</div>
+                <div class="value green">${yearActual.toFixed(2)} €</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Previsto ${reportYear}</div>
+                <div class="value">${yearExpected.toFixed(2)} €</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Pendiente</div>
+                <div class="value" style="color:#c0392b;">${yearPending.toFixed(2)} €</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Tasa de cobro</div>
+                <div class="value">${collectionRate}%</div>
+            </div>
+        </div>
+        <div class="ic-legend">
+            <div class="ic-legend-item"><div class="ic-legend-color" style="background:#d0d0d0;"></div> Previsto</div>
+            <div class="ic-legend-item"><div class="ic-legend-color" style="background:#7eb8c9;"></div> Cobrado</div>
+        </div>
+        <div class="chart-container">`;
+
+    monthData.forEach(d => {
+        const ew = maxVal > 0 ? Math.max((d.expected / maxVal) * 100, 0) : 0;
+        const aw = maxVal > 0 ? Math.max((d.actual / maxVal) * 100, 0) : 0;
+        html += `
+            <div class="income-compare-row">
+                <span class="ic-label">${MONTH_NAMES[d.month]}</span>
+                <div class="ic-bars">
+                    <div class="ic-bar expected" style="width:${Math.max(ew, 1)}%;"></div>
+                    <div class="ic-bar actual" style="width:${Math.max(aw, 1)}%;"></div>
+                </div>
+                <span class="ic-values">${d.actual.toFixed(0)} / ${d.expected.toFixed(0)} €</span>
+            </div>`;
+    });
+
+    html += '</div>';
+
+    // Monthly detail table
+    html += `<table class="rank-table" style="margin-top:15px;">
+        <thead><tr><th>Mes</th><th style="text-align:right;">Previsto</th><th style="text-align:right;">Cobrado</th><th style="text-align:right;">Diferencia</th></tr></thead><tbody>`;
+    let tExp = 0, tAct = 0;
+    monthData.forEach(d => {
+        const diff = d.actual - d.expected;
+        const diffColor = diff >= 0 ? '#2e7d32' : '#c0392b';
+        tExp += d.expected; tAct += d.actual;
+        html += `<tr>
+            <td>${MONTH_NAMES_FULL[d.month]}</td>
+            <td style="text-align:right;">${d.expected.toFixed(2)} €</td>
+            <td style="text-align:right;font-weight:700;color:#2e7d32;">${d.actual.toFixed(2)} €</td>
+            <td style="text-align:right;color:${diffColor};font-weight:600;">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} €</td>
+        </tr>`;
+    });
+    const tDiff = tAct - tExp;
+    html += `<tr class="total-row">
+        <td><strong>Total</strong></td>
+        <td style="text-align:right;">${tExp.toFixed(2)} €</td>
+        <td style="text-align:right;color:#2e7d32;">${tAct.toFixed(2)} €</td>
+        <td style="text-align:right;color:${tDiff >= 0 ? '#2e7d32' : '#c0392b'};">${tDiff >= 0 ? '+' : ''}${tDiff.toFixed(2)} €</td>
+    </tr></tbody></table>`;
+
+    container.innerHTML = html;
+}
+
+function renderRoomsReport(container) {
+    const roomStats = ROOMS.map(room => {
+        const roomBookings = bookings.filter(b => {
+            if (b.room !== room.number) return false;
+            return b.checkin.startsWith(String(reportYear));
+        });
+
+        let totalNights = 0;
+        let totalRevenue = 0;
+        roomBookings.forEach(b => {
+            const nights = nightsBetween(b.checkin, b.checkout);
+            totalNights += nights;
+            totalRevenue += nights * (b.pricePerNight || 0);
+        });
+
+        const daysInYear = ((reportYear % 4 === 0 && reportYear % 100 !== 0) || reportYear % 400 === 0) ? 366 : 365;
+        const occupancyRate = Math.round((totalNights / daysInYear) * 100);
+
+        return {
+            room,
+            bookingCount: roomBookings.length,
+            totalNights,
+            totalRevenue,
+            occupancyRate
+        };
+    });
+
+    // Sort by booking count descending
+    const sorted = [...roomStats].sort((a, b) => b.bookingCount - a.bookingCount);
+    const maxBookings = Math.max(...sorted.map(r => r.bookingCount), 1);
+    const maxRevenue = Math.max(...sorted.map(r => r.totalRevenue), 1);
+
+    // Top/bottom summary
+    const top3 = sorted.slice(0, 3).filter(r => r.bookingCount > 0);
+    const bottom3 = sorted.filter(r => r.bookingCount === 0).length > 0
+        ? sorted.filter(r => r.bookingCount === 0)
+        : sorted.slice(-3).reverse();
+
+    let html = `
+        <div class="income-totals" style="margin-bottom:15px;">
+            <div class="income-total-card">
+                <div class="label">Más demandada</div>
+                <div class="value green" style="font-size:0.95rem;">${top3.length > 0 ? top3[0].room.label.split(' - ')[0] : '-'}</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Menos demandada</div>
+                <div class="value" style="color:#c0392b;font-size:0.95rem;">${bottom3.length > 0 ? bottom3[0].room.label.split(' - ')[0] : '-'}</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Con reservas</div>
+                <div class="value">${sorted.filter(r => r.bookingCount > 0).length} / ${ROOMS.length}</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Ingresos totales</div>
+                <div class="value green">${sorted.reduce((s, r) => s + r.totalRevenue, 0).toFixed(0)} €</div>
+            </div>
+        </div>`;
+
+    // Ranking table
+    html += `<table class="rank-table">
+        <thead><tr>
+            <th>#</th><th>Habitación</th><th style="text-align:center;">Reservas</th>
+            <th style="text-align:center;">Noches</th><th>Demanda</th>
+            <th style="text-align:right;">Ingresos</th><th style="text-align:center;">Ocup.</th>
+        </tr></thead><tbody>`;
+
+    sorted.forEach((r, idx) => {
+        const barW = maxBookings > 0 ? Math.round((r.bookingCount / maxBookings) * 100) : 0;
+        const barClass = idx < 3 ? 'top' : (r.bookingCount === 0 ? 'bottom' : '');
+        const roomLabel = r.room.bedType === 'rural' ? 'Casa Rural' : r.room.label;
+        html += `<tr>
+            <td class="rank-num">${idx + 1}</td>
+            <td>${roomLabel}</td>
+            <td style="text-align:center;font-weight:700;">${r.bookingCount}</td>
+            <td style="text-align:center;">${r.totalNights}</td>
+            <td class="rank-bar-cell"><div class="rank-mini-bar ${barClass}" style="width:${Math.max(barW, 2)}%;"></div></td>
+            <td style="text-align:right;font-weight:600;color:#2e7d32;">${r.totalRevenue.toFixed(0)} €</td>
+            <td style="text-align:center;">${r.occupancyRate}%</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+
+    // Revenue ranking
+    const revenueSort = [...roomStats].sort((a, b) => b.totalRevenue - a.totalRevenue).filter(r => r.totalRevenue > 0);
+    if (revenueSort.length > 0) {
+        html += `<h4 style="margin-top:20px;margin-bottom:10px;font-size:0.9rem;color:#2c3e50;">Top habitaciones por ingresos</h4>
+            <div class="chart-container">`;
+        revenueSort.slice(0, 10).forEach(r => {
+            const w = maxRevenue > 0 ? Math.round((r.totalRevenue / maxRevenue) * 100) : 0;
+            const lbl = r.room.bedType === 'rural' ? 'CR1' : r.room.number;
+            html += `<div class="chart-bar-row">
+                <span class="chart-label">${lbl}</span>
+                <div class="chart-bar-bg">
+                    <div class="chart-bar-fill medium" style="width:${Math.max(w, 1)}%">${r.totalRevenue >= 100 ? r.totalRevenue.toFixed(0) + '€' : ''}</div>
+                </div>
+                <span class="chart-value">${r.totalRevenue.toFixed(0)} €</span>
+            </div>`;
+        });
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); }
 });
 
 // ==================== INIT ====================
