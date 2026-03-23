@@ -500,6 +500,64 @@
         .report-year-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .report-year-nav h4 { font-size: 0.95rem; color: #2c3e50; min-width: 50px; text-align: center; }
 
+        /* FAB button */
+        .fab-btn {
+            position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px;
+            border-radius: 50%; background: #a8d8a8; color: #2c4a2c; border: none;
+            font-size: 1.8rem; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            z-index: 90; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .fab-btn:hover { background: #8cc98c; transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+        /* Quick booking wizard */
+        .wizard-modal { width: 520px; }
+        .wizard-steps { display: flex; gap: 0; margin-bottom: 18px; }
+        .wizard-step {
+            flex: 1; text-align: center; padding: 8px 4px; font-size: 0.72rem; font-weight: 600;
+            border-bottom: 3px solid #ddd; color: #999; transition: all 0.2s;
+        }
+        .wizard-step.active { border-bottom-color: #7eb8c9; color: #2c3e50; }
+        .wizard-step.done { border-bottom-color: #a8d8a8; color: #5a9a5a; }
+        .wizard-panel { display: none; }
+        .wizard-panel.active { display: block; }
+        .wizard-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+        .wizard-results { max-height: 250px; overflow-y: auto; }
+        .wizard-room-card {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px;
+            margin-bottom: 6px; cursor: pointer; transition: all 0.2s;
+        }
+        .wizard-room-card:hover { border-color: #7eb8c9; background: #f0f8ff; }
+        .wizard-room-card.selected { border-color: #7eb8c9; background: #e0f0f8; box-shadow: 0 0 0 2px #7eb8c9; }
+        .wizard-room-card .wr-name { font-weight: 700; font-size: 0.88rem; color: #2c3e50; }
+        .wizard-room-card .wr-detail { font-size: 0.75rem; color: #666; }
+        .wizard-room-card .wr-price { font-weight: 700; color: #2e7d32; }
+        .wizard-no-results { text-align: center; color: #c0392b; padding: 20px; font-size: 0.88rem; font-weight: 600; }
+        .wizard-available { text-align: center; color: #2e7d32; padding: 6px; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
+
+        /* Invoice modal */
+        .invoice-modal { width: 650px; }
+        .invoice-preview {
+            background: white; border: 1px solid #ccc; padding: 30px; font-size: 0.82rem;
+            font-family: 'Inter', sans-serif; line-height: 1.6;
+        }
+        .invoice-preview .inv-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
+        .invoice-preview .inv-company { font-weight: 700; font-size: 0.95rem; color: #2c3e50; }
+        .invoice-preview .inv-details { font-size: 0.78rem; color: #666; }
+        .invoice-preview .inv-number { font-size: 1.1rem; font-weight: 700; color: #2c3e50; text-align: right; }
+        .invoice-preview table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .invoice-preview th { background: #f0f0f0; padding: 8px; text-align: left; font-size: 0.78rem; border-bottom: 1px solid #ccc; }
+        .invoice-preview td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.8rem; }
+        .invoice-preview .inv-total { text-align: right; font-weight: 700; font-size: 1rem; margin-top: 10px; }
+        .invoice-preview .inv-payment-method { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; margin-top: 10px; font-size: 0.78rem; }
+
+        /* Payment method badge */
+        .pm-badge {
+            display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: 600;
+        }
+        .pm-badge.cash { background: #e8f5e9; color: #2e7d32; }
+        .pm-badge.card { background: #e3f2fd; color: #1565c0; }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -821,7 +879,7 @@
                     <label style="font-size:0.75rem">Importe (€)</label>
                     <input type="number" id="paymentAmount" min="0" step="0.01" placeholder="0.00">
                 </div>
-                <div class="form-group" style="flex:1">
+                <div class="form-group" style="flex:0.9">
                     <label style="font-size:0.75rem">Tipo</label>
                     <select id="paymentType">
                         <option value="deposit">Seña/Anticipo</option>
@@ -829,7 +887,14 @@
                         <option value="full">Pago final</option>
                     </select>
                 </div>
-                <div class="form-group" style="flex:0.8">
+                <div class="form-group" style="flex:0.7">
+                    <label style="font-size:0.75rem">Método</label>
+                    <select id="paymentMethod">
+                        <option value="cash">Efectivo</option>
+                        <option value="card">Tarjeta</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:0.7">
                     <label style="font-size:0.75rem">Fecha</label>
                     <input type="date" id="paymentDate">
                 </div>
@@ -844,6 +909,7 @@
             <button class="btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
             <button class="btn-email" onclick="sendEmail()">Email</button>
             <button class="btn-copy-confirm" onclick="copyConfirmation()">Copiar texto</button>
+            <button class="btn-primary" onclick="generateInvoice()" style="font-size:0.8rem;">Factura</button>
         </div>
 
         <div class="form-actions">
@@ -1019,6 +1085,17 @@ const PAYMENT_TYPE_LABELS = {
     deposit: 'Seña/Anticipo',
     partial: 'Pago parcial',
     full: 'Pago final'
+};
+const PAYMENT_METHOD_LABELS = {
+    cash: 'Efectivo',
+    card: 'Tarjeta'
+};
+const BUSINESS_DATA = {
+    name: 'Antonio Toro Díaz',
+    nif: '05712696W',
+    address: 'Avenida Cristo Rey 81',
+    city: 'Villarrubia de los Ojos, Ciudad Real',
+    tradeName: 'Hostal Jijones'
 };
 
 // Casa Rural config
@@ -1239,7 +1316,7 @@ function renderGrid() {
         }
 
         const bedIcon = room.bedType === 'rural' ? '🏡' : (room.bedType === 'double' ? '🛏️' : '🛏️🛏️');
-        const bedLabel = room.bedType === 'rural' ? 'Casa completa · 16 pers.' : (room.bedType === 'double' ? 'Matrimonio' : 'Dos camas');
+        const bedLabel = room.bedType === 'rural' ? 'Casa completa (precio/noche)' : (room.bedType === 'double' ? 'Matrimonio' : 'Dos camas');
         const roomDisplay = room.bedType === 'rural' ? '🏡 Villarrubia' : `${room.number} ${bedIcon}`;
         html += `<tr><td class="room-header"><span class="room-number">${roomDisplay}</span><span class="room-type">${bedLabel}</span></td>`;
 
@@ -1649,6 +1726,7 @@ function setPaymentStatus(status) {
 function addPayment() {
     const amount = parseFloat(document.getElementById('paymentAmount').value);
     const type = document.getElementById('paymentType').value;
+    const method = document.getElementById('paymentMethod').value;
     const date = document.getElementById('paymentDate').value;
 
     if (!amount || amount <= 0) return alert('Introduce un importe válido.');
@@ -1656,7 +1734,7 @@ function addPayment() {
 
     currentPayments.push({
         id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        amount, type, date
+        amount, type, method, date
     });
 
     document.getElementById('paymentAmount').value = '';
@@ -1703,7 +1781,7 @@ function renderPayments() {
             <div class="payment-item">
                 <span>
                     <span class="payment-amount">+${p.amount.toFixed(2)} €</span>
-                    <span class="payment-type"> · ${PAYMENT_TYPE_LABELS[p.type]} · ${p.date}</span>
+                    <span class="payment-type"> · ${PAYMENT_TYPE_LABELS[p.type]} · <span class="pm-badge ${p.method || 'cash'}">${PAYMENT_METHOD_LABELS[p.method] || 'Efectivo'}</span> · ${p.date}</span>
                 </span>
                 <button class="btn-remove-payment" onclick="removePayment('${p.id}')" title="Eliminar pago">✕</button>
             </div>
@@ -2729,12 +2807,11 @@ function renderOccupancyReport(container) {
 
 function renderIncomeReport(container) {
     const monthData = [];
-    let yearActual = 0, yearExpected = 0;
+    let yearActual = 0, yearExpected = 0, yearCash = 0, yearCard = 0;
 
     for (let m = 0; m < 12; m++) {
         const prefix = reportYear + '-' + String(m + 1).padStart(2, '0');
 
-        // Expected: sum of booking totals where checkin falls in this month
         let expected = 0;
         bookings.forEach(b => {
             if (b.checkin.startsWith(prefix)) {
@@ -2743,19 +2820,20 @@ function renderIncomeReport(container) {
             }
         });
 
-        // Actual: payments with date in this month
-        let actual = 0;
+        let actual = 0, cash = 0, card = 0;
         bookings.forEach(b => {
             (b.payments || []).forEach(p => {
                 if (p.date.startsWith(prefix)) {
                     actual += p.amount;
+                    if (p.method === 'card') card += p.amount;
+                    else cash += p.amount;
                 }
             });
         });
 
-        yearActual += actual;
-        yearExpected += expected;
-        monthData.push({ month: m, expected, actual });
+        yearActual += actual; yearExpected += expected;
+        yearCash += cash; yearCard += card;
+        monthData.push({ month: m, expected, actual, cash, card });
     }
 
     const yearPending = Math.max(0, yearExpected - yearActual);
@@ -2782,6 +2860,16 @@ function renderIncomeReport(container) {
                 <div class="value">${collectionRate}%</div>
             </div>
         </div>
+        <div class="income-totals" style="margin-bottom:15px;">
+            <div class="income-total-card">
+                <div class="label">Efectivo</div>
+                <div class="value" style="font-size:1rem;">${yearCash.toFixed(2)} €</div>
+            </div>
+            <div class="income-total-card">
+                <div class="label">Tarjeta</div>
+                <div class="value" style="font-size:1rem;">${yearCard.toFixed(2)} €</div>
+            </div>
+        </div>
         <div class="ic-legend">
             <div class="ic-legend-item"><div class="ic-legend-color" style="background:#d0d0d0;"></div> Previsto</div>
             <div class="ic-legend-item"><div class="ic-legend-color" style="background:#7eb8c9;"></div> Cobrado</div>
@@ -2806,16 +2894,18 @@ function renderIncomeReport(container) {
 
     // Monthly detail table
     html += `<table class="rank-table" style="margin-top:15px;">
-        <thead><tr><th>Mes</th><th style="text-align:right;">Previsto</th><th style="text-align:right;">Cobrado</th><th style="text-align:right;">Diferencia</th></tr></thead><tbody>`;
-    let tExp = 0, tAct = 0;
+        <thead><tr><th>Mes</th><th style="text-align:right;">Previsto</th><th style="text-align:right;">Efectivo</th><th style="text-align:right;">Tarjeta</th><th style="text-align:right;">Total</th><th style="text-align:right;">Dif.</th></tr></thead><tbody>`;
+    let tExp = 0, tAct = 0, tCash = 0, tCard = 0;
     monthData.forEach(d => {
         const diff = d.actual - d.expected;
         const diffColor = diff >= 0 ? '#2e7d32' : '#c0392b';
-        tExp += d.expected; tAct += d.actual;
+        tExp += d.expected; tAct += d.actual; tCash += d.cash; tCard += d.card;
         html += `<tr>
             <td>${MONTH_NAMES_FULL[d.month]}</td>
             <td style="text-align:right;">${d.expected.toFixed(2)} €</td>
-            <td style="text-align:right;font-weight:700;color:#2e7d32;">${d.actual.toFixed(2)} €</td>
+            <td style="text-align:right;color:#2e7d32;">${d.cash.toFixed(2)} €</td>
+            <td style="text-align:right;color:#1565c0;">${d.card.toFixed(2)} €</td>
+            <td style="text-align:right;font-weight:700;">${d.actual.toFixed(2)} €</td>
             <td style="text-align:right;color:${diffColor};font-weight:600;">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} €</td>
         </tr>`;
     });
@@ -2823,7 +2913,9 @@ function renderIncomeReport(container) {
     html += `<tr class="total-row">
         <td><strong>Total</strong></td>
         <td style="text-align:right;">${tExp.toFixed(2)} €</td>
-        <td style="text-align:right;color:#2e7d32;">${tAct.toFixed(2)} €</td>
+        <td style="text-align:right;color:#2e7d32;">${tCash.toFixed(2)} €</td>
+        <td style="text-align:right;color:#1565c0;">${tCard.toFixed(2)} €</td>
+        <td style="text-align:right;">${tAct.toFixed(2)} €</td>
         <td style="text-align:right;color:${tDiff >= 0 ? '#2e7d32' : '#c0392b'};">${tDiff >= 0 ? '+' : ''}${tDiff.toFixed(2)} €</td>
     </tr></tbody></table>`;
 
@@ -2935,10 +3027,272 @@ function renderRoomsReport(container) {
     container.innerHTML = html;
 }
 
+// ==================== QUICK BOOKING WIZARD ====================
+
+let wizardSelectedRoom = null;
+
+function openWizard() {
+    document.getElementById('wizCheckin').value = todayStr();
+    document.getElementById('wizCheckout').value = dateStr(addDays(new Date(), 1));
+    document.getElementById('wizGuests').value = '2';
+    document.getElementById('wizType').value = 'any';
+    wizardSelectedRoom = null;
+    wizardGoTo(1);
+    document.getElementById('wizardModal').classList.add('active');
+}
+
+function closeWizard() {
+    document.getElementById('wizardModal').classList.remove('active');
+}
+
+function wizardGoTo(step) {
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById('wp' + i).classList.toggle('active', i === step);
+        const ws = document.getElementById('ws' + i);
+        ws.classList.toggle('active', i === step);
+        ws.classList.toggle('done', i < step);
+    }
+}
+
+function wizardNext(from) {
+    if (from === 1) {
+        const ci = document.getElementById('wizCheckin').value;
+        const co = document.getElementById('wizCheckout').value;
+        if (!ci || !co) return alert('Selecciona las fechas.');
+        if (co <= ci) return alert('La salida debe ser posterior a la entrada.');
+        wizardGoTo(2);
+    } else if (from === 2) {
+        wizardGoTo(3);
+    }
+}
+
+function wizardBack(to) {
+    wizardGoTo(to - 1);
+}
+
+function wizardSearch() {
+    const checkin = document.getElementById('wizCheckin').value;
+    const checkout = document.getElementById('wizCheckout').value;
+    const guests = parseInt(document.getElementById('wizGuests').value) || 2;
+    const type = document.getElementById('wizType').value;
+    const nights = nightsBetween(checkin, checkout);
+
+    const results = [];
+    ROOMS.forEach(room => {
+        if (type !== 'any' && room.bedType !== type) return;
+        // Casa rural: guests doesn't matter
+        if (room.bedType !== 'rural') {
+            const cap = room.bedType === 'double' ? 2 : 2;
+            if (guests > cap && guests <= 4) return; // filter only for hostal rooms
+        }
+        if (!isRoomAvailable(room.number, checkin, checkout)) return;
+        const nightPrice = room.bedType === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+        results.push({ room, nightPrice, total: nights * nightPrice });
+    });
+
+    wizardSelectedRoom = null;
+    document.getElementById('wizBookBtn').style.display = 'none';
+    const container = document.getElementById('wizardResults');
+
+    if (results.length === 0) {
+        container.innerHTML = '<div class="wizard-no-results">No hay disponibilidad para esas fechas y criterios.</div>';
+    } else {
+        container.innerHTML = `<div class="wizard-available">${results.length} opciones disponibles · ${nights} noche${nights > 1 ? 's' : ''}</div>
+        <div class="wizard-results">${results.map(r => {
+            const id = String(r.room.number);
+            const label = r.room.bedType === 'rural' ? 'Casa Rural Villarrubia (casa completa)' : r.room.label;
+            return `<div class="wizard-room-card" id="wrc_${id}" onclick="wizardSelect('${id}', ${r.nightPrice})">
+                <div>
+                    <div class="wr-name">${label}</div>
+                    <div class="wr-detail">${r.nightPrice.toFixed(0)} €/noche · ${nights} noches</div>
+                </div>
+                <div class="wr-price">${r.total.toFixed(2)} €</div>
+            </div>`;
+        }).join('')}</div>`;
+    }
+    wizardGoTo(4);
+}
+
+function wizardSelect(roomId, price) {
+    wizardSelectedRoom = { roomId, price };
+    document.querySelectorAll('.wizard-room-card').forEach(c => c.classList.remove('selected'));
+    const el = document.getElementById('wrc_' + roomId);
+    if (el) el.classList.add('selected');
+    document.getElementById('wizBookBtn').style.display = 'inline-block';
+}
+
+function wizardBook() {
+    if (!wizardSelectedRoom) return;
+    const checkin = document.getElementById('wizCheckin').value;
+    const checkout = document.getElementById('wizCheckout').value;
+    const room = wizardSelectedRoom.roomId;
+    const price = wizardSelectedRoom.price;
+    closeWizard();
+
+    // Open the full booking form pre-filled
+    document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('bookingId').value = '';
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestPhone').value = '';
+    document.getElementById('guestEmail').value = '';
+    document.getElementById('docType').value = 'dni';
+    document.getElementById('docNumber').value = '';
+    document.getElementById('guestNationality').value = '';
+    document.getElementById('guestCount').value = document.getElementById('wizGuests').value;
+    document.getElementById('bookingStatus').value = 'confirmed';
+    document.getElementById('pricePerNight').value = price;
+    document.getElementById('bookingNotes').value = '';
+    document.getElementById('deleteBtn').style.display = 'none';
+    document.getElementById('confirmActions').style.display = 'none';
+    document.getElementById('priceTotal').textContent = '';
+    document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
+    document.getElementById('depositStatus').value = 'pending';
+    document.getElementById('depositReturned').value = '0';
+    document.getElementById('depositReturnGroup').style.display = 'none';
+    currentChecklist = { checkin: [], checkout: [] };
+    hideAutocomplete();
+
+    document.getElementById('bookingRoom').value = room;
+    document.getElementById('bookingCheckin').value = checkin;
+    document.getElementById('bookingCheckout').value = checkout;
+
+    const selectedRoom = ROOMS.find(r => String(r.number) === String(room));
+    updateRuralSection(selectedRoom);
+
+    currentPayments = [];
+    document.getElementById('paymentStatus').value = 'pending_payment';
+    document.getElementById('paymentDate').value = todayStr();
+    setPaymentStatus('pending_payment');
+    renderPayments();
+    calculatePrice();
+    document.getElementById('bookingModal').classList.add('active');
+    document.getElementById('guestName').focus();
+}
+
+// ==================== INVOICE GENERATION ====================
+
+function generateInvoice() {
+    const id = document.getElementById('bookingId').value;
+    const b = id ? bookings.find(x => x.id === id) : null;
+    if (!b) return alert('Guarda la reserva primero para generar la factura.');
+
+    const nights = nightsBetween(b.checkin, b.checkout);
+    const total = nights * b.pricePerNight;
+    const room = ROOMS.find(r => r.number === b.room);
+    const roomLabel = room ? room.label : b.room;
+    const isRural = room && room.bedType === 'rural';
+    const invoiceNum = 'F-' + b.checkin.replace(/-/g, '') + '-' + String(b.room).replace(/[^a-zA-Z0-9]/g, '');
+    const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
+    const cashTotal = (b.payments || []).filter(p => p.method !== 'card').reduce((s, p) => s + p.amount, 0);
+    const cardTotal = (b.payments || []).filter(p => p.method === 'card').reduce((s, p) => s + p.amount, 0);
+
+    let paymentsHtml = '';
+    if ((b.payments || []).length > 0) {
+        paymentsHtml = '<h4 style="margin-top:15px;font-size:0.8rem;">Detalle de pagos</h4><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Método</th><th style="text-align:right;">Importe</th></tr></thead><tbody>';
+        (b.payments || []).forEach(p => {
+            paymentsHtml += `<tr>
+                <td>${p.date}</td>
+                <td>${PAYMENT_TYPE_LABELS[p.type] || p.type}</td>
+                <td>${PAYMENT_METHOD_LABELS[p.method] || 'Efectivo'}</td>
+                <td style="text-align:right;">${p.amount.toFixed(2)} €</td>
+            </tr>`;
+        });
+        paymentsHtml += '</tbody></table>';
+        paymentsHtml += `<div class="inv-payment-method">
+            <strong>Resumen:</strong> Efectivo: ${cashTotal.toFixed(2)} € · Tarjeta: ${cardTotal.toFixed(2)} € · Total pagado: ${totalPaid.toFixed(2)} €
+        </div>`;
+    }
+
+    const depositHtml = isRural && b.ruralDeposit ? `
+        <tr><td>Fianza / Depósito seguridad</td><td style="text-align:center;">1</td><td style="text-align:right;">${b.ruralDeposit.toFixed(2)} €</td><td style="text-align:right;">${b.ruralDeposit.toFixed(2)} €</td></tr>
+    ` : '';
+    const depositNote = isRural && b.ruralDeposit ? `<p style="font-size:0.75rem;color:#666;margin-top:5px;">* La fianza no se incluye en el total. Estado: ${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'}</p>` : '';
+
+    document.getElementById('invoicePreview').innerHTML = `
+        <div class="invoice-preview" id="invoicePrintArea">
+            <div class="inv-header">
+                <div>
+                    <div class="inv-company">${BUSINESS_DATA.tradeName}</div>
+                    <div class="inv-details">
+                        ${BUSINESS_DATA.name}<br>
+                        NIF: ${BUSINESS_DATA.nif}<br>
+                        ${BUSINESS_DATA.address}<br>
+                        ${BUSINESS_DATA.city}
+                    </div>
+                </div>
+                <div>
+                    <div class="inv-number">FACTURA</div>
+                    <div class="inv-details" style="text-align:right;">
+                        N.º: ${invoiceNum}<br>
+                        Fecha: ${todayStr()}<br>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <strong>Cliente:</strong> ${b.guestName}<br>
+                ${b.docNumber ? `${(b.docType || 'DNI').toUpperCase()}: ${b.docNumber}<br>` : ''}
+                ${b.phone ? `Tel: ${b.phone}<br>` : ''}
+                ${b.email ? `Email: ${b.email}` : ''}
+            </div>
+
+            <table>
+                <thead><tr><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Precio ud.</th><th style="text-align:right;">Importe</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>${isRural ? 'Alquiler Casa Rural Villarrubia (casa completa)' : 'Alojamiento ' + roomLabel}<br>
+                        <span style="font-size:0.72rem;color:#666;">${b.checkin} → ${b.checkout}</span></td>
+                        <td style="text-align:center;">${nights} noche${nights > 1 ? 's' : ''}</td>
+                        <td style="text-align:right;">${b.pricePerNight.toFixed(2)} €</td>
+                        <td style="text-align:right;">${total.toFixed(2)} €</td>
+                    </tr>
+                    ${depositHtml}
+                </tbody>
+            </table>
+            ${depositNote}
+
+            <div class="inv-total">TOTAL: ${total.toFixed(2)} €</div>
+
+            ${paymentsHtml}
+
+            <div style="margin-top:20px;font-size:0.72rem;color:#999;border-top:1px solid #eee;padding-top:10px;">
+                ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
+            </div>
+        </div>`;
+
+    document.getElementById('invoiceModal').classList.add('active');
+}
+
+function closeInvoiceModal() {
+    document.getElementById('invoiceModal').classList.remove('active');
+}
+
+function printInvoice() {
+    const content = document.getElementById('invoicePrintArea').innerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>Factura</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px; color: #333; }
+            .inv-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
+            .inv-company { font-weight: 700; font-size: 1.1rem; color: #2c3e50; }
+            .inv-details { font-size: 0.85rem; color: #666; }
+            .inv-number { font-size: 1.2rem; font-weight: 700; color: #2c3e50; text-align: right; }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            th { background: #f0f0f0; padding: 8px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid #ccc; }
+            td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.88rem; }
+            .inv-total { text-align: right; font-weight: 700; font-size: 1.1rem; margin-top: 10px; }
+            .inv-payment-method { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; margin-top: 10px; font-size: 0.85rem; }
+            @media print { body { padding: 0; } }
+        </style></head><body>${content}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 300);
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); }
 });
 
 // ==================== INIT ====================
@@ -2962,6 +3316,96 @@ function init() {
 
 init();
 </script>
+
+<!-- FAB Button -->
+<button class="fab-btn" onclick="openWizard()" title="Nueva reserva rápida">+</button>
+
+<!-- Modal Reserva Rápida (Wizard) -->
+<div class="modal-overlay" id="wizardModal">
+    <div class="modal wizard-modal">
+        <h2>Nueva Reserva</h2>
+        <div class="wizard-steps">
+            <div class="wizard-step active" id="ws1">1. Fechas</div>
+            <div class="wizard-step" id="ws2">2. Huéspedes</div>
+            <div class="wizard-step" id="ws3">3. Tipo</div>
+            <div class="wizard-step" id="ws4">4. Disponibilidad</div>
+        </div>
+
+        <div class="wizard-panel active" id="wp1">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha de entrada *</label>
+                    <input type="date" id="wizCheckin">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de salida *</label>
+                    <input type="date" id="wizCheckout">
+                </div>
+            </div>
+            <div class="wizard-nav">
+                <span></span>
+                <button class="btn-primary" onclick="wizardNext(1)">Siguiente</button>
+            </div>
+        </div>
+
+        <div class="wizard-panel" id="wp2">
+            <div class="form-group">
+                <label>Numero de huéspedes</label>
+                <select id="wizGuests" style="width:200px;">
+                    <option value="1">1 persona</option>
+                    <option value="2" selected>2 personas</option>
+                    <option value="3">3 personas</option>
+                    <option value="4">4 personas</option>
+                    <option value="5">5+</option>
+                </select>
+            </div>
+            <div class="wizard-nav">
+                <button class="btn-secondary" onclick="wizardBack(2)">Atrás</button>
+                <button class="btn-primary" onclick="wizardNext(2)">Siguiente</button>
+            </div>
+        </div>
+
+        <div class="wizard-panel" id="wp3">
+            <div class="form-group">
+                <label>Tipo de alojamiento</label>
+                <select id="wizType" style="width:250px;">
+                    <option value="any">Cualquiera</option>
+                    <option value="double">Cama de matrimonio</option>
+                    <option value="twin">Dos camas</option>
+                    <option value="rural">Casa Rural completa</option>
+                </select>
+            </div>
+            <div class="wizard-nav">
+                <button class="btn-secondary" onclick="wizardBack(3)">Atrás</button>
+                <button class="btn-success" onclick="wizardSearch()">Ver disponibilidad</button>
+            </div>
+        </div>
+
+        <div class="wizard-panel" id="wp4">
+            <div id="wizardResults"></div>
+            <div class="wizard-nav">
+                <button class="btn-secondary" onclick="wizardBack(4)">Cambiar criterios</button>
+                <button class="btn-success" id="wizBookBtn" onclick="wizardBook()" style="display:none;">Reservar</button>
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top:10px;">
+            <button class="btn-secondary" onclick="closeWizard()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Factura -->
+<div class="modal-overlay" id="invoiceModal">
+    <div class="modal invoice-modal">
+        <h2>Factura</h2>
+        <div id="invoicePreview"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-primary" onclick="printInvoice()" style="margin-right:auto;">Imprimir / PDF</button>
+            <button class="btn-secondary" onclick="closeInvoiceModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
