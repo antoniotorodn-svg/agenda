@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostal Gijones - Sistema de Reservas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+
+        header {
+            background: linear-gradient(135deg, #1a5276, #2e86c1);
+            color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        header h1 { font-size: 1.5rem; }
+        header .subtitle { font-size: 0.85rem; opacity: 0.8; }
+
+        .toolbar {
+            background: white; padding: 12px 30px;
+            display: flex; align-items: center; gap: 15px;
+            border-bottom: 1px solid #ddd; flex-wrap: wrap;
+        }
+        .toolbar label { font-weight: 600; font-size: 0.85rem; }
+        .toolbar input[type="date"] {
+            padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem;
+        }
+        .toolbar button {
+            padding: 7px 16px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-primary { background: #2e86c1; color: white; }
+        .btn-primary:hover { background: #1a5276; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #1e8449; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-outline { background: transparent; border: 2px solid #2e86c1; color: #2e86c1; }
+        .btn-outline:hover { background: #2e86c1; color: white; }
+
+        .nav-arrows { display: flex; gap: 5px; }
+        .nav-arrows button { padding: 7px 12px; font-size: 1rem; }
+
+        .legend {
+            display: flex; gap: 15px; margin-left: auto; font-size: 0.8rem; align-items: center;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color {
+            width: 16px; height: 16px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15);
+        }
+
+        .grid-container {
+            overflow-x: auto; padding: 20px 30px; position: relative;
+        }
+
+        table.booking-grid {
+            border-collapse: collapse; width: auto; min-width: 100%;
+            background: white; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        table.booking-grid th, table.booking-grid td {
+            border: 1px solid #e0e0e0; text-align: center; font-size: 0.75rem;
+        }
+        table.booking-grid thead th {
+            background: #2c3e50; color: white; padding: 8px 4px;
+            position: sticky; top: 0; z-index: 10; min-width: 38px;
+        }
+        table.booking-grid thead th.corner {
+            position: sticky; left: 0; z-index: 20; min-width: 110px;
+            background: #1a252f;
+        }
+        table.booking-grid thead th.weekend { background: #4a2c2c; }
+        table.booking-grid thead th.today-header { background: #1a6e1a; }
+
+        .room-header {
+            position: sticky; left: 0; z-index: 5;
+            background: #f8f9fa; font-weight: 700; padding: 6px 10px;
+            white-space: nowrap; text-align: left !important; min-width: 110px;
+        }
+        .room-header .room-number { font-size: 0.85rem; color: #2c3e50; }
+        .room-header .room-type { font-size: 0.65rem; color: #888; display: block; }
+
+        .floor-separator td, .floor-separator th {
+            background: #34495e !important; color: white; font-weight: 700;
+            padding: 5px 10px; font-size: 0.8rem; text-align: left !important;
+        }
+
+        td.day-cell {
+            padding: 0; height: 36px; min-width: 38px; cursor: pointer;
+            position: relative; transition: background 0.15s;
+        }
+        td.day-cell:hover { background: #e8f4fd; }
+        td.day-cell.weekend { background: #fef9f0; }
+        td.day-cell.today { box-shadow: inset 0 0 0 2px #27ae60; }
+
+        td.day-cell.booked {
+            cursor: pointer; padding: 0;
+        }
+        .booking-block {
+            height: 100%; width: 100%; display: flex; align-items: center;
+            justify-content: center; font-size: 0.65rem; font-weight: 600;
+            color: white; text-overflow: ellipsis; overflow: hidden;
+            white-space: nowrap; padding: 0 2px;
+        }
+        .booking-start { border-radius: 4px 0 0 4px; }
+        .booking-end { border-radius: 0 4px 4px 0; }
+        .booking-single { border-radius: 4px; }
+
+        .status-confirmed { background: #2e86c1; }
+        .status-pending { background: #f39c12; }
+        .status-checkedin { background: #27ae60; }
+        .status-checkedout { background: #95a5a6; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; border-radius: 12px; padding: 30px;
+            width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .form-group textarea { height: 60px; resize: vertical; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .price-display { font-size: 1.1rem; font-weight: 700; color: #27ae60; margin-top: 5px; }
+
+        .stats-bar {
+            background: white; padding: 10px 30px; border-top: 1px solid #ddd;
+            display: flex; gap: 30px; font-size: 0.8rem; color: #666;
+        }
+        .stat { display: flex; align-items: center; gap: 5px; }
+        .stat strong { color: #2c3e50; }
+
+        /* Tooltip */
+        .tooltip {
+            display: none; position: absolute; background: #2c3e50; color: white;
+            padding: 8px 12px; border-radius: 6px; font-size: 0.75rem;
+            z-index: 50; pointer-events: none; white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .tooltip.active { display: block; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 10px 15px; }
+            .toolbar { padding: 10px 15px; }
+            .grid-container { padding: 10px 15px; }
+            .legend { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Hostal Gijones</h1>
+        <div class="subtitle">Sistema de Gestión de Reservas</div>
+    </div>
+    <div style="text-align: right; font-size: 0.85rem;">
+        <div id="currentDateDisplay"></div>
+        <div style="opacity:0.7; font-size:0.75rem;">30 habitaciones · 2 plantas</div>
+    </div>
+</header>
+
+<div class="toolbar">
+    <div class="nav-arrows">
+        <button class="btn-outline" onclick="navigateWeeks(-2)" title="2 semanas atrás">«</button>
+        <button class="btn-outline" onclick="navigateWeeks(-1)" title="1 semana atrás">‹</button>
+        <button class="btn-primary" onclick="goToToday()">Hoy</button>
+        <button class="btn-outline" onclick="navigateWeeks(1)" title="1 semana adelante">›</button>
+        <button class="btn-outline" onclick="navigateWeeks(2)" title="2 semanas adelante">»</button>
+    </div>
+
+    <label>Desde:</label>
+    <input type="date" id="startDate" onchange="renderGrid()">
+
+    <label>Días:</label>
+    <select id="daysToShow" onchange="renderGrid()">
+        <option value="14">14 días</option>
+        <option value="21">21 días</option>
+        <option value="30" selected>30 días</option>
+        <option value="45">45 días</option>
+        <option value="60">60 días</option>
+    </select>
+
+    <button class="btn-success" onclick="openNewBooking()">+ Nueva Reserva</button>
+    <button class="btn-secondary" onclick="exportData()">Exportar</button>
+    <button class="btn-secondary" onclick="importData()">Importar</button>
+    <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color status-confirmed"></div> Confirmada</div>
+        <div class="legend-item"><div class="legend-color status-pending"></div> Pendiente</div>
+        <div class="legend-item"><div class="legend-color status-checkedin"></div> Check-in</div>
+        <div class="legend-item"><div class="legend-color status-checkedout"></div> Check-out</div>
+    </div>
+</div>
+
+<div class="grid-container">
+    <table class="booking-grid" id="bookingGrid"></table>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- Modal Nueva/Editar Reserva -->
+<div class="modal-overlay" id="bookingModal">
+    <div class="modal">
+        <h2 id="modalTitle">Nueva Reserva</h2>
+        <input type="hidden" id="bookingId">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nombre del huésped *</label>
+                <input type="text" id="guestName" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="tel" id="guestPhone" placeholder="+34 600 000 000">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="guestEmail" placeholder="email@ejemplo.com">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Habitación *</label>
+                <select id="bookingRoom"></select>
+            </div>
+            <div class="form-group">
+                <label>Huéspedes</label>
+                <select id="guestCount">
+                    <option value="1">1 persona</option>
+                    <option value="2" selected>2 personas</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Check-in *</label>
+                <input type="date" id="bookingCheckin" onchange="calculatePrice()">
+            </div>
+            <div class="form-group">
+                <label>Check-out *</label>
+                <input type="date" id="bookingCheckout" onchange="calculatePrice()">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="bookingStatus">
+                    <option value="pending">Pendiente</option>
+                    <option value="confirmed">Confirmada</option>
+                    <option value="checkedin">Check-in realizado</option>
+                    <option value="checkedout">Check-out realizado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Precio/noche (€)</label>
+                <input type="number" id="pricePerNight" value="55" min="0" step="0.5" onchange="calculatePrice()">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Notas</label>
+            <textarea id="bookingNotes" placeholder="Observaciones, peticiones especiales..."></textarea>
+        </div>
+        <div id="priceTotal" class="price-display"></div>
+        <div class="form-actions">
+            <button class="btn-danger" id="deleteBtn" onclick="deleteBooking()" style="display:none; margin-right:auto;">Eliminar</button>
+            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn-success" onclick="saveBooking()">Guardar Reserva</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== DATA MODEL ====================
+
+const ROOMS = [
+    // Planta 1: 101-115
+    { number: 101, floor: 1, bedType: 'double', label: '101 - Matrimonio' },
+    { number: 102, floor: 1, bedType: 'twin', label: '102 - Dos camas' },
+    { number: 103, floor: 1, bedType: 'double', label: '103 - Matrimonio' },
+    { number: 104, floor: 1, bedType: 'twin', label: '104 - Dos camas' },
+    { number: 105, floor: 1, bedType: 'double', label: '105 - Matrimonio' },
+    { number: 106, floor: 1, bedType: 'twin', label: '106 - Dos camas' },
+    { number: 107, floor: 1, bedType: 'double', label: '107 - Matrimonio' },
+    { number: 108, floor: 1, bedType: 'twin', label: '108 - Dos camas' },
+    { number: 109, floor: 1, bedType: 'double', label: '109 - Matrimonio' },
+    { number: 110, floor: 1, bedType: 'twin', label: '110 - Dos camas' },
+    { number: 111, floor: 1, bedType: 'double', label: '111 - Matrimonio' },
+    { number: 112, floor: 1, bedType: 'twin', label: '112 - Dos camas' },
+    { number: 113, floor: 1, bedType: 'double', label: '113 - Matrimonio' },
+    { number: 114, floor: 1, bedType: 'twin', label: '114 - Dos camas' },
+    { number: 115, floor: 1, bedType: 'double', label: '115 - Matrimonio' },
+    // Planta 2: 201-216
+    { number: 201, floor: 2, bedType: 'double', label: '201 - Matrimonio' },
+    { number: 202, floor: 2, bedType: 'twin', label: '202 - Dos camas' },
+    { number: 203, floor: 2, bedType: 'double', label: '203 - Matrimonio' },
+    { number: 204, floor: 2, bedType: 'twin', label: '204 - Dos camas' },
+    { number: 205, floor: 2, bedType: 'double', label: '205 - Matrimonio' },
+    { number: 206, floor: 2, bedType: 'twin', label: '206 - Dos camas' },
+    { number: 207, floor: 2, bedType: 'double', label: '207 - Matrimonio' },
+    { number: 208, floor: 2, bedType: 'twin', label: '208 - Dos camas' },
+    { number: 209, floor: 2, bedType: 'double', label: '209 - Matrimonio' },
+    { number: 210, floor: 2, bedType: 'twin', label: '210 - Dos camas' },
+    { number: 211, floor: 2, bedType: 'double', label: '211 - Matrimonio' },
+    { number: 212, floor: 2, bedType: 'twin', label: '212 - Dos camas' },
+    { number: 213, floor: 2, bedType: 'double', label: '213 - Matrimonio' },
+    { number: 214, floor: 2, bedType: 'twin', label: '214 - Dos camas' },
+    { number: 215, floor: 2, bedType: 'double', label: '215 - Matrimonio' },
+    { number: 216, floor: 2, bedType: 'twin', label: '216 - Dos camas' },
+];
+
+const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const STATUS_LABELS = {
+    pending: 'Pendiente', confirmed: 'Confirmada',
+    checkedin: 'Check-in', checkedout: 'Check-out'
+};
+
+let bookings = [];
+
+// ==================== PERSISTENCE ====================
+
+function loadBookings() {
+    try {
+        bookings = JSON.parse(localStorage.getItem('hostal_gijones_bookings') || '[]');
+    } catch { bookings = []; }
+}
+
+function saveBookings() {
+    localStorage.setItem('hostal_gijones_bookings', JSON.stringify(bookings));
+}
+
+// ==================== DATE HELPERS ====================
+
+function dateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function parseDate(s) {
+    const [y,m,d] = s.split('-').map(Number);
+    return new Date(y, m-1, d);
+}
+
+function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+}
+
+function nightsBetween(d1, d2) {
+    return Math.round((parseDate(d2) - parseDate(d1)) / 86400000);
+}
+
+function isWeekend(d) { return d.getDay() === 0 || d.getDay() === 6; }
+
+function todayStr() { return dateStr(new Date()); }
+
+// ==================== BOOKING LOGIC ====================
+
+function generateId() {
+    return 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+}
+
+function getBookingsForRoomAndDate(roomNumber, date) {
+    return bookings.filter(b =>
+        b.room === roomNumber && date >= b.checkin && date < b.checkout
+    );
+}
+
+function hasConflict(roomNumber, checkin, checkout, excludeId) {
+    return bookings.some(b =>
+        b.room === roomNumber &&
+        b.id !== excludeId &&
+        b.checkin < checkout &&
+        b.checkout > checkin
+    );
+}
+
+// ==================== GRID RENDERING ====================
+
+function renderGrid() {
+    const startInput = document.getElementById('startDate').value;
+    const startDate = startInput ? parseDate(startInput) : new Date();
+    const days = parseInt(document.getElementById('daysToShow').value);
+    const today = todayStr();
+
+    const table = document.getElementById('bookingGrid');
+    let html = '<thead><tr><th class="corner">Habitación</th>';
+
+    // Date headers
+    const dates = [];
+    for (let i = 0; i < days; i++) {
+        const d = addDays(startDate, i);
+        const ds = dateStr(d);
+        dates.push(ds);
+        const we = isWeekend(d) ? ' weekend' : '';
+        const tod = ds === today ? ' today-header' : '';
+        const monthLabel = d.getDate() === 1 || i === 0 ? `<div style="font-size:0.6rem;opacity:0.7">${MONTH_NAMES[d.getMonth()]}</div>` : '';
+        html += `<th class="${we}${tod}">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    let currentFloor = 0;
+
+    ROOMS.forEach(room => {
+        // Floor separator
+        if (room.floor !== currentFloor) {
+            currentFloor = room.floor;
+            html += `<tr class="floor-separator"><td colspan="${days + 1}">Planta ${currentFloor} ${currentFloor === 1 ? '(Habitaciones 101-115)' : '(Habitaciones 201-216)'}</td></tr>`;
+        }
+
+        const bedIcon = room.bedType === 'double' ? '🛏️' : '🛏️🛏️';
+        const bedLabel = room.bedType === 'double' ? 'Matrimonio' : 'Dos camas';
+        html += `<tr><td class="room-header"><span class="room-number">${room.number} ${bedIcon}</span><span class="room-type">${bedLabel}</span></td>`;
+
+        dates.forEach(ds => {
+            const matches = getBookingsForRoomAndDate(room.number, ds);
+            const we = isWeekend(parseDate(ds)) ? ' weekend' : '';
+            const tod = ds === today ? ' today' : '';
+
+            if (matches.length > 0) {
+                const b = matches[0];
+                const isStart = ds === b.checkin;
+                const endDate = dateStr(addDays(parseDate(b.checkout), -1));
+                const isEnd = ds === endDate;
+                const isSingle = isStart && isEnd;
+                let posClass = '';
+                if (isSingle) posClass = 'booking-single';
+                else if (isStart) posClass = 'booking-start';
+                else if (isEnd) posClass = 'booking-end';
+
+                const label = isStart ? b.guestName.split(' ')[0] : '';
+                html += `<td class="day-cell booked${we}${tod}" data-booking-id="${b.id}"
+                    onmouseenter="showTooltip(event,'${b.id}')" onmouseleave="hideTooltip()"
+                    onclick="editBooking('${b.id}')">
+                    <div class="booking-block status-${b.status} ${posClass}">${label}</div></td>`;
+            } else {
+                html += `<td class="day-cell${we}${tod}" onclick="openNewBooking(${room.number},'${ds}')"></td>`;
+            }
+        });
+
+        html += '</tr>';
+    });
+
+    html += '</tbody>';
+    table.innerHTML = html;
+
+    updateStats();
+}
+
+// ==================== STATS ====================
+
+function updateStats() {
+    const today = todayStr();
+    const occupied = ROOMS.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
+    const total = ROOMS.length;
+    const free = total - occupied;
+    const occupancy = Math.round((occupied / total) * 100);
+
+    const todayCheckins = bookings.filter(b => b.checkin === today).length;
+    const todayCheckouts = bookings.filter(b => b.checkout === today).length;
+    const pending = bookings.filter(b => b.status === 'pending' && b.checkout > today).length;
+
+    document.getElementById('statsBar').innerHTML = `
+        <div class="stat">Ocupación hoy: <strong>${occupied}/${total} (${occupancy}%)</strong></div>
+        <div class="stat">Libres: <strong>${free}</strong></div>
+        <div class="stat">Check-ins hoy: <strong>${todayCheckins}</strong></div>
+        <div class="stat">Check-outs hoy: <strong>${todayCheckouts}</strong></div>
+        <div class="stat">Pendientes: <strong>${pending}</strong></div>
+        <div class="stat">Total reservas: <strong>${bookings.length}</strong></div>
+    `;
+}
+
+// ==================== TOOLTIP ====================
+
+function showTooltip(event, bookingId) {
+    const b = bookings.find(x => x.id === bookingId);
+    if (!b) return;
+    const nights = nightsBetween(b.checkin, b.checkout);
+    const totalPrice = (nights * b.pricePerNight).toFixed(2);
+    const tip = document.getElementById('tooltip');
+    tip.innerHTML = `<strong>${b.guestName}</strong><br>
+        Hab. ${b.room} · ${nights} noche(s)<br>
+        ${b.checkin} → ${b.checkout}<br>
+        Estado: ${STATUS_LABELS[b.status]}<br>
+        Total: ${totalPrice} €`;
+    tip.classList.add('active');
+    tip.style.left = (event.pageX + 12) + 'px';
+    tip.style.top = (event.pageY - 10) + 'px';
+}
+
+function hideTooltip() {
+    document.getElementById('tooltip').classList.remove('active');
+}
+
+// ==================== NAVIGATION ====================
+
+function navigateWeeks(n) {
+    const input = document.getElementById('startDate');
+    const current = input.value ? parseDate(input.value) : new Date();
+    input.value = dateStr(addDays(current, n * 7));
+    renderGrid();
+}
+
+function goToToday() {
+    document.getElementById('startDate').value = todayStr();
+    renderGrid();
+}
+
+// ==================== MODAL ====================
+
+function populateRoomSelect() {
+    const sel = document.getElementById('bookingRoom');
+    sel.innerHTML = '';
+    ROOMS.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.number;
+        opt.textContent = r.label;
+        sel.appendChild(opt);
+    });
+}
+
+function openNewBooking(room, date) {
+    document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('bookingId').value = '';
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestPhone').value = '';
+    document.getElementById('guestEmail').value = '';
+    document.getElementById('guestCount').value = '2';
+    document.getElementById('bookingStatus').value = 'confirmed';
+    document.getElementById('pricePerNight').value = '55';
+    document.getElementById('bookingNotes').value = '';
+    document.getElementById('deleteBtn').style.display = 'none';
+    document.getElementById('priceTotal').textContent = '';
+
+    if (room) document.getElementById('bookingRoom').value = room;
+    if (date) {
+        document.getElementById('bookingCheckin').value = date;
+        document.getElementById('bookingCheckout').value = dateStr(addDays(parseDate(date), 1));
+    } else {
+        document.getElementById('bookingCheckin').value = todayStr();
+        document.getElementById('bookingCheckout').value = dateStr(addDays(new Date(), 1));
+    }
+
+    calculatePrice();
+    document.getElementById('bookingModal').classList.add('active');
+    document.getElementById('guestName').focus();
+}
+
+function editBooking(id) {
+    const b = bookings.find(x => x.id === id);
+    if (!b) return;
+
+    document.getElementById('modalTitle').textContent = 'Editar Reserva';
+    document.getElementById('bookingId').value = b.id;
+    document.getElementById('guestName').value = b.guestName;
+    document.getElementById('guestPhone').value = b.phone || '';
+    document.getElementById('guestEmail').value = b.email || '';
+    document.getElementById('bookingRoom').value = b.room;
+    document.getElementById('guestCount').value = b.guests || 2;
+    document.getElementById('bookingCheckin').value = b.checkin;
+    document.getElementById('bookingCheckout').value = b.checkout;
+    document.getElementById('bookingStatus').value = b.status;
+    document.getElementById('pricePerNight').value = b.pricePerNight;
+    document.getElementById('bookingNotes').value = b.notes || '';
+    document.getElementById('deleteBtn').style.display = 'block';
+
+    calculatePrice();
+    document.getElementById('bookingModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('bookingModal').classList.remove('active');
+}
+
+function calculatePrice() {
+    const checkin = document.getElementById('bookingCheckin').value;
+    const checkout = document.getElementById('bookingCheckout').value;
+    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
+
+    if (checkin && checkout && checkout > checkin) {
+        const nights = nightsBetween(checkin, checkout);
+        document.getElementById('priceTotal').textContent = `Total: ${(nights * price).toFixed(2)} € (${nights} noche${nights > 1 ? 's' : ''})`;
+    } else {
+        document.getElementById('priceTotal').textContent = '';
+    }
+}
+
+function saveBooking() {
+    const name = document.getElementById('guestName').value.trim();
+    const room = parseInt(document.getElementById('bookingRoom').value);
+    const checkin = document.getElementById('bookingCheckin').value;
+    const checkout = document.getElementById('bookingCheckout').value;
+    const status = document.getElementById('bookingStatus').value;
+    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
+    const id = document.getElementById('bookingId').value;
+
+    if (!name) return alert('Introduce el nombre del huésped.');
+    if (!checkin || !checkout) return alert('Introduce las fechas de check-in y check-out.');
+    if (checkout <= checkin) return alert('La fecha de check-out debe ser posterior al check-in.');
+
+    if (hasConflict(room, checkin, checkout, id)) {
+        return alert('La habitación ya está ocupada en esas fechas.');
+    }
+
+    const booking = {
+        id: id || generateId(),
+        guestName: name,
+        phone: document.getElementById('guestPhone').value.trim(),
+        email: document.getElementById('guestEmail').value.trim(),
+        room, checkin, checkout, status, pricePerNight: price,
+        guests: parseInt(document.getElementById('guestCount').value),
+        notes: document.getElementById('bookingNotes').value.trim(),
+        createdAt: id ? bookings.find(b => b.id === id)?.createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    if (id) {
+        const idx = bookings.findIndex(b => b.id === id);
+        if (idx >= 0) bookings[idx] = booking;
+    } else {
+        bookings.push(booking);
+    }
+
+    saveBookings();
+    closeModal();
+    renderGrid();
+}
+
+function deleteBooking() {
+    const id = document.getElementById('bookingId').value;
+    if (!id) return;
+    if (!confirm('¿Seguro que quieres eliminar esta reserva?')) return;
+    bookings = bookings.filter(b => b.id !== id);
+    saveBookings();
+    closeModal();
+    renderGrid();
+}
+
+// ==================== EXPORT / IMPORT ====================
+
+function exportData() {
+    const data = JSON.stringify(bookings, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hostal_gijones_reservas_${todayStr()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData() {
+    document.getElementById('importFile').click();
+}
+
+function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!Array.isArray(data)) throw new Error('Formato inválido');
+            if (!confirm(`Se importarán ${data.length} reservas. ¿Las reservas actuales se reemplazarán?`)) return;
+            bookings = data;
+            saveBookings();
+            renderGrid();
+            alert('Importación completada.');
+        } catch {
+            alert('Error al importar el archivo. Verifica que sea un JSON válido.');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// ==================== KEYBOARD ====================
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+});
+
+// ==================== INIT ====================
+
+function init() {
+    loadBookings();
+    populateRoomSelect();
+
+    const today = new Date();
+    // Start grid 3 days before today
+    const startDate = addDays(today, -3);
+    document.getElementById('startDate').value = dateStr(startDate);
+    document.getElementById('currentDateDisplay').textContent =
+        `${DAY_NAMES[today.getDay()]} ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()}`;
+
+    renderGrid();
+}
+
+init();
+</script>
+
+</body>
+</html>
