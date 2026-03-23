@@ -558,6 +558,72 @@
         .pm-badge.cash { background: #e8f5e9; color: #2e7d32; }
         .pm-badge.card { background: #e3f2fd; color: #1565c0; }
 
+        /* Login screen */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #7eb8c9, #a8d5e2);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .login-screen.hidden { display: none; }
+        .login-box {
+            background: white; border-radius: 16px; padding: 40px; width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center;
+        }
+        .login-box h1 { font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; margin-bottom: 5px; }
+        .login-box .login-subtitle { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
+        .user-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .user-card {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
+        }
+        .user-card:hover { border-color: #7eb8c9; background: #f0f8ff; }
+        .user-card.selected { border-color: #7eb8c9; background: #e0f0f8; box-shadow: 0 0 0 2px #7eb8c9; }
+        .user-card .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 700;
+            font-size: 1rem; color: white;
+        }
+        .user-card .user-label { font-weight: 600; color: #2c3e50; font-size: 0.9rem; }
+        .user-card .user-role { font-size: 0.72rem; color: #888; }
+        .pin-input-group { margin-top: 15px; display: none; }
+        .pin-input-group.visible { display: block; }
+        .pin-input {
+            width: 160px; padding: 10px; text-align: center; font-size: 1.3rem;
+            letter-spacing: 8px; border: 2px solid #ccc; border-radius: 8px;
+            font-weight: 700; color: #2c3e50;
+        }
+        .pin-input:focus { border-color: #7eb8c9; outline: none; }
+        .login-error { color: #c0392b; font-size: 0.8rem; margin-top: 8px; min-height: 20px; }
+        .btn-login {
+            margin-top: 12px; padding: 10px 30px; background: #7eb8c9; color: #2c3e50;
+            border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-login:hover { background: #5fa8bc; }
+
+        /* User indicator in header */
+        .user-indicator {
+            display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.25);
+            padding: 4px 12px 4px 6px; border-radius: 20px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-indicator:hover { background: rgba(255,255,255,0.4); }
+        .user-indicator .ui-avatar {
+            width: 26px; height: 26px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 700;
+            font-size: 0.7rem; color: white;
+        }
+        .user-indicator .ui-name { font-size: 0.8rem; font-weight: 600; color: #2c3e50; }
+
+        /* Audit info in booking modal */
+        .audit-info {
+            background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px;
+            padding: 8px 12px; margin-top: 10px; font-size: 0.72rem; color: #888;
+        }
+        .audit-info strong { color: #2c3e50; }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -585,14 +651,31 @@
 </head>
 <body>
 
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h1>Hostal Jijones</h1>
+        <div class="login-subtitle">Selecciona tu usuario e introduce el PIN</div>
+        <div class="user-cards" id="userCards"></div>
+        <div class="pin-input-group" id="pinGroup">
+            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()">
+            <div class="login-error" id="loginError"></div>
+            <button class="btn-login" onclick="doLogin()">Entrar</button>
+        </div>
+    </div>
+</div>
+
 <header>
     <div>
         <h1>Hostal Jijones</h1>
         <div class="subtitle">Sistema de Gestión de Reservas</div>
     </div>
-    <div style="text-align: right; font-size: 0.85rem;">
-        <div id="currentDateDisplay"></div>
-        <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
+    <div style="text-align: right; font-size: 0.85rem; display:flex; align-items:center; gap:12px;">
+        <div>
+            <div id="currentDateDisplay"></div>
+            <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
+        </div>
+        <div class="user-indicator" id="userIndicator" onclick="logout()" title="Cerrar sesión"></div>
     </div>
 </header>
 
@@ -912,6 +995,8 @@
             <button class="btn-primary" onclick="generateInvoice()" style="font-size:0.8rem;">Factura</button>
         </div>
 
+        <div class="audit-info" id="auditInfo" style="display:none;"></div>
+
         <div class="form-actions">
             <button class="btn-danger" id="deleteBtn" onclick="deleteBooking()" style="display:none; margin-right:auto;">Eliminar</button>
             <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1097,6 +1182,12 @@ const BUSINESS_DATA = {
     city: 'Villarrubia de los Ojos, Ciudad Real',
     tradeName: 'Hostal Jijones'
 };
+const USERS = [
+    { id: 'admin', name: 'Administrador', pin: '1101', role: 'admin', color: '#5a8a99' },
+    { id: 'carmen', name: 'Carmen', pin: '1001', role: 'recepción', color: '#c084a0' },
+    { id: 'lucia', name: 'Lucía', pin: '1002', role: 'recepción', color: '#a0b464' }
+];
+let currentUser = null;
 
 // Casa Rural config
 const RURAL_DEFAULT_PRICE = 250;
@@ -1409,12 +1500,13 @@ function showTooltip(event, bookingId) {
     const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${b.docNumber}` : '';
     const isRural = ROOMS.find(r => r.number === b.room)?.bedType === 'rural';
     const depositInfo = isRural && b.ruralDeposit ? `<br>Fianza: ${b.ruralDeposit} € (${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'})` : '';
+    const auditLine = b.createdBy ? `<br><span style="opacity:0.7">${b.updatedBy ? b.updatedBy : b.createdBy} · ${formatAuditDate(b.updatedAt || b.createdAt)}</span>` : '';
     tip.innerHTML = `<strong>${b.guestName}</strong>${docInfo}<br>
         ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)<br>
         ${b.checkin} → ${b.checkout}<br>
         Estado: ${STATUS_LABELS[b.status]}<br>
         Total: ${totalPrice} € · Pagado: ${totalPaid.toFixed(2)} €<br>
-        Pago: ${paymentLabel}${depositInfo}`;
+        Pago: ${paymentLabel}${depositInfo}${auditLine}`;
     tip.classList.add('active');
     tip.style.left = (event.pageX + 12) + 'px';
     tip.style.top = (event.pageY - 10) + 'px';
@@ -1497,6 +1589,7 @@ function openNewBooking(room, date) {
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
     document.getElementById('priceTotal').textContent = '';
+    document.getElementById('auditInfo').style.display = 'none';
     hideAutocomplete();
 
     // Reset rural fields
@@ -1551,6 +1644,9 @@ function editBooking(id) {
     document.getElementById('deleteBtn').style.display = 'block';
     document.getElementById('confirmActions').style.display = 'flex';
     hideAutocomplete();
+
+    // Audit info
+    renderAuditInfo(b);
 
     // Rural fields
     document.getElementById('depositAmount').value = b.ruralDeposit || RURAL_DEFAULT_DEPOSIT;
@@ -1619,6 +1715,18 @@ function saveBooking() {
 
     const isRural = ROOMS.find(r => r.number === room)?.bedType === 'rural';
 
+    const existingBooking = id ? bookings.find(b => b.id === id) : null;
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    const now = new Date().toISOString();
+
+    // Build audit history
+    const history = existingBooking ? [...(existingBooking.history || [])] : [];
+    if (id) {
+        history.push({ action: 'modificada', user: userName, date: now });
+    } else {
+        history.push({ action: 'creada', user: userName, date: now });
+    }
+
     const booking = {
         id: id || generateId(),
         guestName: name,
@@ -1632,8 +1740,11 @@ function saveBooking() {
         ruralDepositStatus: isRural ? document.getElementById('depositStatus').value : undefined,
         ruralDepositReturned: isRural ? parseFloat(document.getElementById('depositReturned').value) || 0 : undefined,
         ruralChecklist: isRural ? currentChecklist : undefined,
-        createdAt: id ? bookings.find(b => b.id === id)?.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: existingBooking ? existingBooking.createdAt : now,
+        createdBy: existingBooking ? (existingBooking.createdBy || 'Sistema') : userName,
+        updatedAt: now,
+        updatedBy: userName,
+        history
     };
 
     if (id) {
@@ -1654,8 +1765,24 @@ function saveBooking() {
 function deleteBooking() {
     const id = document.getElementById('bookingId').value;
     if (!id) return;
-    if (!confirm('¿Seguro que quieres eliminar esta reserva?')) return;
-    bookings = bookings.filter(b => b.id !== id);
+    const b = bookings.find(x => x.id === id);
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    if (!confirm(`¿Seguro que quieres eliminar esta reserva?\n(Acción registrada a nombre de: ${userName})`)) return;
+
+    // Log cancellation before removing
+    const cancelLog = JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]');
+    cancelLog.push({
+        bookingId: id,
+        guestName: b ? b.guestName : '?',
+        room: b ? b.room : '?',
+        checkin: b ? b.checkin : '?',
+        checkout: b ? b.checkout : '?',
+        cancelledBy: userName,
+        cancelledAt: new Date().toISOString()
+    });
+    localStorage.setItem('hostal_jijones_cancel_log', JSON.stringify(cancelLog));
+
+    bookings = bookings.filter(x => x.id !== id);
     saveBookings();
     closeModal();
     renderGrid();
@@ -3289,6 +3416,97 @@ function printInvoice() {
     setTimeout(() => win.print(), 300);
 }
 
+// ==================== LOGIN / USER SESSION ====================
+
+function renderLoginScreen() {
+    const container = document.getElementById('userCards');
+    container.innerHTML = USERS.map(u => `
+        <div class="user-card" id="uc_${u.id}" onclick="selectLoginUser('${u.id}')">
+            <div class="user-avatar" style="background:${u.color};">${u.name.charAt(0)}</div>
+            <div>
+                <div class="user-label">${u.name}</div>
+                <div class="user-role">${u.role}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+let selectedLoginUser = null;
+
+function selectLoginUser(userId) {
+    selectedLoginUser = USERS.find(u => u.id === userId);
+    document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('uc_' + userId).classList.add('selected');
+    document.getElementById('pinGroup').classList.add('visible');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('pinInput').focus();
+}
+
+function doLogin() {
+    if (!selectedLoginUser) return;
+    const pin = document.getElementById('pinInput').value;
+    if (pin === selectedLoginUser.pin) {
+        currentUser = selectedLoginUser;
+        document.getElementById('loginScreen').classList.add('hidden');
+        updateUserIndicator();
+        init();
+    } else {
+        document.getElementById('loginError').textContent = 'PIN incorrecto';
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+    }
+}
+
+function logout() {
+    if (!confirm('¿Cerrar sesión?')) return;
+    currentUser = null;
+    selectedLoginUser = null;
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('pinGroup').classList.remove('visible');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+}
+
+function updateUserIndicator() {
+    if (!currentUser) return;
+    document.getElementById('userIndicator').innerHTML = `
+        <div class="ui-avatar" style="background:${currentUser.color};">${currentUser.name.charAt(0)}</div>
+        <span class="ui-name">${currentUser.name}</span>
+    `;
+}
+
+// ==================== AUDIT TRAIL ====================
+
+function renderAuditInfo(booking) {
+    const el = document.getElementById('auditInfo');
+    if (!booking) { el.style.display = 'none'; return; }
+
+    let html = '';
+    if (booking.createdBy) html += `<strong>Creada por:</strong> ${booking.createdBy} · ${formatAuditDate(booking.createdAt)}<br>`;
+    if (booking.updatedBy && booking.updatedAt !== booking.createdAt) {
+        html += `<strong>Última modificación:</strong> ${booking.updatedBy} · ${formatAuditDate(booking.updatedAt)}<br>`;
+    }
+
+    // Show history
+    if (booking.history && booking.history.length > 0) {
+        html += '<div style="margin-top:4px;"><strong>Historial:</strong></div>';
+        booking.history.slice().reverse().forEach(h => {
+            html += `<div style="padding-left:8px;">· Reserva ${h.action} por <strong>${h.user}</strong> el ${formatAuditDate(h.date)}</div>`;
+        });
+    }
+
+    el.innerHTML = html;
+    el.style.display = 'block';
+}
+
+function formatAuditDate(isoStr) {
+    if (!isoStr) return '-';
+    const d = new Date(isoStr);
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
@@ -3305,7 +3523,6 @@ function init() {
     const today = new Date();
     calendarMonth = today.getMonth();
     calendarYear = today.getFullYear();
-    // Start grid 3 days before today
     const startDate = addDays(today, -3);
     document.getElementById('startDate').value = dateStr(startDate);
     document.getElementById('currentDateDisplay').textContent =
@@ -3314,7 +3531,8 @@ function init() {
     renderGrid();
 }
 
-init();
+// Show login screen on startup
+renderLoginScreen();
 </script>
 
 <!-- FAB Button -->
