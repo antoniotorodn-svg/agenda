@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hostal Gijones - Sistema de Reservas</title>
+    <title>Hostal Jijones - Sistema de Reservas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f0eb; color: #3d3d3d; }
 
         header {
-            background: linear-gradient(135deg, #1a5276, #2e86c1);
-            color: white; padding: 15px 30px;
+            background: linear-gradient(135deg, #7eb8c9, #a8d5e2);
+            color: #2c3e50; padding: 15px 30px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        header h1 { font-size: 1.5rem; }
-        header .subtitle { font-size: 0.85rem; opacity: 0.8; }
+        header h1 { font-size: 1.5rem; font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; }
+        header .subtitle { font-size: 0.85rem; opacity: 0.7; color: #2c3e50; }
 
         .toolbar {
             background: white; padding: 12px 30px;
@@ -30,16 +33,16 @@
             padding: 7px 16px; border: none; border-radius: 4px;
             cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
         }
-        .btn-primary { background: #2e86c1; color: white; }
-        .btn-primary:hover { background: #1a5276; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-success:hover { background: #1e8449; }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-secondary { background: #95a5a6; color: white; }
-        .btn-secondary:hover { background: #7f8c8d; }
-        .btn-outline { background: transparent; border: 2px solid #2e86c1; color: #2e86c1; }
-        .btn-outline:hover { background: #2e86c1; color: white; }
+        .btn-primary { background: #7eb8c9; color: #2c3e50; font-weight: 600; }
+        .btn-primary:hover { background: #5fa8bc; }
+        .btn-success { background: #a8d8a8; color: #2c4a2c; font-weight: 600; }
+        .btn-success:hover { background: #8cc98c; }
+        .btn-danger { background: #e8a8a8; color: #5a2020; font-weight: 600; }
+        .btn-danger:hover { background: #d98888; }
+        .btn-secondary { background: #c5c5c5; color: #3d3d3d; font-weight: 600; }
+        .btn-secondary:hover { background: #aaa; }
+        .btn-outline { background: transparent; border: 2px solid #7eb8c9; color: #4a8a9e; }
+        .btn-outline:hover { background: #7eb8c9; color: #2c3e50; }
 
         .nav-arrows { display: flex; gap: 5px; }
         .nav-arrows button { padding: 7px 12px; font-size: 1rem; }
@@ -65,54 +68,58 @@
             border: 1px solid #e0e0e0; text-align: center; font-size: 0.75rem;
         }
         table.booking-grid thead th {
-            background: #2c3e50; color: white; padding: 8px 4px;
+            background: #6b9dad; color: white; padding: 8px 4px;
             position: sticky; top: 0; z-index: 10; min-width: 38px;
+            font-weight: 600;
         }
         table.booking-grid thead th.corner {
             position: sticky; left: 0; z-index: 20; min-width: 110px;
-            background: #1a252f;
+            background: #5a8a99;
         }
-        table.booking-grid thead th.weekend { background: #4a2c2c; }
-        table.booking-grid thead th.today-header { background: #1a6e1a; }
+        table.booking-grid thead th.weekend { background: #c4a882; color: #3d2e1a; }
+        table.booking-grid thead th.today-header { background: #8cc98c; color: #2c4a2c; }
 
         .room-header {
             position: sticky; left: 0; z-index: 5;
             background: #f8f9fa; font-weight: 700; padding: 6px 10px;
             white-space: nowrap; text-align: left !important; min-width: 110px;
         }
-        .room-header .room-number { font-size: 0.85rem; color: #2c3e50; }
-        .room-header .room-type { font-size: 0.65rem; color: #888; display: block; }
+        .room-header .room-number { font-size: 0.85rem; color: #2c3e50; font-weight: 700; }
+        .room-header .room-type { font-size: 0.7rem; color: #777; display: block; font-weight: 500; }
 
         .floor-separator td, .floor-separator th {
-            background: #34495e !important; color: white; font-weight: 700;
+            background: #b8d4de !important; color: #2c3e50; font-weight: 700;
             padding: 5px 10px; font-size: 0.8rem; text-align: left !important;
+        }
+        .floor-separator.rural td, .floor-separator.rural th {
+            background: #c9dbb2 !important; color: #3a4a2a;
         }
 
         td.day-cell {
             padding: 0; height: 36px; min-width: 38px; cursor: pointer;
             position: relative; transition: background 0.15s;
         }
-        td.day-cell:hover { background: #e8f4fd; }
-        td.day-cell.weekend { background: #fef9f0; }
-        td.day-cell.today { box-shadow: inset 0 0 0 2px #27ae60; }
+        td.day-cell:hover { background: #dceef4; }
+        td.day-cell.weekend { background: #faf3ea; }
+        td.day-cell.today { box-shadow: inset 0 0 0 2px #8cc98c; }
 
         td.day-cell.booked {
             cursor: pointer; padding: 0;
         }
         .booking-block {
             height: 100%; width: 100%; display: flex; align-items: center;
-            justify-content: center; font-size: 0.65rem; font-weight: 600;
-            color: white; text-overflow: ellipsis; overflow: hidden;
+            justify-content: center; font-size: 0.7rem; font-weight: 700;
+            text-overflow: ellipsis; overflow: hidden;
             white-space: nowrap; padding: 0 2px;
         }
         .booking-start { border-radius: 4px 0 0 4px; }
         .booking-end { border-radius: 0 4px 4px 0; }
         .booking-single { border-radius: 4px; }
 
-        .status-confirmed { background: #2e86c1; }
-        .status-pending { background: #f39c12; }
-        .status-checkedin { background: #27ae60; }
-        .status-checkedout { background: #95a5a6; }
+        .status-confirmed { background: #7eb8c9; color: #1a3a4a; }
+        .status-pending { background: #f0c87a; color: #5a3e10; }
+        .status-checkedin { background: #a8d8a8; color: #2c4a2c; }
+        .status-checkedout { background: #c5c5c5; color: #3d3d3d; }
 
         /* Modal */
         .modal-overlay {
@@ -125,7 +132,7 @@
             width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-        .modal h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; }
+        .modal h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; font-family: 'Playfair Display', Georgia, serif; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; }
         .form-group input, .form-group select, .form-group textarea {
@@ -136,14 +143,14 @@
         .form-row { display: flex; gap: 15px; }
         .form-row .form-group { flex: 1; }
         .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-        .price-display { font-size: 1.1rem; font-weight: 700; color: #27ae60; margin-top: 5px; }
+        .price-display { font-size: 1.1rem; font-weight: 700; color: #5a9a5a; margin-top: 5px; }
 
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
         }
         .stat { display: flex; align-items: center; gap: 5px; }
-        .stat strong { color: #2c3e50; }
+        .stat strong { color: #2c3e50; font-weight: 700; }
 
         /* Tooltip */
         .tooltip {
@@ -167,12 +174,12 @@
 
 <header>
     <div>
-        <h1>Hostal Gijones</h1>
+        <h1>Hostal Jijones</h1>
         <div class="subtitle">Sistema de Gestión de Reservas</div>
     </div>
     <div style="text-align: right; font-size: 0.85rem;">
         <div id="currentDateDisplay"></div>
-        <div style="opacity:0.7; font-size:0.75rem;">30 habitaciones · 2 plantas</div>
+        <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
     </div>
 </header>
 
@@ -247,6 +254,20 @@
                 <select id="guestCount">
                     <option value="1">1 persona</option>
                     <option value="2" selected>2 personas</option>
+                    <option value="3">3 personas</option>
+                    <option value="4">4 personas</option>
+                    <option value="5">5 personas</option>
+                    <option value="6">6 personas</option>
+                    <option value="7">7 personas</option>
+                    <option value="8">8 personas</option>
+                    <option value="9">9 personas</option>
+                    <option value="10">10 personas</option>
+                    <option value="11">11 personas</option>
+                    <option value="12">12 personas</option>
+                    <option value="13">13 personas</option>
+                    <option value="14">14 personas</option>
+                    <option value="15">15 personas</option>
+                    <option value="16">16 personas</option>
                 </select>
             </div>
         </div>
@@ -325,6 +346,8 @@ const ROOMS = [
     { number: 214, floor: 2, bedType: 'twin', label: '214 - Dos camas' },
     { number: 215, floor: 2, bedType: 'double', label: '215 - Matrimonio' },
     { number: 216, floor: 2, bedType: 'twin', label: '216 - Dos camas' },
+    // Casa Rural Villarrubia
+    { number: 'CR1', floor: 'rural', bedType: 'rural', label: 'Casa Rural Villarrubia (16 pers.)' },
 ];
 
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -340,12 +363,12 @@ let bookings = [];
 
 function loadBookings() {
     try {
-        bookings = JSON.parse(localStorage.getItem('hostal_gijones_bookings') || '[]');
+        bookings = JSON.parse(localStorage.getItem('hostal_jijones_bookings') || '[]');
     } catch { bookings = []; }
 }
 
 function saveBookings() {
-    localStorage.setItem('hostal_gijones_bookings', JSON.stringify(bookings));
+    localStorage.setItem('hostal_jijones_bookings', JSON.stringify(bookings));
 }
 
 // ==================== DATE HELPERS ====================
@@ -424,12 +447,17 @@ function renderGrid() {
         // Floor separator
         if (room.floor !== currentFloor) {
             currentFloor = room.floor;
-            html += `<tr class="floor-separator"><td colspan="${days + 1}">Planta ${currentFloor} ${currentFloor === 1 ? '(Habitaciones 101-115)' : '(Habitaciones 201-216)'}</td></tr>`;
+            if (currentFloor === 'rural') {
+                html += `<tr class="floor-separator rural"><td colspan="${days + 1}">Casa Rural Villarrubia (16 personas)</td></tr>`;
+            } else {
+                html += `<tr class="floor-separator"><td colspan="${days + 1}">Planta ${currentFloor} ${currentFloor === 1 ? '(Habitaciones 101-115)' : '(Habitaciones 201-216)'}</td></tr>`;
+            }
         }
 
-        const bedIcon = room.bedType === 'double' ? '🛏️' : '🛏️🛏️';
-        const bedLabel = room.bedType === 'double' ? 'Matrimonio' : 'Dos camas';
-        html += `<tr><td class="room-header"><span class="room-number">${room.number} ${bedIcon}</span><span class="room-type">${bedLabel}</span></td>`;
+        const bedIcon = room.bedType === 'rural' ? '🏡' : (room.bedType === 'double' ? '🛏️' : '🛏️🛏️');
+        const bedLabel = room.bedType === 'rural' ? 'Casa completa · 16 pers.' : (room.bedType === 'double' ? 'Matrimonio' : 'Dos camas');
+        const roomDisplay = room.bedType === 'rural' ? '🏡 Villarrubia' : `${room.number} ${bedIcon}`;
+        html += `<tr><td class="room-header"><span class="room-number">${roomDisplay}</span><span class="room-type">${bedLabel}</span></td>`;
 
         dates.forEach(ds => {
             const matches = getBookingsForRoomAndDate(room.number, ds);
@@ -536,6 +564,13 @@ function populateRoomSelect() {
         opt.textContent = r.label;
         sel.appendChild(opt);
     });
+    // Update guest count when room changes
+    sel.addEventListener('change', function() {
+        const room = ROOMS.find(r => String(r.number) === sel.value);
+        if (room && room.bedType === 'rural') {
+            document.getElementById('guestCount').value = '16';
+        }
+    });
 }
 
 function openNewBooking(room, date) {
@@ -606,7 +641,8 @@ function calculatePrice() {
 
 function saveBooking() {
     const name = document.getElementById('guestName').value.trim();
-    const room = parseInt(document.getElementById('bookingRoom').value);
+    const roomVal = document.getElementById('bookingRoom').value;
+    const room = isNaN(roomVal) ? roomVal : parseInt(roomVal);
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
     const status = document.getElementById('bookingStatus').value;
@@ -663,7 +699,7 @@ function exportData() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `hostal_gijones_reservas_${todayStr()}.json`;
+    a.download = `hostal_jijones_reservas_${todayStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
 }
