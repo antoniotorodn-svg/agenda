@@ -558,6 +558,72 @@
         .pm-badge.cash { background: #e8f5e9; color: #2e7d32; }
         .pm-badge.card { background: #e3f2fd; color: #1565c0; }
 
+        /* Login screen */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #7eb8c9, #a8d5e2);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .login-screen.hidden { display: none; }
+        .login-box {
+            background: white; border-radius: 16px; padding: 40px; width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center;
+        }
+        .login-box h1 { font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; margin-bottom: 5px; }
+        .login-box .login-subtitle { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
+        .user-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .user-card {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
+        }
+        .user-card:hover { border-color: #7eb8c9; background: #f0f8ff; }
+        .user-card.selected { border-color: #7eb8c9; background: #e0f0f8; box-shadow: 0 0 0 2px #7eb8c9; }
+        .user-card .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 700;
+            font-size: 1rem; color: white;
+        }
+        .user-card .user-label { font-weight: 600; color: #2c3e50; font-size: 0.9rem; }
+        .user-card .user-role { font-size: 0.72rem; color: #888; }
+        .pin-input-group { margin-top: 15px; display: none; }
+        .pin-input-group.visible { display: block; }
+        .pin-input {
+            width: 160px; padding: 10px; text-align: center; font-size: 1.3rem;
+            letter-spacing: 8px; border: 2px solid #ccc; border-radius: 8px;
+            font-weight: 700; color: #2c3e50;
+        }
+        .pin-input:focus { border-color: #7eb8c9; outline: none; }
+        .login-error { color: #c0392b; font-size: 0.8rem; margin-top: 8px; min-height: 20px; }
+        .btn-login {
+            margin-top: 12px; padding: 10px 30px; background: #7eb8c9; color: #2c3e50;
+            border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-login:hover { background: #5fa8bc; }
+
+        /* User indicator in header */
+        .user-indicator {
+            display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.25);
+            padding: 4px 12px 4px 6px; border-radius: 20px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-indicator:hover { background: rgba(255,255,255,0.4); }
+        .user-indicator .ui-avatar {
+            width: 26px; height: 26px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 700;
+            font-size: 0.7rem; color: white;
+        }
+        .user-indicator .ui-name { font-size: 0.8rem; font-weight: 600; color: #2c3e50; }
+
+        /* Audit info in booking modal */
+        .audit-info {
+            background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px;
+            padding: 8px 12px; margin-top: 10px; font-size: 0.72rem; color: #888;
+        }
+        .audit-info strong { color: #2c3e50; }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -574,25 +640,244 @@
         }
         .tooltip.active { display: block; }
 
-        /* Responsive */
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablet landscape & small desktop */
+        @media (max-width: 1024px) {
+            .reports-modal, .invoice-modal, .client-modal { width: 95vw; }
+            .income-modal, .search-modal, .client-detail-modal { width: 95vw; }
+            .checklist-modal, .rules-modal, .block-modal { width: 95vw; }
+            .rank-table { font-size: 0.75rem; }
+            .rank-table th, .rank-table td { padding: 6px 6px; }
+            .rank-bar-cell { width: 60px; }
+            .income-total-card .value { font-size: 1rem; }
+        }
+
+        /* Tablet portrait */
         @media (max-width: 768px) {
-            header { padding: 10px 15px; }
-            .toolbar { padding: 10px 15px; }
-            .grid-container { padding: 10px 15px; }
+            header { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            header h1 { font-size: 1.2rem; }
+            header .subtitle { font-size: 0.75rem; }
+
+            .toolbar {
+                padding: 8px 10px; gap: 8px;
+            }
+            .toolbar label { display: none; }
+            .toolbar button { padding: 6px 10px; font-size: 0.78rem; }
+            .toolbar input[type="date"] { font-size: 0.78rem; padding: 5px 6px; max-width: 130px; }
+            .toolbar select { font-size: 0.78rem; padding: 5px 4px; }
+            .nav-arrows button { padding: 6px 8px; font-size: 0.9rem; }
             .legend { display: none; }
+            .view-toggle button { padding: 5px 10px; font-size: 0.72rem; }
+
+            .grid-container { padding: 8px; }
+            .calendar-container { padding: 10px; }
+            .calendar-nav h3 { font-size: 0.95rem; min-width: 140px; }
+            .calendar-grid .cal-day { min-height: 60px; padding: 2px; }
+            .calendar-grid .cal-day .day-num { font-size: 0.7rem; }
+            .calendar-grid .cal-day .cal-booking { font-size: 0.55rem; }
+            .calendar-grid .cal-header { padding: 5px; font-size: 0.7rem; }
+
+            .modal { padding: 20px 15px; width: 98vw; max-height: 95vh; border-radius: 10px; }
+            .modal h2 { font-size: 1.05rem; margin-bottom: 14px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .form-row .form-group { flex: none; }
+            .form-group { margin-bottom: 10px; }
+            .form-group label { font-size: 0.8rem; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.85rem; padding: 8px 10px; }
+            .form-actions { flex-wrap: wrap; gap: 8px; }
+            .form-actions button { flex: 1; min-width: 100px; }
+
+            .add-payment-row { flex-wrap: wrap; }
+            .add-payment-row .form-group { flex: 1 1 45% !important; min-width: 100px; }
+            .btn-add-payment { width: 100%; margin-top: 4px; }
+
+            .payment-section { padding: 10px; }
+            .payment-status-badges { gap: 4px; }
+            .payment-badge { padding: 4px 8px; font-size: 0.7rem; }
+
+            .confirm-actions { gap: 6px; }
+            .confirm-actions button { flex: 1; min-width: 80px; font-size: 0.72rem; padding: 6px 8px; }
+
+            .doc-section { padding: 10px; }
+            .doc-section .form-row { flex-direction: column; gap: 0; }
+
+            .rural-section { padding: 10px; }
+            .rural-section .form-row { flex-direction: column; gap: 0; }
+
+            .search-form { flex-direction: column; }
+            .search-form .form-group { width: 100% !important; min-width: 0 !important; }
+            .search-result-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+            .client-card { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .stay-item { flex-direction: column; align-items: flex-start; gap: 2px; }
+
+            .income-totals { gap: 8px; }
+            .income-total-card { min-width: 120px; padding: 8px; }
+            .income-total-card .label { font-size: 0.68rem; }
+            .income-total-card .value { font-size: 0.9rem; }
+
+            .chart-label { width: 40px; font-size: 0.7rem; }
+            .chart-value { width: 50px; font-size: 0.68rem; }
+            .chart-bar-fill { font-size: 0.62rem; }
+            .ic-values { width: 90px; font-size: 0.62rem; }
+
+            .stats-bar { padding: 8px 10px; gap: 10px; flex-wrap: wrap; font-size: 0.72rem; }
+
+            .wizard-modal { width: 98vw; }
+            .wizard-steps { gap: 0; }
+            .wizard-step { font-size: 0.65rem; padding: 6px 2px; }
+            .wizard-room-card { flex-direction: column; align-items: flex-start; gap: 4px; }
+
+            .login-box { width: 92vw; padding: 25px 20px; }
+
+            .invoice-preview { padding: 15px; font-size: 0.75rem; }
+            .invoice-preview .inv-header { flex-direction: column; gap: 10px; }
+            .invoice-preview .inv-number { text-align: left; }
+            .invoice-preview th, .invoice-preview td { padding: 5px 4px; font-size: 0.72rem; }
+
+            .user-indicator .ui-name { display: none; }
+
+            .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 15px; right: 15px; }
+        }
+
+        /* Mobile small */
+        @media (max-width: 480px) {
+            header { padding: 8px 10px; }
+            header h1 { font-size: 1rem; }
+            header .subtitle { display: none; }
+
+            .toolbar { padding: 6px 8px; gap: 6px; }
+            .toolbar button { padding: 5px 7px; font-size: 0.7rem; }
+            .toolbar input[type="date"] { max-width: 110px; font-size: 0.72rem; }
+            .nav-arrows { gap: 2px; }
+            .nav-arrows button { padding: 5px 6px; font-size: 0.8rem; }
+
+            .grid-container { padding: 4px; }
+            table.booking-grid th, table.booking-grid td { font-size: 0.65rem; }
+            table.booking-grid thead th { padding: 5px 2px; min-width: 30px; }
+            td.day-cell { height: 30px; min-width: 30px; }
+            .room-header { padding: 4px 6px; min-width: 80px; }
+            .room-header .room-number { font-size: 0.72rem; }
+            .room-header .room-type { font-size: 0.6rem; }
+            .booking-block { font-size: 0.6rem; }
+            .floor-separator td, .floor-separator th { font-size: 0.7rem; padding: 3px 6px; }
+
+            .calendar-container { padding: 4px; }
+            .calendar-nav { gap: 6px; margin-bottom: 8px; }
+            .calendar-nav h3 { font-size: 0.85rem; min-width: 110px; }
+            .calendar-grid .cal-day { min-height: 45px; }
+            .calendar-grid .cal-day .cal-booking { font-size: 0.5rem; padding: 0 2px; }
+            .calendar-grid .cal-header { font-size: 0.6rem; padding: 4px 2px; }
+
+            .modal { padding: 15px 10px; border-radius: 8px; }
+            .modal h2 { font-size: 0.95rem; margin-bottom: 10px; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.82rem; padding: 7px 8px; }
+
+            .stats-bar { gap: 6px; font-size: 0.65rem; padding: 6px 8px; }
+            .stat { gap: 3px; }
+
+            .report-tabs, .income-tabs, .checklist-tabs { flex-wrap: wrap; }
+            .report-tab, .income-tab, .checklist-tab { font-size: 0.72rem; padding: 5px 10px; }
+
+            .rank-table { font-size: 0.68rem; }
+            .rank-table th, .rank-table td { padding: 4px 3px; }
+            .rank-bar-cell { display: none; }
+
+            .payment-item { font-size: 0.7rem; flex-wrap: wrap; }
+            .payment-summary { flex-direction: column; gap: 2px; font-size: 0.75rem; }
+
+            .checklist-item { gap: 6px; font-size: 0.75rem; }
+            .checklist-item .item-note { width: 90px; font-size: 0.68rem; }
+            .checklist-item .item-qty { width: 35px; font-size: 0.68rem; }
+
+            .audit-info { font-size: 0.65rem; padding: 6px 8px; }
+
+            .login-box { padding: 20px 15px; }
+            .login-box h1 { font-size: 1.3rem; }
+            .user-card { padding: 10px 12px; }
+            .user-card .user-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
+            .pin-input { width: 140px; font-size: 1.1rem; }
+        }
+
+        /* Very small mobile */
+        @media (max-width: 360px) {
+            header h1 { font-size: 0.9rem; }
+            .toolbar button { font-size: 0.65rem; padding: 4px 5px; }
+            .modal { padding: 12px 8px; }
+            .form-group label { font-size: 0.72rem; }
+            .calendar-grid .cal-day { min-height: 36px; }
+            .calendar-grid .cal-day .day-num { font-size: 0.6rem; }
+            .calendar-grid .cal-day .cal-booking { display: none; }
+            .fab-btn { width: 44px; height: 44px; font-size: 1.3rem; bottom: 10px; right: 10px; }
+        }
+
+        /* Touch device improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .toolbar button { min-height: 40px; }
+            td.day-cell { min-height: 38px; }
+            .form-group input, .form-group select { min-height: 42px; }
+            .payment-badge { min-height: 36px; display: flex; align-items: center; }
+            .wizard-room-card { padding: 14px 12px; }
+            .client-card { padding: 14px; }
+            .user-card { padding: 14px 16px; }
+            .btn-login { min-height: 44px; }
+        }
+
+        /* Safe area for devices with notch */
+        @supports (padding: env(safe-area-inset-bottom)) {
+            .fab-btn { bottom: calc(15px + env(safe-area-inset-bottom)); right: calc(15px + env(safe-area-inset-right)); }
+            .stats-bar { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal { max-height: 98vh; }
+            .login-box { padding: 15px 20px; }
+            .login-box h1 { font-size: 1.1rem; margin-bottom: 2px; }
+            .login-subtitle { margin-bottom: 10px !important; }
+            .user-cards { flex-direction: row; flex-wrap: wrap; }
+            .user-card { flex: 1; min-width: 120px; }
+            .calendar-grid .cal-day { min-height: 50px; }
+        }
+
+        /* Print styles */
+        @media print {
+            .login-screen, .toolbar, .stats-bar, .fab-btn, .tooltip,
+            .modal-overlay, .nav-arrows, .view-toggle, .legend { display: none !important; }
+            header { box-shadow: none; }
+            .grid-container { padding: 0; overflow: visible; }
+            table.booking-grid { box-shadow: none; }
         }
     </style>
 </head>
 <body>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h1>Hostal Jijones</h1>
+        <div class="login-subtitle">Selecciona tu usuario e introduce el PIN</div>
+        <div class="user-cards" id="userCards"></div>
+        <div class="pin-input-group" id="pinGroup">
+            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()">
+            <div class="login-error" id="loginError"></div>
+            <button class="btn-login" onclick="doLogin()">Entrar</button>
+        </div>
+    </div>
+</div>
 
 <header>
     <div>
         <h1>Hostal Jijones</h1>
         <div class="subtitle">Sistema de Gestión de Reservas</div>
     </div>
-    <div style="text-align: right; font-size: 0.85rem;">
-        <div id="currentDateDisplay"></div>
-        <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
+    <div style="text-align: right; font-size: 0.85rem; display:flex; align-items:center; gap:12px;">
+        <div>
+            <div id="currentDateDisplay"></div>
+            <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
+        </div>
+        <div class="user-indicator" id="userIndicator" onclick="logout()" title="Cerrar sesión"></div>
     </div>
 </header>
 
@@ -912,6 +1197,8 @@
             <button class="btn-primary" onclick="generateInvoice()" style="font-size:0.8rem;">Factura</button>
         </div>
 
+        <div class="audit-info" id="auditInfo" style="display:none;"></div>
+
         <div class="form-actions">
             <button class="btn-danger" id="deleteBtn" onclick="deleteBooking()" style="display:none; margin-right:auto;">Eliminar</button>
             <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1097,6 +1384,12 @@ const BUSINESS_DATA = {
     city: 'Villarrubia de los Ojos, Ciudad Real',
     tradeName: 'Hostal Jijones'
 };
+const USERS = [
+    { id: 'admin', name: 'Administrador', pin: '1101', role: 'admin', color: '#5a8a99' },
+    { id: 'carmen', name: 'Carmen', pin: '1001', role: 'recepción', color: '#c084a0' },
+    { id: 'lucia', name: 'Lucía', pin: '1002', role: 'recepción', color: '#a0b464' }
+];
+let currentUser = null;
 
 // Casa Rural config
 const RURAL_DEFAULT_PRICE = 250;
@@ -1409,12 +1702,13 @@ function showTooltip(event, bookingId) {
     const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${b.docNumber}` : '';
     const isRural = ROOMS.find(r => r.number === b.room)?.bedType === 'rural';
     const depositInfo = isRural && b.ruralDeposit ? `<br>Fianza: ${b.ruralDeposit} € (${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'})` : '';
+    const auditLine = b.createdBy ? `<br><span style="opacity:0.7">${b.updatedBy ? b.updatedBy : b.createdBy} · ${formatAuditDate(b.updatedAt || b.createdAt)}</span>` : '';
     tip.innerHTML = `<strong>${b.guestName}</strong>${docInfo}<br>
         ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)<br>
         ${b.checkin} → ${b.checkout}<br>
         Estado: ${STATUS_LABELS[b.status]}<br>
         Total: ${totalPrice} € · Pagado: ${totalPaid.toFixed(2)} €<br>
-        Pago: ${paymentLabel}${depositInfo}`;
+        Pago: ${paymentLabel}${depositInfo}${auditLine}`;
     tip.classList.add('active');
     tip.style.left = (event.pageX + 12) + 'px';
     tip.style.top = (event.pageY - 10) + 'px';
@@ -1497,6 +1791,7 @@ function openNewBooking(room, date) {
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
     document.getElementById('priceTotal').textContent = '';
+    document.getElementById('auditInfo').style.display = 'none';
     hideAutocomplete();
 
     // Reset rural fields
@@ -1551,6 +1846,9 @@ function editBooking(id) {
     document.getElementById('deleteBtn').style.display = 'block';
     document.getElementById('confirmActions').style.display = 'flex';
     hideAutocomplete();
+
+    // Audit info
+    renderAuditInfo(b);
 
     // Rural fields
     document.getElementById('depositAmount').value = b.ruralDeposit || RURAL_DEFAULT_DEPOSIT;
@@ -1619,6 +1917,18 @@ function saveBooking() {
 
     const isRural = ROOMS.find(r => r.number === room)?.bedType === 'rural';
 
+    const existingBooking = id ? bookings.find(b => b.id === id) : null;
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    const now = new Date().toISOString();
+
+    // Build audit history
+    const history = existingBooking ? [...(existingBooking.history || [])] : [];
+    if (id) {
+        history.push({ action: 'modificada', user: userName, date: now });
+    } else {
+        history.push({ action: 'creada', user: userName, date: now });
+    }
+
     const booking = {
         id: id || generateId(),
         guestName: name,
@@ -1632,8 +1942,11 @@ function saveBooking() {
         ruralDepositStatus: isRural ? document.getElementById('depositStatus').value : undefined,
         ruralDepositReturned: isRural ? parseFloat(document.getElementById('depositReturned').value) || 0 : undefined,
         ruralChecklist: isRural ? currentChecklist : undefined,
-        createdAt: id ? bookings.find(b => b.id === id)?.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: existingBooking ? existingBooking.createdAt : now,
+        createdBy: existingBooking ? (existingBooking.createdBy || 'Sistema') : userName,
+        updatedAt: now,
+        updatedBy: userName,
+        history
     };
 
     if (id) {
@@ -1654,8 +1967,24 @@ function saveBooking() {
 function deleteBooking() {
     const id = document.getElementById('bookingId').value;
     if (!id) return;
-    if (!confirm('¿Seguro que quieres eliminar esta reserva?')) return;
-    bookings = bookings.filter(b => b.id !== id);
+    const b = bookings.find(x => x.id === id);
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    if (!confirm(`¿Seguro que quieres eliminar esta reserva?\n(Acción registrada a nombre de: ${userName})`)) return;
+
+    // Log cancellation before removing
+    const cancelLog = JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]');
+    cancelLog.push({
+        bookingId: id,
+        guestName: b ? b.guestName : '?',
+        room: b ? b.room : '?',
+        checkin: b ? b.checkin : '?',
+        checkout: b ? b.checkout : '?',
+        cancelledBy: userName,
+        cancelledAt: new Date().toISOString()
+    });
+    localStorage.setItem('hostal_jijones_cancel_log', JSON.stringify(cancelLog));
+
+    bookings = bookings.filter(x => x.id !== id);
     saveBookings();
     closeModal();
     renderGrid();
@@ -3289,6 +3618,97 @@ function printInvoice() {
     setTimeout(() => win.print(), 300);
 }
 
+// ==================== LOGIN / USER SESSION ====================
+
+function renderLoginScreen() {
+    const container = document.getElementById('userCards');
+    container.innerHTML = USERS.map(u => `
+        <div class="user-card" id="uc_${u.id}" onclick="selectLoginUser('${u.id}')">
+            <div class="user-avatar" style="background:${u.color};">${u.name.charAt(0)}</div>
+            <div>
+                <div class="user-label">${u.name}</div>
+                <div class="user-role">${u.role}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+let selectedLoginUser = null;
+
+function selectLoginUser(userId) {
+    selectedLoginUser = USERS.find(u => u.id === userId);
+    document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('uc_' + userId).classList.add('selected');
+    document.getElementById('pinGroup').classList.add('visible');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('pinInput').focus();
+}
+
+function doLogin() {
+    if (!selectedLoginUser) return;
+    const pin = document.getElementById('pinInput').value;
+    if (pin === selectedLoginUser.pin) {
+        currentUser = selectedLoginUser;
+        document.getElementById('loginScreen').classList.add('hidden');
+        updateUserIndicator();
+        init();
+    } else {
+        document.getElementById('loginError').textContent = 'PIN incorrecto';
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+    }
+}
+
+function logout() {
+    if (!confirm('¿Cerrar sesión?')) return;
+    currentUser = null;
+    selectedLoginUser = null;
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('pinGroup').classList.remove('visible');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+}
+
+function updateUserIndicator() {
+    if (!currentUser) return;
+    document.getElementById('userIndicator').innerHTML = `
+        <div class="ui-avatar" style="background:${currentUser.color};">${currentUser.name.charAt(0)}</div>
+        <span class="ui-name">${currentUser.name}</span>
+    `;
+}
+
+// ==================== AUDIT TRAIL ====================
+
+function renderAuditInfo(booking) {
+    const el = document.getElementById('auditInfo');
+    if (!booking) { el.style.display = 'none'; return; }
+
+    let html = '';
+    if (booking.createdBy) html += `<strong>Creada por:</strong> ${booking.createdBy} · ${formatAuditDate(booking.createdAt)}<br>`;
+    if (booking.updatedBy && booking.updatedAt !== booking.createdAt) {
+        html += `<strong>Última modificación:</strong> ${booking.updatedBy} · ${formatAuditDate(booking.updatedAt)}<br>`;
+    }
+
+    // Show history
+    if (booking.history && booking.history.length > 0) {
+        html += '<div style="margin-top:4px;"><strong>Historial:</strong></div>';
+        booking.history.slice().reverse().forEach(h => {
+            html += `<div style="padding-left:8px;">· Reserva ${h.action} por <strong>${h.user}</strong> el ${formatAuditDate(h.date)}</div>`;
+        });
+    }
+
+    el.innerHTML = html;
+    el.style.display = 'block';
+}
+
+function formatAuditDate(isoStr) {
+    if (!isoStr) return '-';
+    const d = new Date(isoStr);
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
@@ -3305,7 +3725,6 @@ function init() {
     const today = new Date();
     calendarMonth = today.getMonth();
     calendarYear = today.getFullYear();
-    // Start grid 3 days before today
     const startDate = addDays(today, -3);
     document.getElementById('startDate').value = dateStr(startDate);
     document.getElementById('currentDateDisplay').textContent =
@@ -3314,7 +3733,8 @@ function init() {
     renderGrid();
 }
 
-init();
+// Show login screen on startup
+renderLoginScreen();
 </script>
 
 <!-- FAB Button -->
