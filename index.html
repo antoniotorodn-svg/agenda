@@ -12,37 +12,42 @@
         body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #F2EDE5; color: #3d3d3d; }
 
         header {
-            background: linear-gradient(135deg, #7B96B5, #AECFE0);
-            color: #2c3e50; padding: 15px 30px;
+            background: white; color: #2c3e50; padding: 16px 28px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e8e8e8;
         }
-        header h1 { font-size: 1.5rem; font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; }
-        header .subtitle { font-size: 0.85rem; opacity: 0.7; color: #2c3e50; }
+        header h1 { font-size: 1.3rem; font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; font-weight: 700; }
+        header .subtitle { font-size: 0.78rem; color: #999; font-weight: 500; }
 
         .toolbar {
-            background: white; padding: 12px 30px;
-            display: flex; align-items: center; gap: 15px;
-            border-bottom: 1px solid #ddd; flex-wrap: wrap;
+            background: white; padding: 12px 28px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid #f0f0f0; flex-wrap: wrap;
         }
-        .toolbar label { font-weight: 600; font-size: 0.85rem; }
+        .toolbar label { font-weight: 600; font-size: 0.8rem; color: #888; }
         .toolbar input[type="date"] {
-            padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem;
+            padding: 7px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.82rem;
+            background: #fafafa; transition: border-color 0.15s;
+        }
+        .toolbar input[type="date"]:focus { border-color: #7B96B5; outline: none; }
+        .toolbar select {
+            padding: 7px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.82rem;
+            background: #fafafa; cursor: pointer;
         }
         .toolbar button {
-            padding: 7px 16px; border: none; border-radius: 4px;
-            cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+            padding: 7px 16px; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.15s;
         }
-        .btn-primary { background: #7B96B5; color: white; font-weight: 600; }
+        .btn-primary { background: #7B96B5; color: white; font-weight: 600; border-radius: 6px; }
         .btn-primary:hover { background: #6A85A3; }
-        .btn-success { background: #AECFE0; color: #2c3e50; font-weight: 600; }
-        .btn-success:hover { background: #96BFD4; }
-        .btn-danger { background: #d4a0a0; color: #5a2020; font-weight: 600; }
-        .btn-danger:hover { background: #d98888; }
-        .btn-secondary { background: #C0AD94; color: #3d2e1a; font-weight: 600; }
-        .btn-secondary:hover { background: #A89578; }
-        .btn-outline { background: transparent; border: 2px solid #7B96B5; color: #6A85A3; }
-        .btn-outline:hover { background: #7B96B5; color: white; }
+        .btn-success { background: #7B96B5; color: white; font-weight: 600; }
+        .btn-success:hover { background: #6A85A3; }
+        .btn-danger { background: #e8e0d8; color: #8a5a5a; font-weight: 600; }
+        .btn-danger:hover { background: #d4c4b8; }
+        .btn-secondary { background: #f0ebe4; color: #666; font-weight: 600; }
+        .btn-secondary:hover { background: #e0d8ce; }
+        .btn-outline { background: transparent; border: 1.5px solid #d0d0d0; color: #666; border-radius: 6px; }
+        .btn-outline:hover { background: #f5f5f5; color: #333; border-color: #999; }
 
         .nav-arrows { display: flex; gap: 5px; }
         .nav-arrows button { padding: 7px 12px; font-size: 1rem; }
@@ -56,13 +61,13 @@
         }
 
         .grid-container {
-            overflow-x: auto; padding: 20px 30px; position: relative;
+            overflow-x: auto; padding: 20px 28px; position: relative;
         }
 
         table.booking-grid {
             border-collapse: collapse; width: auto; min-width: 100%;
-            background: white; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
         }
         table.booking-grid th, table.booking-grid td {
             border: 1px solid #e0e0e0; text-align: center; font-size: 0.75rem;
@@ -128,16 +133,19 @@
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: white; border-radius: 12px; padding: 30px;
+            background: white; border-radius: 14px; padding: 28px;
             width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
         }
         .modal h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; font-family: 'Playfair Display', Georgia, serif; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;
-            font-size: 0.9rem;
+            width: 100%; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 6px;
+            font-size: 0.88rem; background: #fafafa; transition: border-color 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #7B96B5; outline: none; background: white;
         }
         .form-group textarea { height: 60px; resize: vertical; }
         .form-row { display: flex; gap: 15px; }
@@ -231,50 +239,7 @@
         .income-total-card .value { font-size: 1.2rem; font-weight: 700; color: #2c3e50; }
         .income-total-card .value.green { color: #6A85A3; }
 
-        /* View toggle */
-        .view-toggle { display: flex; gap: 0; }
-        .view-toggle button {
-            padding: 7px 14px; border: 1px solid #ccc; background: #f5f5f5;
-            font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-        .view-toggle button:first-child { border-radius: 4px 0 0 4px; }
-        .view-toggle button:last-child { border-radius: 0 4px 4px 0; }
-        .view-toggle button.active { background: #7B96B5; color: white; border-color: #7B96B5; }
-
-        /* Monthly Calendar */
-        .calendar-container { padding: 20px 30px; display: none; }
-        .calendar-container.active { display: block; }
-        .calendar-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .calendar-nav h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; color: #2c3e50; min-width: 180px; text-align: center; }
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
-            background: #e0e0e0; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-        .calendar-grid .cal-header {
-            background: #7B96B5; color: white; padding: 8px; text-align: center;
-            font-size: 0.8rem; font-weight: 600;
-        }
-        .calendar-grid .cal-day {
-            background: white; min-height: 90px; padding: 4px; cursor: pointer;
-            transition: background 0.15s; position: relative;
-        }
-        .calendar-grid .cal-day:hover { background: #F5EFE6; }
-        .calendar-grid .cal-day.other-month { background: #f5f5f5; opacity: 0.5; }
-        .calendar-grid .cal-day.today { box-shadow: inset 0 0 0 2px #7B96B5; }
-        .calendar-grid .cal-day.weekend { background: #F5EFE6; }
-        .calendar-grid .cal-day .day-num {
-            font-size: 0.8rem; font-weight: 700; color: #2c3e50; margin-bottom: 2px;
-        }
-        .calendar-grid .cal-day .cal-booking {
-            font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; margin-bottom: 1px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            cursor: pointer; font-weight: 600;
-        }
-        .calendar-grid .cal-day .cal-more {
-            font-size: 0.6rem; color: #666; font-weight: 600; cursor: pointer;
-        }
-        .cal-booking.status-blocked { background: #C0AD94; color: #3d2e1a; }
+        /* (Calendar removed) */
 
         /* Blocked dates */
         .status-blocked { background: #C0AD94; color: #3d2e1a; }
@@ -420,18 +385,6 @@
         .checklist-ok { color: #6A85A3; font-weight: 700; }
         .checklist-issues { color: #c0392b; font-weight: 700; }
 
-        /* House rules modal */
-        .rules-modal { width: 550px; }
-        .rules-textarea {
-            width: 100%; height: 300px; padding: 12px; border: 1px solid #ccc;
-            border-radius: 6px; font-size: 0.85rem; font-family: 'Inter', sans-serif;
-            resize: vertical; line-height: 1.5;
-        }
-        .rules-preview {
-            white-space: pre-wrap; font-size: 0.82rem; line-height: 1.6;
-            max-height: 350px; overflow-y: auto; padding: 12px;
-            background: #fafbfc; border: 1px solid #e0e0e0; border-radius: 6px;
-        }
 
         /* Reports modal */
         .reports-modal { width: 750px; }
@@ -561,14 +514,14 @@
         /* Login screen */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #7B96B5, #AECFE0);
+            background: linear-gradient(135deg, #f8f5f0, #e8e0d6);
             display: flex; align-items: center; justify-content: center;
             z-index: 9999;
         }
         .login-screen.hidden { display: none; }
         .login-box {
             background: white; border-radius: 16px; padding: 40px; width: 380px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04); text-align: center;
         }
         .login-box h1 { font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; margin-bottom: 5px; }
         .login-box .login-subtitle { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
@@ -625,8 +578,8 @@
         .audit-info strong { color: #2c3e50; }
 
         .stats-bar {
-            background: white; padding: 10px 30px; border-top: 1px solid #ddd;
-            display: flex; gap: 30px; font-size: 0.8rem; color: #666;
+            background: white; padding: 12px 28px; border-top: 1px solid #f0f0f0;
+            display: flex; gap: 24px; font-size: 0.78rem; color: #999;
         }
         .stat { display: flex; align-items: center; gap: 5px; }
         .stat strong { color: #2c3e50; font-weight: 700; }
@@ -639,6 +592,100 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .tooltip.active { display: block; }
+
+        /* ==================== INVOICES PANEL ==================== */
+        .invoices-panel { padding: 24px 30px; }
+        .invoices-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+        }
+        .invoices-header h2 {
+            font-family: 'Playfair Display', Georgia, serif; font-size: 1.3rem;
+            color: #2c3e50; margin: 0;
+        }
+        .invoices-filters {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .invoices-filters input {
+            padding: 7px 12px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 0.82rem; font-family: inherit;
+        }
+        .invoices-stats {
+            display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .inv-stat-card {
+            flex: 1; min-width: 140px; background: white; border-radius: 10px;
+            padding: 16px 20px; border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .inv-stat-label { font-size: 0.72rem; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+        .inv-stat-value { font-size: 1.3rem; font-weight: 700; color: #2c3e50; margin-top: 4px; }
+
+        .invoices-table {
+            width: 100%; border-collapse: collapse; font-size: 0.82rem;
+            background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .invoices-table th {
+            background: #7B96B5; color: white; padding: 10px 12px;
+            text-align: left; font-weight: 600; font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 0.03em;
+        }
+        .invoices-table td {
+            padding: 10px 12px; border-bottom: 1px solid #f0f0f0;
+        }
+        .invoices-table tr:hover td { background: #F5EFE6; }
+        .invoices-table tr:last-child td { border-bottom: none; }
+
+        .inv-status-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            font-size: 0.7rem; font-weight: 600;
+        }
+        .inv-status-paid { background: #dce8f0; color: #6A85A3; }
+        .inv-status-partial { background: #F5EFE6; color: #8a7560; }
+        .inv-status-pending { background: #f0e4dd; color: #8a6050; }
+
+        .btn-inv-view {
+            padding: 4px 12px; background: #7B96B5; color: white; border: none;
+            border-radius: 4px; font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .btn-inv-view:hover { background: #6A85A3; }
+
+        /* ==================== CLIENT PICKER ==================== */
+        .client-picker-section {
+            margin-bottom: 15px;
+        }
+        .client-picker-bar {
+            display: flex; gap: 8px; align-items: flex-end;
+        }
+        .btn-client-search {
+            padding: 8px 14px; background: #F5EFE6; color: #2c3e50; border: 1px solid #E6D8C3;
+            border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; white-space: nowrap; transition: all 0.15s;
+            height: 38px;
+        }
+        .btn-client-search:hover { background: #E6D8C3; }
+        .client-selected-info {
+            display: flex; align-items: center; gap: 12px; margin-top: 8px;
+            padding: 8px 14px; background: #dce8f0; border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        .csi-name { font-weight: 700; color: #2c3e50; }
+        .csi-doc { color: #6A85A3; font-size: 0.75rem; }
+        .csi-phone { color: #888; font-size: 0.75rem; }
+        .csi-clear {
+            margin-left: auto; background: none; border: none;
+            color: #999; cursor: pointer; font-size: 0.9rem; padding: 0 4px;
+        }
+        .csi-clear:hover { color: #c0392b; }
+
+        .btn-pick-client {
+            padding: 5px 12px; background: #7B96B5; color: white; border: none;
+            border-radius: 4px; font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; white-space: nowrap;
+        }
+        .btn-pick-client:hover { background: #6A85A3; }
 
         /* ==================== SIDEBAR ==================== */
         .app-layout {
@@ -748,7 +795,7 @@
         @media (max-width: 1024px) {
             .reports-modal, .invoice-modal, .client-modal { width: 95vw; }
             .income-modal, .search-modal, .client-detail-modal { width: 95vw; }
-            .checklist-modal, .rules-modal, .block-modal { width: 95vw; }
+            .checklist-modal, .block-modal { width: 95vw; }
             .rank-table { font-size: 0.75rem; }
             .rank-table th, .rank-table td { padding: 6px 6px; }
             .rank-bar-cell { width: 60px; }
@@ -779,15 +826,7 @@
             .toolbar select { font-size: 0.78rem; padding: 5px 4px; }
             .nav-arrows button { padding: 6px 8px; font-size: 0.9rem; }
             .legend { display: none; }
-            .view-toggle button { padding: 5px 10px; font-size: 0.72rem; }
-
             .grid-container { padding: 8px; }
-            .calendar-container { padding: 10px; }
-            .calendar-nav h3 { font-size: 0.95rem; min-width: 140px; }
-            .calendar-grid .cal-day { min-height: 60px; padding: 2px; }
-            .calendar-grid .cal-day .day-num { font-size: 0.7rem; }
-            .calendar-grid .cal-day .cal-booking { font-size: 0.55rem; }
-            .calendar-grid .cal-header { padding: 5px; font-size: 0.7rem; }
 
             .modal { padding: 20px 15px; width: 98vw; max-height: 95vh; border-radius: 10px; }
             .modal h2 { font-size: 1.05rem; margin-bottom: 14px; }
@@ -849,6 +888,18 @@
 
             .user-indicator { display: none; }
 
+            .invoices-panel { padding: 12px; }
+            .invoices-header { flex-direction: column; align-items: flex-start; }
+            .invoices-filters { width: 100%; }
+            .invoices-filters input { flex: 1; min-width: 0; }
+            .inv-stat-card { min-width: 100px; padding: 10px 14px; }
+            .inv-stat-value { font-size: 1rem; }
+            .invoices-table { font-size: 0.72rem; }
+            .invoices-table th, .invoices-table td { padding: 6px 8px; }
+
+            .client-picker-bar { flex-direction: column; }
+            .btn-client-search { width: 100%; height: auto; }
+
             .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 15px; right: 15px; }
         }
 
@@ -873,13 +924,6 @@
             .room-header .room-type { font-size: 0.6rem; }
             .booking-block { font-size: 0.6rem; }
             .floor-separator td, .floor-separator th { font-size: 0.7rem; padding: 3px 6px; }
-
-            .calendar-container { padding: 4px; }
-            .calendar-nav { gap: 6px; margin-bottom: 8px; }
-            .calendar-nav h3 { font-size: 0.85rem; min-width: 110px; }
-            .calendar-grid .cal-day { min-height: 45px; }
-            .calendar-grid .cal-day .cal-booking { font-size: 0.5rem; padding: 0 2px; }
-            .calendar-grid .cal-header { font-size: 0.6rem; padding: 4px 2px; }
 
             .modal { padding: 15px 10px; border-radius: 8px; }
             .modal h2 { font-size: 0.95rem; margin-bottom: 10px; }
@@ -917,9 +961,6 @@
             .toolbar button { font-size: 0.65rem; padding: 4px 5px; }
             .modal { padding: 12px 8px; }
             .form-group label { font-size: 0.72rem; }
-            .calendar-grid .cal-day { min-height: 36px; }
-            .calendar-grid .cal-day .day-num { font-size: 0.6rem; }
-            .calendar-grid .cal-day .cal-booking { display: none; }
             .fab-btn { width: 44px; height: 44px; font-size: 1.3rem; bottom: 10px; right: 10px; }
         }
 
@@ -949,13 +990,12 @@
             .login-subtitle { margin-bottom: 10px !important; }
             .user-cards { flex-direction: row; flex-wrap: wrap; }
             .user-card { flex: 1; min-width: 120px; }
-            .calendar-grid .cal-day { min-height: 50px; }
         }
 
         /* Print styles */
         @media print {
             .sidebar, .sidebar-overlay, .toolbar, .stats-bar, .fab-btn, .tooltip,
-            .modal-overlay, .nav-arrows, .view-toggle, .legend, .hamburger-btn { display: none !important; }
+            .modal-overlay, .nav-arrows, .legend, .hamburger-btn { display: none !important; }
             .main-content { margin-left: 0 !important; }
             header { box-shadow: none; }
             .grid-container { padding: 0; overflow: visible; }
@@ -996,10 +1036,6 @@
             <span class="si-icon">▦</span>
             <span class="si-label">Tabla de Reservas</span>
         </div>
-        <div class="sidebar-item" onclick="sidebarNav('calendar')" data-section="calendar">
-            <span class="si-icon">📅</span>
-            <span class="si-label">Calendario</span>
-        </div>
         <div class="sidebar-item" onclick="sidebarNav('newBooking')" data-section="newBooking">
             <span class="si-icon">＋</span>
             <span class="si-label">Nueva Reserva</span>
@@ -1014,6 +1050,10 @@
         </div>
 
         <div class="sidebar-section">Finanzas</div>
+        <div class="sidebar-item" onclick="sidebarNav('invoices')" data-section="invoices">
+            <span class="si-icon">🧾</span>
+            <span class="si-label">Facturas</span>
+        </div>
         <div class="sidebar-item" onclick="sidebarNav('income')" data-section="income">
             <span class="si-icon">💰</span>
             <span class="si-label">Ingresos</span>
@@ -1027,10 +1067,6 @@
         <div class="sidebar-item" onclick="sidebarNav('clients')" data-section="clients">
             <span class="si-icon">👤</span>
             <span class="si-label">Clientes</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
-            <span class="si-icon">📋</span>
-            <span class="si-label">Normas Casa Rural</span>
         </div>
 
         <div class="sidebar-section">Datos</div>
@@ -1108,11 +1144,6 @@
         <option value="60">60 días</option>
     </select>
 
-    <div class="view-toggle">
-        <button class="active" id="viewGrid" onclick="switchView('grid')">Tabla</button>
-        <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
-    </div>
-
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
 </div>
 
@@ -1120,16 +1151,17 @@
     <table class="booking-grid" id="bookingGrid"></table>
 </div>
 
-<div class="calendar-container" id="calendarContainer">
-    <div class="calendar-nav" style="flex-wrap:wrap;">
-        <button class="btn-outline" onclick="navigateCalendarYear(-1)" title="Año anterior">«</button>
-        <h3 id="calendarYearTitle" style="min-width:50px;"></h3>
-        <button class="btn-outline" onclick="navigateCalendarYear(1)" title="Año siguiente">»</button>
-        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:6px;">Hoy</button>
+<!-- Invoices Panel -->
+<div class="invoices-panel" id="invoicesPanel" style="display:none;">
+    <div class="invoices-header">
+        <h2>Facturas</h2>
+        <div class="invoices-filters">
+            <input type="month" id="invoiceMonthFilter" onchange="renderInvoicesList()">
+            <input type="text" id="invoiceSearchFilter" placeholder="Buscar cliente, hab..." oninput="renderInvoicesList()" style="width:200px;">
+        </div>
     </div>
-    <div class="calendar-month-tabs" id="calendarMonthTabs" style="display:flex; gap:0; margin-bottom:12px; flex-wrap:wrap;">
-    </div>
-    <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="invoices-stats" id="invoicesStats"></div>
+    <div class="invoices-list" id="invoicesList"></div>
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
@@ -1219,20 +1251,33 @@
     <div class="modal">
         <h2 id="modalTitle">Nueva Reserva</h2>
         <input type="hidden" id="bookingId">
-        <div class="form-row">
-            <div class="form-group autocomplete-wrapper">
-                <label>Nombre del huésped *</label>
-                <input type="text" id="guestName" placeholder="Nombre completo" autocomplete="off" oninput="onGuestNameInput(this.value)" onfocus="onGuestNameInput(this.value)">
-                <div class="autocomplete-list" id="guestAutocomplete" style="display:none;"></div>
+        <div class="client-picker-section">
+            <div class="client-picker-bar">
+                <div class="form-group autocomplete-wrapper" style="flex:1;margin-bottom:0;">
+                    <label>Cliente *</label>
+                    <input type="text" id="guestName" placeholder="Escribe para buscar o crea nuevo..." autocomplete="off" oninput="onGuestNameInput(this.value)" onfocus="onGuestNameInput(this.value)">
+                    <div class="autocomplete-list" id="guestAutocomplete" style="display:none;"></div>
+                </div>
+                <button type="button" class="btn-client-search" onclick="openClientPickerModal()" title="Buscar en base de datos">
+                    👤 Buscar cliente
+                </button>
             </div>
+            <div class="client-selected-info" id="clientSelectedInfo" style="display:none;">
+                <span class="csi-name" id="csiName"></span>
+                <span class="csi-doc" id="csiDoc"></span>
+                <span class="csi-phone" id="csiPhone"></span>
+                <button type="button" class="csi-clear" onclick="clearSelectedClient()" title="Limpiar">✕</button>
+            </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
                 <label>Teléfono</label>
                 <input type="tel" id="guestPhone" placeholder="+34 600 000 000">
             </div>
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="guestEmail" placeholder="email@ejemplo.com">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="guestEmail" placeholder="email@ejemplo.com">
+            </div>
         </div>
         <div class="doc-section">
             <h4>Documento de identidad (obligatorio)</h4>
@@ -1338,7 +1383,6 @@
             </div>
             <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
                 <button type="button" class="btn-primary" onclick="openChecklist()" style="font-size:0.78rem;">Checklist Inventario</button>
-                <button type="button" class="btn-primary" onclick="openRulesModal()" style="font-size:0.78rem;">Normas de la Casa</button>
             </div>
         </div>
 
@@ -1446,26 +1490,6 @@
 </div>
 
 <!-- Modal Normas de la Casa -->
-<div class="modal-overlay" id="rulesModal">
-    <div class="modal rules-modal">
-        <h2>Normas de la Casa - Villarrubia</h2>
-        <div class="checklist-tabs" id="rulesTabs">
-            <div class="checklist-tab active" onclick="switchRulesTab('edit')">Editar</div>
-            <div class="checklist-tab" onclick="switchRulesTab('preview')">Vista previa</div>
-        </div>
-        <div id="rulesEditContainer">
-            <textarea class="rules-textarea" id="rulesText"></textarea>
-        </div>
-        <div id="rulesPreviewContainer" style="display:none;">
-            <div class="rules-preview" id="rulesPreview"></div>
-        </div>
-        <div class="form-actions" style="margin-top:15px;">
-            <button class="btn-primary" onclick="copyRules()" style="margin-right:auto;">Copiar normas</button>
-            <button class="btn-secondary" onclick="closeRulesModal()">Cerrar</button>
-            <button class="btn-success" onclick="saveRules()">Guardar</button>
-        </div>
-    </div>
-</div>
 
 <!-- Modal Informes -->
 <div class="modal-overlay" id="reportsModal">
@@ -1664,8 +1688,6 @@ let currentPayments = []; // temp payments for modal editing
 let currentChecklist = { checkin: [], checkout: [] };
 let currentChecklistTab = 'checkin';
 let currentView = 'grid';
-let calendarMonth = new Date().getMonth();
-let calendarYear = new Date().getFullYear();
 
 // ==================== PERSISTENCE ====================
 
@@ -2461,110 +2483,6 @@ function renderIncomeByWeek(allPayments) {
 
 // ==================== VIEW TOGGLE ====================
 
-function switchView(view) {
-    currentView = view;
-    document.getElementById('viewGrid').classList.toggle('active', view === 'grid');
-    document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
-    document.getElementById('gridContainer').style.display = view === 'grid' ? 'block' : 'none';
-    document.getElementById('calendarContainer').classList.toggle('active', view === 'calendar');
-    // Update sidebar active
-    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-    const sidebarSection = view === 'grid' ? 'grid' : 'calendar';
-    const sItem = document.querySelector(`.sidebar-item[data-section="${sidebarSection}"]`);
-    if (sItem) sItem.classList.add('active');
-    if (view === 'calendar') renderCalendar();
-}
-
-// ==================== MONTHLY CALENDAR ====================
-
-function navigateMonth(dir) {
-    calendarMonth += dir;
-    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-    renderCalendar();
-}
-
-function goToCurrentMonth() {
-    const now = new Date();
-    calendarMonth = now.getMonth();
-    calendarYear = now.getFullYear();
-    renderCalendar();
-}
-
-function renderCalendar() {
-    renderCalendarMonthTabs();
-
-    const firstDay = new Date(calendarYear, calendarMonth, 1);
-    const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
-    const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
-    const today = todayStr();
-
-    const dayLabels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-    let html = dayLabels.map(d => `<div class="cal-header">${d}</div>`).join('');
-
-    // Fill leading empty days
-    const prevMonth = new Date(calendarYear, calendarMonth, 0);
-    for (let i = startDow - 1; i >= 0; i--) {
-        const day = prevMonth.getDate() - i;
-        const d = new Date(calendarYear, calendarMonth - 1, day);
-        html += buildCalendarDay(d, today, true);
-    }
-
-    // Fill current month days
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const d = new Date(calendarYear, calendarMonth, day);
-        html += buildCalendarDay(d, today, false);
-    }
-
-    // Fill trailing days
-    const totalCells = startDow + lastDay.getDate();
-    const remaining = (7 - (totalCells % 7)) % 7;
-    for (let i = 1; i <= remaining; i++) {
-        const d = new Date(calendarYear, calendarMonth + 1, i);
-        html += buildCalendarDay(d, today, true);
-    }
-
-    document.getElementById('calendarGrid').innerHTML = html;
-}
-
-function buildCalendarDay(d, today, otherMonth) {
-    const ds = dateStr(d);
-    const isToday = ds === today;
-    const isWe = d.getDay() === 0 || d.getDay() === 6;
-    let cls = 'cal-day';
-    if (otherMonth) cls += ' other-month';
-    if (isToday) cls += ' today';
-    if (isWe && !otherMonth) cls += ' weekend';
-
-    // Find bookings and blocks for this date across all rooms
-    const dayBookings = bookings.filter(b => ds >= b.checkin && ds < b.checkout);
-    const dayBlocks = blocks.filter(bl => ds >= bl.from && ds < bl.to);
-
-    let items = '';
-    const maxShow = 3;
-    const all = [];
-
-    dayBookings.forEach(b => {
-        const room = ROOMS.find(r => r.number === b.room);
-        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : b.room) : b.room;
-        all.push(`<div class="cal-booking status-${b.status}" onclick="event.stopPropagation();editBooking('${b.id}')" title="${b.guestName} - Hab.${roomLabel}">${roomLabel} ${b.guestName.split(' ')[0]}</div>`);
-    });
-    dayBlocks.forEach(bl => {
-        const room = ROOMS.find(r => r.number === bl.room);
-        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : bl.room) : bl.room;
-        all.push(`<div class="cal-booking status-blocked" onclick="event.stopPropagation();editBlock('${bl.id}')" title="Bloqueado - ${BLOCK_REASON_LABELS[bl.reason]}">${roomLabel} ${BLOCK_REASON_LABELS[bl.reason]}</div>`);
-    });
-
-    if (all.length <= maxShow) {
-        items = all.join('');
-    } else {
-        items = all.slice(0, maxShow - 1).join('');
-        items += `<div class="cal-more">+${all.length - maxShow + 1} más</div>`;
-    }
-
-    return `<div class="${cls}" onclick="openNewBooking(null,'${ds}')"><div class="day-num">${d.getDate()}</div>${items}</div>`;
-}
-
 // ==================== AVAILABILITY SEARCH ====================
 
 function openSearchModal() {
@@ -2930,14 +2848,19 @@ function renderClientList() {
         const stays = getCustomerStays(c);
         const stayCount = stays.length;
         const docInfo = c.docNumber ? `${(c.docType || 'doc').toUpperCase()}: ${c.docNumber}` : 'Sin documento';
-        return `<div class="client-card" onclick="openClientDetail('${c.id}')">
+        const pickMode = document.getElementById('clientsModal')._pickMode;
+        const pickBtn = pickMode ? `<button class="btn-pick-client" onclick="event.stopPropagation();selectClientForBooking('${c.id}')">Seleccionar</button>` : '';
+        return `<div class="client-card" onclick="${pickMode ? `selectClientForBooking('${c.id}')` : `openClientDetail('${c.id}')`}">
             <div>
                 <div class="client-name">${c.name}</div>
                 <div class="client-info">${c.phone || 'Sin teléfono'} · ${docInfo}</div>
             </div>
-            <div style="text-align:right;">
-                <div class="client-stays">${stayCount} estancia${stayCount !== 1 ? 's' : ''}</div>
-                <div class="client-info">${c.email || ''}</div>
+            <div style="text-align:right;display:flex;align-items:center;gap:8px;">
+                ${pickBtn}
+                <div>
+                    <div class="client-stays">${stayCount} estancia${stayCount !== 1 ? 's' : ''}</div>
+                    <div class="client-info">${c.email || ''}</div>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -3911,7 +3834,7 @@ function formatAuditDate(isoStr) {
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeReportsModal(); closeWizard(); closeInvoiceModal(); }
 });
 
 // ==================== INIT ====================
@@ -3934,16 +3857,22 @@ function sidebarNav(section) {
     const item = document.querySelector(`.sidebar-item[data-section="${section}"]`);
     if (item) item.classList.add('active');
 
+    // Hide/show panels
+    const isPanel = (section === 'grid' || section === 'invoices');
+    document.getElementById('gridContainer').style.display = (section === 'grid' || !isPanel) ? 'block' : 'none';
+    document.getElementById('invoicesPanel').style.display = section === 'invoices' ? 'block' : 'none';
+    document.querySelector('.toolbar').style.display = section === 'invoices' ? 'none' : 'flex';
+    document.getElementById('statsBar').style.display = section === 'invoices' ? 'none' : 'flex';
+
     switch(section) {
-        case 'grid': switchView('grid'); break;
-        case 'calendar': switchView('calendar'); break;
+        case 'grid': break;
+        case 'invoices': renderInvoicesList(); break;
         case 'newBooking': openNewBooking(); break;
         case 'search': openSearchModal(); break;
         case 'block': openBlockModal(); break;
         case 'income': openIncomeModal(); break;
         case 'reports': openReportsModal(); break;
         case 'clients': openClientsModal(); break;
-        case 'rules': openRulesModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
     }
@@ -3957,35 +3886,149 @@ function updateSidebarUser() {
     document.getElementById('sidebarUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : 'Recepción';
 }
 
-// ==================== CALENDAR YEAR/MONTH TABS ====================
+// ==================== INVOICES PANEL ====================
 
-function navigateCalendarYear(dir) {
-    calendarYear += dir;
-    renderCalendar();
+function renderInvoicesList() {
+    const monthFilter = document.getElementById('invoiceMonthFilter').value;
+    const searchFilter = (document.getElementById('invoiceSearchFilter').value || '').toLowerCase();
+
+    // Get all bookings that have checkout in the past or payments
+    let invoiceBookings = bookings.filter(b => {
+        const hasCheckout = b.checkout <= todayStr() || b.status === 'checkedout';
+        const hasPaid = (b.payments || []).length > 0;
+        return hasCheckout || hasPaid;
+    });
+
+    // Filter by month
+    if (monthFilter) {
+        invoiceBookings = invoiceBookings.filter(b => b.checkin.startsWith(monthFilter));
+    }
+
+    // Filter by search
+    if (searchFilter) {
+        invoiceBookings = invoiceBookings.filter(b =>
+            b.guestName.toLowerCase().includes(searchFilter) ||
+            String(b.room).toLowerCase().includes(searchFilter) ||
+            (b.docNumber || '').toLowerCase().includes(searchFilter)
+        );
+    }
+
+    // Sort by checkin desc
+    invoiceBookings.sort((a, b) => b.checkin.localeCompare(a.checkin));
+
+    // Stats
+    let totalRevenue = 0, totalPaid = 0, totalPending = 0;
+    invoiceBookings.forEach(b => {
+        const nights = nightsBetween(b.checkin, b.checkout);
+        const total = nights * b.pricePerNight;
+        const paid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
+        totalRevenue += total;
+        totalPaid += paid;
+        totalPending += Math.max(0, total - paid);
+    });
+
+    document.getElementById('invoicesStats').innerHTML = `
+        <div class="inv-stat-card">
+            <div class="inv-stat-label">Total facturado</div>
+            <div class="inv-stat-value">${totalRevenue.toFixed(2)} €</div>
+        </div>
+        <div class="inv-stat-card">
+            <div class="inv-stat-label">Cobrado</div>
+            <div class="inv-stat-value" style="color:#6A85A3;">${totalPaid.toFixed(2)} €</div>
+        </div>
+        <div class="inv-stat-card">
+            <div class="inv-stat-label">Pendiente</div>
+            <div class="inv-stat-value" style="color:#c0392b;">${totalPending.toFixed(2)} €</div>
+        </div>
+        <div class="inv-stat-card">
+            <div class="inv-stat-label">Facturas</div>
+            <div class="inv-stat-value">${invoiceBookings.length}</div>
+        </div>
+    `;
+
+    if (invoiceBookings.length === 0) {
+        document.getElementById('invoicesList').innerHTML = '<div class="no-results">No hay facturas para este periodo</div>';
+        return;
+    }
+
+    document.getElementById('invoicesList').innerHTML = `
+        <table class="invoices-table">
+            <thead><tr>
+                <th>N.º Factura</th>
+                <th>Cliente</th>
+                <th>Hab.</th>
+                <th>Fechas</th>
+                <th>Noches</th>
+                <th style="text-align:right;">Total</th>
+                <th style="text-align:right;">Pagado</th>
+                <th>Estado</th>
+                <th></th>
+            </tr></thead>
+            <tbody>
+            ${invoiceBookings.map(b => {
+                const nights = nightsBetween(b.checkin, b.checkout);
+                const total = nights * b.pricePerNight;
+                const paid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
+                const remaining = Math.max(0, total - paid);
+                const invoiceNum = 'F-' + b.checkin.replace(/-/g, '') + '-' + String(b.room).replace(/[^a-zA-Z0-9]/g, '');
+                const statusClass = remaining <= 0 ? 'inv-status-paid' : paid > 0 ? 'inv-status-partial' : 'inv-status-pending';
+                const statusLabel = remaining <= 0 ? 'Pagada' : paid > 0 ? 'Parcial' : 'Pendiente';
+                return `<tr>
+                    <td><strong>${invoiceNum}</strong></td>
+                    <td>${b.guestName}</td>
+                    <td>${b.room}</td>
+                    <td>${b.checkin} → ${b.checkout}</td>
+                    <td style="text-align:center;">${nights}</td>
+                    <td style="text-align:right;font-weight:600;">${total.toFixed(2)} €</td>
+                    <td style="text-align:right;">${paid.toFixed(2)} €</td>
+                    <td><span class="inv-status-badge ${statusClass}">${statusLabel}</span></td>
+                    <td><button class="btn-inv-view" onclick="viewInvoiceFromList('${b.id}')">Ver</button></td>
+                </tr>`;
+            }).join('')}
+            </tbody>
+        </table>
+    `;
 }
 
-function goToCalendarMonth(month) {
-    calendarMonth = month;
-    renderCalendar();
+function viewInvoiceFromList(bookingId) {
+    const b = bookings.find(x => x.id === bookingId);
+    if (!b) return;
+    // Temporarily set bookingId to generate the invoice
+    document.getElementById('bookingId').value = bookingId;
+    generateInvoice();
 }
 
-function renderCalendarMonthTabs() {
-    const shortMonths = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const container = document.getElementById('calendarMonthTabs');
-    const yearTitle = document.getElementById('calendarYearTitle');
-    if (yearTitle) yearTitle.textContent = calendarYear;
-    if (!container) return;
-    container.innerHTML = shortMonths.map((m, i) =>
-        `<button onclick="goToCalendarMonth(${i})" style="
-            padding:5px 0; flex:1; min-width:0; border:1px solid #ccc; font-size:0.72rem;
-            font-weight:600; cursor:pointer; transition:all 0.15s;
-            background:${i === calendarMonth ? '#7B96B5' : '#f5f5f5'};
-            color:${i === calendarMonth ? 'white' : '#555'};
-            border-color:${i === calendarMonth ? '#7B96B5' : '#ccc'};
-            ${i === 0 ? 'border-radius:4px 0 0 4px;' : ''}
-            ${i === 11 ? 'border-radius:0 4px 4px 0;' : ''}
-        ">${m}</button>`
-    ).join('');
+// ==================== CLIENT PICKER FOR BOOKING ====================
+
+function openClientPickerModal() {
+    openClientsModal();
+    // Add pick mode
+    document.getElementById('clientsModal')._pickMode = true;
+}
+
+function clearSelectedClient() {
+    document.getElementById('clientSelectedInfo').style.display = 'none';
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestPhone').value = '';
+    document.getElementById('guestEmail').value = '';
+    document.getElementById('docType').value = 'dni';
+    document.getElementById('docNumber').value = '';
+    document.getElementById('guestNationality').value = '';
+}
+
+function selectClientForBooking(customerId) {
+    const c = customers.find(x => x.id === customerId);
+    if (!c) return;
+    selectCustomer(customerId);
+    // Show selected info bar
+    const info = document.getElementById('clientSelectedInfo');
+    document.getElementById('csiName').textContent = c.name;
+    document.getElementById('csiDoc').textContent = c.docNumber ? `${(c.docType || 'DNI').toUpperCase()}: ${c.docNumber}` : '';
+    document.getElementById('csiPhone').textContent = c.phone || '';
+    info.style.display = 'flex';
+    // Close clients modal
+    document.getElementById('clientsModal').classList.remove('active');
+    document.getElementById('clientsModal')._pickMode = false;
 }
 
 function init() {
@@ -3994,9 +4037,8 @@ function init() {
     populateBlockRoomSelect();
 
     const today = new Date();
-    calendarMonth = today.getMonth();
-    calendarYear = today.getFullYear();
     const startDate = addDays(today, -3);
+    document.getElementById('invoiceMonthFilter').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
     document.getElementById('startDate').value = dateStr(startDate);
     document.getElementById('currentDateDisplay').textContent =
         `${DAY_NAMES[today.getDay()]} ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()}`;
