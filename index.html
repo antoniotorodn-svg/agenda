@@ -231,6 +231,78 @@
         .income-total-card .value { font-size: 1.2rem; font-weight: 700; color: #2c3e50; }
         .income-total-card .value.green { color: #2e7d32; }
 
+        /* View toggle */
+        .view-toggle { display: flex; gap: 0; }
+        .view-toggle button {
+            padding: 7px 14px; border: 1px solid #ccc; background: #f5f5f5;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .view-toggle button:first-child { border-radius: 4px 0 0 4px; }
+        .view-toggle button:last-child { border-radius: 0 4px 4px 0; }
+        .view-toggle button.active { background: #7eb8c9; color: #2c3e50; border-color: #7eb8c9; }
+
+        /* Monthly Calendar */
+        .calendar-container { padding: 20px 30px; display: none; }
+        .calendar-container.active { display: block; }
+        .calendar-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .calendar-nav h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; color: #2c3e50; min-width: 180px; text-align: center; }
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
+            background: #e0e0e0; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .calendar-grid .cal-header {
+            background: #6b9dad; color: white; padding: 8px; text-align: center;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .calendar-grid .cal-day {
+            background: white; min-height: 90px; padding: 4px; cursor: pointer;
+            transition: background 0.15s; position: relative;
+        }
+        .calendar-grid .cal-day:hover { background: #f0f8ff; }
+        .calendar-grid .cal-day.other-month { background: #f5f5f5; opacity: 0.5; }
+        .calendar-grid .cal-day.today { box-shadow: inset 0 0 0 2px #8cc98c; }
+        .calendar-grid .cal-day.weekend { background: #faf3ea; }
+        .calendar-grid .cal-day .day-num {
+            font-size: 0.8rem; font-weight: 700; color: #2c3e50; margin-bottom: 2px;
+        }
+        .calendar-grid .cal-day .cal-booking {
+            font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; margin-bottom: 1px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            cursor: pointer; font-weight: 600;
+        }
+        .calendar-grid .cal-day .cal-more {
+            font-size: 0.6rem; color: #666; font-weight: 600; cursor: pointer;
+        }
+        .cal-booking.status-blocked { background: #d4a0a0; color: #5a1a1a; }
+
+        /* Blocked dates */
+        .status-blocked { background: #d4a0a0; color: #5a1a1a; }
+
+        /* Availability search modal */
+        .search-modal { width: 650px; }
+        .search-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; align-items: flex-end; }
+        .search-form .form-group { margin-bottom: 0; }
+        .search-results { max-height: 400px; overflow-y: auto; }
+        .search-result-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px;
+            margin-bottom: 8px; background: white; transition: all 0.2s;
+        }
+        .search-result-item:hover { border-color: #7eb8c9; background: #f0f8ff; }
+        .search-result-item .result-room { font-weight: 700; font-size: 0.9rem; color: #2c3e50; }
+        .search-result-item .result-details { font-size: 0.8rem; color: #666; }
+        .search-result-item .result-price { font-weight: 700; color: #2e7d32; font-size: 0.95rem; }
+        .btn-book-result {
+            padding: 5px 14px; background: #a8d8a8; color: #2c4a2c; border: none;
+            border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-book-result:hover { background: #8cc98c; }
+        .no-results { text-align: center; color: #999; padding: 30px; font-size: 0.9rem; }
+
+        /* Block modal */
+        .block-modal { width: 450px; }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -290,7 +362,14 @@
         <option value="60">60 días</option>
     </select>
 
+    <div class="view-toggle">
+        <button class="active" id="viewGrid" onclick="switchView('grid')">Tabla</button>
+        <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
+    </div>
+
     <button class="btn-success" onclick="openNewBooking()">+ Nueva Reserva</button>
+    <button class="btn-primary" onclick="openSearchModal()">Buscar Disponibilidad</button>
+    <button class="btn-primary" onclick="openBlockModal()">Bloquear Fechas</button>
     <button class="btn-primary" onclick="openIncomeModal()">Ingresos</button>
     <button class="btn-secondary" onclick="exportData()">Exportar</button>
     <button class="btn-secondary" onclick="importData()">Importar</button>
@@ -301,16 +380,104 @@
         <div class="legend-item"><div class="legend-color status-pending"></div> Pendiente</div>
         <div class="legend-item"><div class="legend-color status-checkedin"></div> Check-in</div>
         <div class="legend-item"><div class="legend-color status-checkedout"></div> Check-out</div>
+        <div class="legend-item"><div class="legend-color status-blocked"></div> Bloqueada</div>
     </div>
 </div>
 
-<div class="grid-container">
+<div class="grid-container" id="gridContainer">
     <table class="booking-grid" id="bookingGrid"></table>
+</div>
+
+<div class="calendar-container" id="calendarContainer">
+    <div class="calendar-nav">
+        <button class="btn-outline" onclick="navigateMonth(-1)">‹</button>
+        <h3 id="calendarTitle"></h3>
+        <button class="btn-outline" onclick="navigateMonth(1)">›</button>
+        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:10px;">Hoy</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
 
 <div class="tooltip" id="tooltip"></div>
+
+<!-- Modal Buscar Disponibilidad -->
+<div class="modal-overlay" id="searchModal">
+    <div class="modal search-modal">
+        <h2>Buscar Disponibilidad</h2>
+        <div class="search-form">
+            <div class="form-group" style="flex:1;min-width:120px;">
+                <label>Desde</label>
+                <input type="date" id="searchFrom">
+            </div>
+            <div class="form-group" style="width:90px;">
+                <label>Noches</label>
+                <input type="number" id="searchNights" min="1" value="1" style="width:100%;">
+            </div>
+            <div class="form-group" style="width:100px;">
+                <label>Personas</label>
+                <input type="number" id="searchGuests" min="1" value="2" style="width:100%;">
+            </div>
+            <div class="form-group" style="width:130px;">
+                <label>Tipo hab.</label>
+                <select id="searchBedType" style="width:100%;">
+                    <option value="any">Cualquiera</option>
+                    <option value="double">Matrimonio</option>
+                    <option value="twin">Dos camas</option>
+                    <option value="rural">Casa Rural</option>
+                </select>
+            </div>
+            <button class="btn-success" onclick="searchAvailability()" style="align-self:flex-end;">Buscar</button>
+        </div>
+        <div class="search-results" id="searchResults">
+            <div class="no-results">Introduce los criterios y pulsa Buscar</div>
+        </div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeSearchModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bloquear Fechas -->
+<div class="modal-overlay" id="blockModal">
+    <div class="modal block-modal">
+        <h2 id="blockModalTitle">Bloquear Fechas</h2>
+        <input type="hidden" id="blockId">
+        <div class="form-group">
+            <label>Habitación *</label>
+            <select id="blockRoom"></select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Desde *</label>
+                <input type="date" id="blockFrom">
+            </div>
+            <div class="form-group">
+                <label>Hasta *</label>
+                <input type="date" id="blockTo">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Motivo</label>
+            <select id="blockReason">
+                <option value="maintenance">Mantenimiento</option>
+                <option value="personal">Uso propio</option>
+                <option value="closed">Temporada cerrada</option>
+                <option value="other">Otro</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Notas</label>
+            <textarea id="blockNotes" placeholder="Detalles del bloqueo..."></textarea>
+        </div>
+        <div class="form-actions">
+            <button class="btn-danger" id="deleteBlockBtn" onclick="deleteBlock()" style="display:none; margin-right:auto;">Eliminar Bloqueo</button>
+            <button class="btn-secondary" onclick="closeBlockModal()">Cancelar</button>
+            <button class="btn-success" onclick="saveBlock()">Guardar Bloqueo</button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Nueva/Editar Reserva -->
 <div class="modal-overlay" id="bookingModal">
@@ -492,8 +659,13 @@ const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct'
 const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const STATUS_LABELS = {
     pending: 'Pendiente', confirmed: 'Confirmada',
-    checkedin: 'Check-in', checkedout: 'Check-out'
+    checkedin: 'Check-in', checkedout: 'Check-out', blocked: 'Bloqueada'
 };
+const BLOCK_REASON_LABELS = {
+    maintenance: 'Mantenimiento', personal: 'Uso propio',
+    closed: 'Temporada cerrada', other: 'Otro'
+};
+const MONTH_NAMES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const PAYMENT_STATUS_LABELS = {
     pending_payment: 'Pendiente de cobro',
     deposit_paid: 'Seña entregada',
@@ -506,7 +678,11 @@ const PAYMENT_TYPE_LABELS = {
 };
 
 let bookings = [];
+let blocks = [];
 let currentPayments = []; // temp payments for modal editing
+let currentView = 'grid';
+let calendarMonth = new Date().getMonth();
+let calendarYear = new Date().getFullYear();
 
 // ==================== PERSISTENCE ====================
 
@@ -514,10 +690,17 @@ function loadBookings() {
     try {
         bookings = JSON.parse(localStorage.getItem('hostal_jijones_bookings') || '[]');
     } catch { bookings = []; }
+    try {
+        blocks = JSON.parse(localStorage.getItem('hostal_jijones_blocks') || '[]');
+    } catch { blocks = []; }
 }
 
 function saveBookings() {
     localStorage.setItem('hostal_jijones_bookings', JSON.stringify(bookings));
+}
+
+function saveBlocks() {
+    localStorage.setItem('hostal_jijones_blocks', JSON.stringify(blocks));
 }
 
 // ==================== DATE HELPERS ====================
@@ -558,12 +741,29 @@ function getBookingsForRoomAndDate(roomNumber, date) {
 }
 
 function hasConflict(roomNumber, checkin, checkout, excludeId) {
-    return bookings.some(b =>
+    const bookingConflict = bookings.some(b =>
         b.room === roomNumber &&
         b.id !== excludeId &&
         b.checkin < checkout &&
         b.checkout > checkin
     );
+    const blockConflict = blocks.some(bl =>
+        bl.room === roomNumber &&
+        bl.id !== excludeId &&
+        bl.from < checkout &&
+        bl.to > checkin
+    );
+    return bookingConflict || blockConflict;
+}
+
+function getBlocksForRoomAndDate(roomNumber, date) {
+    return blocks.filter(bl =>
+        bl.room === roomNumber && date >= bl.from && date < bl.to
+    );
+}
+
+function isRoomAvailable(roomNumber, checkin, checkout) {
+    return !hasConflict(roomNumber, checkin, checkout, null);
 }
 
 // ==================== GRID RENDERING ====================
@@ -610,6 +810,7 @@ function renderGrid() {
 
         dates.forEach(ds => {
             const matches = getBookingsForRoomAndDate(room.number, ds);
+            const blockMatches = getBlocksForRoomAndDate(room.number, ds);
             const we = isWeekend(parseDate(ds)) ? ' weekend' : '';
             const tod = ds === today ? ' today' : '';
 
@@ -631,8 +832,23 @@ function renderGrid() {
                     onmouseenter="showTooltip(event,'${b.id}')" onmouseleave="hideTooltip()"
                     onclick="editBooking('${b.id}')">
                     <div class="booking-block status-${b.status} ${posClass}">${label}${payDot}</div></td>`;
+            } else if (blockMatches.length > 0) {
+                const bl = blockMatches[0];
+                const isStart = ds === bl.from;
+                const endDate = dateStr(addDays(parseDate(bl.to), -1));
+                const isEnd = ds === endDate;
+                const isSingle = isStart && isEnd;
+                let posClass = '';
+                if (isSingle) posClass = 'booking-single';
+                else if (isStart) posClass = 'booking-start';
+                else if (isEnd) posClass = 'booking-end';
+                const label = isStart ? BLOCK_REASON_LABELS[bl.reason] || 'Bloqueado' : '';
+                html += `<td class="day-cell booked${we}${tod}"
+                    onmouseenter="showBlockTooltip(event,'${bl.id}')" onmouseleave="hideTooltip()"
+                    onclick="editBlock('${bl.id}')">
+                    <div class="booking-block status-blocked ${posClass}">${label}</div></td>`;
             } else {
-                html += `<td class="day-cell${we}${tod}" onclick="openNewBooking(${room.number},'${ds}')"></td>`;
+                html += `<td class="day-cell${we}${tod}" onclick="openNewBooking(${typeof room.number === 'string' ? "'" + room.number + "'" : room.number},'${ds}')"></td>`;
             }
         });
 
@@ -860,7 +1076,7 @@ function deleteBooking() {
 // ==================== EXPORT / IMPORT ====================
 
 function exportData() {
-    const data = JSON.stringify(bookings, null, 2);
+    const data = JSON.stringify({ bookings, blocks }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -880,12 +1096,24 @@ function handleImport(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const data = JSON.parse(e.target.result);
-            if (!Array.isArray(data)) throw new Error('Formato inválido');
-            if (!confirm(`Se importarán ${data.length} reservas. ¿Las reservas actuales se reemplazarán?`)) return;
-            bookings = data;
-            saveBookings();
+            const raw = JSON.parse(e.target.result);
+            // Support both old format (array) and new format ({bookings, blocks})
+            if (Array.isArray(raw)) {
+                if (!confirm(`Se importarán ${raw.length} reservas. ¿Los datos actuales se reemplazarán?`)) return;
+                bookings = raw;
+                saveBookings();
+            } else if (raw.bookings) {
+                const blockCount = (raw.blocks || []).length;
+                if (!confirm(`Se importarán ${raw.bookings.length} reservas y ${blockCount} bloqueos. ¿Los datos actuales se reemplazarán?`)) return;
+                bookings = raw.bookings;
+                blocks = raw.blocks || [];
+                saveBookings();
+                saveBlocks();
+            } else {
+                throw new Error('Formato inválido');
+            }
             renderGrid();
+            if (currentView === 'calendar') renderCalendar();
             alert('Importación completada.');
         } catch {
             alert('Error al importar el archivo. Verifica que sea un JSON válido.');
@@ -1117,10 +1345,326 @@ function renderIncomeByWeek(allPayments) {
     document.getElementById('incomeTableContainer').innerHTML = html;
 }
 
+// ==================== VIEW TOGGLE ====================
+
+function switchView(view) {
+    currentView = view;
+    document.getElementById('viewGrid').classList.toggle('active', view === 'grid');
+    document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
+    document.getElementById('gridContainer').style.display = view === 'grid' ? 'block' : 'none';
+    document.getElementById('calendarContainer').classList.toggle('active', view === 'calendar');
+    if (view === 'calendar') renderCalendar();
+}
+
+// ==================== MONTHLY CALENDAR ====================
+
+function navigateMonth(dir) {
+    calendarMonth += dir;
+    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+    renderCalendar();
+}
+
+function goToCurrentMonth() {
+    const now = new Date();
+    calendarMonth = now.getMonth();
+    calendarYear = now.getFullYear();
+    renderCalendar();
+}
+
+function renderCalendar() {
+    document.getElementById('calendarTitle').textContent = `${MONTH_NAMES_FULL[calendarMonth]} ${calendarYear}`;
+
+    const firstDay = new Date(calendarYear, calendarMonth, 1);
+    const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
+    const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
+    const today = todayStr();
+
+    const dayLabels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    let html = dayLabels.map(d => `<div class="cal-header">${d}</div>`).join('');
+
+    // Fill leading empty days
+    const prevMonth = new Date(calendarYear, calendarMonth, 0);
+    for (let i = startDow - 1; i >= 0; i--) {
+        const day = prevMonth.getDate() - i;
+        const d = new Date(calendarYear, calendarMonth - 1, day);
+        html += buildCalendarDay(d, today, true);
+    }
+
+    // Fill current month days
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const d = new Date(calendarYear, calendarMonth, day);
+        html += buildCalendarDay(d, today, false);
+    }
+
+    // Fill trailing days
+    const totalCells = startDow + lastDay.getDate();
+    const remaining = (7 - (totalCells % 7)) % 7;
+    for (let i = 1; i <= remaining; i++) {
+        const d = new Date(calendarYear, calendarMonth + 1, i);
+        html += buildCalendarDay(d, today, true);
+    }
+
+    document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function buildCalendarDay(d, today, otherMonth) {
+    const ds = dateStr(d);
+    const isToday = ds === today;
+    const isWe = d.getDay() === 0 || d.getDay() === 6;
+    let cls = 'cal-day';
+    if (otherMonth) cls += ' other-month';
+    if (isToday) cls += ' today';
+    if (isWe && !otherMonth) cls += ' weekend';
+
+    // Find bookings and blocks for this date across all rooms
+    const dayBookings = bookings.filter(b => ds >= b.checkin && ds < b.checkout);
+    const dayBlocks = blocks.filter(bl => ds >= bl.from && ds < bl.to);
+
+    let items = '';
+    const maxShow = 3;
+    const all = [];
+
+    dayBookings.forEach(b => {
+        const room = ROOMS.find(r => r.number === b.room);
+        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : b.room) : b.room;
+        all.push(`<div class="cal-booking status-${b.status}" onclick="event.stopPropagation();editBooking('${b.id}')" title="${b.guestName} - Hab.${roomLabel}">${roomLabel} ${b.guestName.split(' ')[0]}</div>`);
+    });
+    dayBlocks.forEach(bl => {
+        const room = ROOMS.find(r => r.number === bl.room);
+        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : bl.room) : bl.room;
+        all.push(`<div class="cal-booking status-blocked" onclick="event.stopPropagation();editBlock('${bl.id}')" title="Bloqueado - ${BLOCK_REASON_LABELS[bl.reason]}">${roomLabel} ${BLOCK_REASON_LABELS[bl.reason]}</div>`);
+    });
+
+    if (all.length <= maxShow) {
+        items = all.join('');
+    } else {
+        items = all.slice(0, maxShow - 1).join('');
+        items += `<div class="cal-more">+${all.length - maxShow + 1} más</div>`;
+    }
+
+    return `<div class="${cls}" onclick="openNewBooking(null,'${ds}')"><div class="day-num">${d.getDate()}</div>${items}</div>`;
+}
+
+// ==================== AVAILABILITY SEARCH ====================
+
+function openSearchModal() {
+    document.getElementById('searchFrom').value = todayStr();
+    document.getElementById('searchNights').value = '1';
+    document.getElementById('searchGuests').value = '2';
+    document.getElementById('searchBedType').value = 'any';
+    document.getElementById('searchResults').innerHTML = '<div class="no-results">Introduce los criterios y pulsa Buscar</div>';
+    document.getElementById('searchModal').classList.add('active');
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').classList.remove('active');
+}
+
+function searchAvailability() {
+    const from = document.getElementById('searchFrom').value;
+    const nights = parseInt(document.getElementById('searchNights').value) || 1;
+    const guests = parseInt(document.getElementById('searchGuests').value) || 1;
+    const bedType = document.getElementById('searchBedType').value;
+
+    if (!from) return alert('Selecciona una fecha de inicio.');
+
+    const checkout = dateStr(addDays(parseDate(from), nights));
+    const results = [];
+
+    ROOMS.forEach(room => {
+        // Filter by bed type
+        if (bedType !== 'any' && room.bedType !== bedType) return;
+
+        // Filter by capacity
+        const capacity = room.bedType === 'rural' ? 16 : (room.bedType === 'double' ? 2 : 2);
+        if (guests > capacity) return;
+
+        // Check availability
+        if (isRoomAvailable(room.number, from, checkout)) {
+            results.push({
+                room,
+                checkin: from,
+                checkout,
+                nights,
+                totalPrice: nights * 55 // default price
+            });
+        }
+    });
+
+    const container = document.getElementById('searchResults');
+
+    if (results.length === 0) {
+        container.innerHTML = '<div class="no-results">No hay habitaciones disponibles con esos criterios.<br>Prueba con otras fechas o menos noches.</div>';
+        return;
+    }
+
+    container.innerHTML = results.map(r => {
+        const roomNum = r.room.bedType === 'rural' ? "'CR1'" : r.room.number;
+        return `
+        <div class="search-result-item">
+            <div>
+                <div class="result-room">${r.room.label}</div>
+                <div class="result-details">${r.checkin} → ${r.checkout} · ${r.nights} noche${r.nights > 1 ? 's' : ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="result-price">${r.totalPrice.toFixed(2)} €</div>
+                <button class="btn-book-result" onclick="bookFromSearch(${roomNum},'${r.checkin}','${r.checkout}')">Reservar</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function bookFromSearch(room, checkin, checkout) {
+    closeSearchModal();
+    document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('bookingId').value = '';
+    document.getElementById('guestName').value = '';
+    document.getElementById('guestPhone').value = '';
+    document.getElementById('guestEmail').value = '';
+    document.getElementById('guestCount').value = '2';
+    document.getElementById('bookingStatus').value = 'confirmed';
+    document.getElementById('pricePerNight').value = '55';
+    document.getElementById('bookingNotes').value = '';
+    document.getElementById('deleteBtn').style.display = 'none';
+    document.getElementById('priceTotal').textContent = '';
+    document.getElementById('bookingRoom').value = room;
+    document.getElementById('bookingCheckin').value = checkin;
+    document.getElementById('bookingCheckout').value = checkout;
+
+    currentPayments = [];
+    document.getElementById('paymentStatus').value = 'pending_payment';
+    document.getElementById('paymentDate').value = todayStr();
+    setPaymentStatus('pending_payment');
+    renderPayments();
+    calculatePrice();
+    document.getElementById('bookingModal').classList.add('active');
+    document.getElementById('guestName').focus();
+}
+
+// ==================== BLOCK MANAGEMENT ====================
+
+function populateBlockRoomSelect() {
+    const sel = document.getElementById('blockRoom');
+    sel.innerHTML = '';
+    ROOMS.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.number;
+        opt.textContent = r.label;
+        sel.appendChild(opt);
+    });
+}
+
+function openBlockModal(room, date) {
+    document.getElementById('blockModalTitle').textContent = 'Bloquear Fechas';
+    document.getElementById('blockId').value = '';
+    document.getElementById('blockReason').value = 'maintenance';
+    document.getElementById('blockNotes').value = '';
+    document.getElementById('deleteBlockBtn').style.display = 'none';
+
+    if (room) document.getElementById('blockRoom').value = room;
+    if (date) {
+        document.getElementById('blockFrom').value = date;
+        document.getElementById('blockTo').value = dateStr(addDays(parseDate(date), 1));
+    } else {
+        document.getElementById('blockFrom').value = todayStr();
+        document.getElementById('blockTo').value = dateStr(addDays(new Date(), 1));
+    }
+
+    document.getElementById('blockModal').classList.add('active');
+}
+
+function editBlock(id) {
+    const bl = blocks.find(x => x.id === id);
+    if (!bl) return;
+
+    document.getElementById('blockModalTitle').textContent = 'Editar Bloqueo';
+    document.getElementById('blockId').value = bl.id;
+    document.getElementById('blockRoom').value = bl.room;
+    document.getElementById('blockFrom').value = bl.from;
+    document.getElementById('blockTo').value = bl.to;
+    document.getElementById('blockReason').value = bl.reason;
+    document.getElementById('blockNotes').value = bl.notes || '';
+    document.getElementById('deleteBlockBtn').style.display = 'block';
+
+    document.getElementById('blockModal').classList.add('active');
+}
+
+function closeBlockModal() {
+    document.getElementById('blockModal').classList.remove('active');
+}
+
+function saveBlock() {
+    const roomVal = document.getElementById('blockRoom').value;
+    const room = isNaN(roomVal) ? roomVal : parseInt(roomVal);
+    const from = document.getElementById('blockFrom').value;
+    const to = document.getElementById('blockTo').value;
+    const reason = document.getElementById('blockReason').value;
+    const notes = document.getElementById('blockNotes').value.trim();
+    const id = document.getElementById('blockId').value;
+
+    if (!from || !to) return alert('Introduce las fechas del bloqueo.');
+    if (to <= from) return alert('La fecha "hasta" debe ser posterior a "desde".');
+
+    // Check conflicts (with bookings only, not other blocks when editing)
+    const bookingConflict = bookings.some(b =>
+        b.room === room && b.checkin < to && b.checkout > from
+    );
+    if (bookingConflict) return alert('Ya hay reservas en esas fechas para esa habitación.');
+
+    const blockConflict = blocks.some(bl =>
+        bl.room === room && bl.id !== id && bl.from < to && bl.to > from
+    );
+    if (blockConflict) return alert('Ya hay un bloqueo en esas fechas para esa habitación.');
+
+    const block = {
+        id: id || 'bl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        room, from, to, reason, notes,
+        createdAt: id ? blocks.find(bl => bl.id === id)?.createdAt : new Date().toISOString()
+    };
+
+    if (id) {
+        const idx = blocks.findIndex(bl => bl.id === id);
+        if (idx >= 0) blocks[idx] = block;
+    } else {
+        blocks.push(block);
+    }
+
+    saveBlocks();
+    closeBlockModal();
+    renderGrid();
+    if (currentView === 'calendar') renderCalendar();
+}
+
+function deleteBlock() {
+    const id = document.getElementById('blockId').value;
+    if (!id) return;
+    if (!confirm('¿Eliminar este bloqueo?')) return;
+    blocks = blocks.filter(bl => bl.id !== id);
+    saveBlocks();
+    closeBlockModal();
+    renderGrid();
+    if (currentView === 'calendar') renderCalendar();
+}
+
+function showBlockTooltip(event, blockId) {
+    const bl = blocks.find(x => x.id === blockId);
+    if (!bl) return;
+    const nights = nightsBetween(bl.from, bl.to);
+    const tip = document.getElementById('tooltip');
+    tip.innerHTML = `<strong>BLOQUEADO</strong><br>
+        Hab. ${bl.room} · ${nights} día(s)<br>
+        ${bl.from} → ${bl.to}<br>
+        Motivo: ${BLOCK_REASON_LABELS[bl.reason] || bl.reason}${bl.notes ? '<br>' + bl.notes : ''}`;
+    tip.classList.add('active');
+    tip.style.left = (event.pageX + 12) + 'px';
+    tip.style.top = (event.pageY - 10) + 'px';
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); }
 });
 
 // ==================== INIT ====================
@@ -1128,8 +1672,11 @@ document.addEventListener('keydown', e => {
 function init() {
     loadBookings();
     populateRoomSelect();
+    populateBlockRoomSelect();
 
     const today = new Date();
+    calendarMonth = today.getMonth();
+    calendarYear = today.getFullYear();
     // Start grid 3 days before today
     const startDate = addDays(today, -3);
     document.getElementById('startDate').value = dateStr(startDate);
