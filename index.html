@@ -377,6 +377,62 @@
         }
         .btn-copy-confirm:hover { background: #e0b860; }
 
+        /* Casa Rural specific */
+        .rural-section {
+            background: #f0f7e6; border: 1px solid #c9dbb2; border-radius: 8px;
+            padding: 12px 15px; margin-top: 10px; display: none;
+        }
+        .rural-section.visible { display: block; }
+        .rural-section h4 { font-size: 0.85rem; color: #3a4a2a; margin-bottom: 8px; }
+        .rural-badge {
+            display: inline-block; background: #c9dbb2; color: #3a4a2a; padding: 2px 8px;
+            border-radius: 10px; font-size: 0.7rem; font-weight: 600; margin-bottom: 8px;
+        }
+
+        /* Inventory checklist */
+        .checklist-modal { width: 550px; }
+        .checklist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .checklist-tabs { display: flex; gap: 0; margin-bottom: 12px; }
+        .checklist-tab {
+            padding: 6px 16px; border: 1px solid #ccc; background: #f5f5f5;
+            cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
+        }
+        .checklist-tab:first-child { border-radius: 4px 0 0 4px; }
+        .checklist-tab:last-child { border-radius: 0 4px 4px 0; }
+        .checklist-tab.active { background: #c9dbb2; color: #3a4a2a; border-color: #c9dbb2; }
+        .checklist-items { max-height: 350px; overflow-y: auto; }
+        .checklist-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+            border-bottom: 1px solid #eee; font-size: 0.82rem;
+        }
+        .checklist-item:hover { background: #f9f9f9; }
+        .checklist-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checklist-item .item-name { flex: 1; }
+        .checklist-item .item-qty { width: 50px; font-size: 0.78rem; color: #666; text-align: center; }
+        .checklist-item .item-note {
+            width: 140px; font-size: 0.75rem; padding: 3px 6px;
+            border: 1px solid #ddd; border-radius: 3px;
+        }
+        .checklist-summary {
+            margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px;
+            font-size: 0.82rem; display: flex; justify-content: space-between;
+        }
+        .checklist-ok { color: #2e7d32; font-weight: 700; }
+        .checklist-issues { color: #c0392b; font-weight: 700; }
+
+        /* House rules modal */
+        .rules-modal { width: 550px; }
+        .rules-textarea {
+            width: 100%; height: 300px; padding: 12px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 0.85rem; font-family: 'Inter', sans-serif;
+            resize: vertical; line-height: 1.5;
+        }
+        .rules-preview {
+            white-space: pre-wrap; font-size: 0.82rem; line-height: 1.6;
+            max-height: 350px; overflow-y: auto; padding: 12px;
+            background: #fafbfc; border: 1px solid #e0e0e0; border-radius: 6px;
+        }
+
         .stats-bar {
             background: white; padding: 10px 30px; border-top: 1px solid #ddd;
             display: flex; gap: 30px; font-size: 0.8rem; color: #666;
@@ -653,6 +709,35 @@
         </div>
         <div id="priceTotal" class="price-display"></div>
 
+        <!-- Casa Rural section -->
+        <div class="rural-section" id="ruralSection">
+            <div class="rural-badge">Casa Rural Villarrubia</div>
+            <h4>Fianza / Deposito de seguridad</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Importe fianza (€)</label>
+                    <input type="number" id="depositAmount" value="300" min="0" step="10">
+                </div>
+                <div class="form-group">
+                    <label>Estado fianza</label>
+                    <select id="depositStatus">
+                        <option value="pending">Pendiente</option>
+                        <option value="collected">Cobrada</option>
+                        <option value="returned">Devuelta</option>
+                        <option value="partial_return">Devolucion parcial</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" id="depositReturnGroup" style="display:none;">
+                <label>Importe devuelto (€)</label>
+                <input type="number" id="depositReturned" value="0" min="0" step="10">
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-primary" onclick="openChecklist()" style="font-size:0.78rem;">Checklist Inventario</button>
+                <button type="button" class="btn-primary" onclick="openRulesModal()" style="font-size:0.78rem;">Normas de la Casa</button>
+            </div>
+        </div>
+
         <!-- Payment Section -->
         <div class="payment-section">
             <h3>Gestión de Pago</h3>
@@ -723,6 +808,47 @@
         <div class="stay-history" id="clientStayHistory"></div>
         <div class="form-actions" style="margin-top:15px;">
             <button class="btn-secondary" onclick="closeClientDetail()">Volver</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Checklist Inventario -->
+<div class="modal-overlay" id="checklistModal">
+    <div class="modal checklist-modal">
+        <div class="checklist-header">
+            <h2>Checklist Inventario - Villarrubia</h2>
+        </div>
+        <div class="checklist-tabs">
+            <div class="checklist-tab active" onclick="switchChecklistTab('checkin')">Check-in</div>
+            <div class="checklist-tab" onclick="switchChecklistTab('checkout')">Check-out</div>
+        </div>
+        <div class="checklist-items" id="checklistItems"></div>
+        <div class="checklist-summary" id="checklistSummary"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeChecklist()">Cerrar</button>
+            <button class="btn-success" onclick="saveChecklist()">Guardar Checklist</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Normas de la Casa -->
+<div class="modal-overlay" id="rulesModal">
+    <div class="modal rules-modal">
+        <h2>Normas de la Casa - Villarrubia</h2>
+        <div class="checklist-tabs" id="rulesTabs">
+            <div class="checklist-tab active" onclick="switchRulesTab('edit')">Editar</div>
+            <div class="checklist-tab" onclick="switchRulesTab('preview')">Vista previa</div>
+        </div>
+        <div id="rulesEditContainer">
+            <textarea class="rules-textarea" id="rulesText"></textarea>
+        </div>
+        <div id="rulesPreviewContainer" style="display:none;">
+            <div class="rules-preview" id="rulesPreview"></div>
+        </div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-primary" onclick="copyRules()" style="margin-right:auto;">Copiar normas</button>
+            <button class="btn-secondary" onclick="closeRulesModal()">Cerrar</button>
+            <button class="btn-success" onclick="saveRules()">Guardar</button>
         </div>
     </div>
 </div>
@@ -806,10 +932,85 @@ const PAYMENT_TYPE_LABELS = {
     full: 'Pago final'
 };
 
+// Casa Rural config
+const RURAL_DEFAULT_PRICE = 250;
+const RURAL_DEFAULT_DEPOSIT = 300;
+const DEPOSIT_STATUS_LABELS = {
+    pending: 'Pendiente', collected: 'Cobrada',
+    returned: 'Devuelta', partial_return: 'Devolucion parcial'
+};
+const DEFAULT_INVENTORY = [
+    { name: 'Juego de llaves', qty: 2, category: 'general' },
+    { name: 'Mando garaje', qty: 1, category: 'general' },
+    { name: 'Mando aire acondicionado', qty: 3, category: 'general' },
+    { name: 'Televisor + mando', qty: 2, category: 'general' },
+    { name: 'Sábanas juego completo', qty: 8, category: 'dormitorios' },
+    { name: 'Almohadas', qty: 16, category: 'dormitorios' },
+    { name: 'Mantas', qty: 8, category: 'dormitorios' },
+    { name: 'Toallas grandes', qty: 16, category: 'baños' },
+    { name: 'Toallas pequeñas', qty: 16, category: 'baños' },
+    { name: 'Alfombrilla baño', qty: 4, category: 'baños' },
+    { name: 'Juego cazuelas/ollas', qty: 1, category: 'cocina' },
+    { name: 'Sartenes', qty: 3, category: 'cocina' },
+    { name: 'Juego platos (16 llanos + 16 hondos)', qty: 1, category: 'cocina' },
+    { name: 'Vasos', qty: 20, category: 'cocina' },
+    { name: 'Copas vino', qty: 16, category: 'cocina' },
+    { name: 'Cubiertos completos', qty: 16, category: 'cocina' },
+    { name: 'Cafetera', qty: 1, category: 'cocina' },
+    { name: 'Tostadora', qty: 1, category: 'cocina' },
+    { name: 'Microondas', qty: 1, category: 'cocina' },
+    { name: 'Plancha ropa', qty: 1, category: 'limpieza' },
+    { name: 'Escoba + recogedor', qty: 2, category: 'limpieza' },
+    { name: 'Fregona + cubo', qty: 1, category: 'limpieza' },
+    { name: 'Aspiradora', qty: 1, category: 'limpieza' },
+    { name: 'Mobiliario jardín (sillas)', qty: 8, category: 'exterior' },
+    { name: 'Mesa jardín', qty: 1, category: 'exterior' },
+    { name: 'Barbacoa', qty: 1, category: 'exterior' },
+    { name: 'Tumbonas piscina', qty: 4, category: 'exterior' },
+];
+const DEFAULT_HOUSE_RULES = `NORMAS DE LA CASA - Casa Rural Villarrubia
+
+1. HORARIOS
+   - Check-in: a partir de las 16:00h
+   - Check-out: antes de las 11:00h
+
+2. CAPACIDAD MÁXIMA
+   - 16 personas. No se permite superar este número.
+
+3. RUIDO
+   - Silencio a partir de las 23:00h.
+   - Prohibidas fiestas sin autorización previa.
+
+4. PISCINA
+   - Uso bajo responsabilidad del huésped.
+   - Menores siempre acompañados de un adulto.
+   - Horario: 10:00 - 22:00h.
+
+5. MASCOTAS
+   - Consultar disponibilidad previamente.
+   - El huésped es responsable de cualquier daño.
+
+6. LIMPIEZA
+   - Dejar la casa recogida al salir.
+   - Sacar la basura a los contenedores.
+   - Dejar la cocina limpia.
+
+7. FIANZA
+   - Se cobrará una fianza de ${RURAL_DEFAULT_DEPOSIT}€.
+   - Se devolverá tras verificar el estado de la casa.
+   - Cualquier daño será descontado de la fianza.
+
+8. PROHIBICIONES
+   - Fumar dentro de la casa.
+   - Encender fuego fuera de la barbacoa/chimenea.
+   - Alterar la instalación eléctrica o de fontanería.`;
+
 let bookings = [];
 let blocks = [];
 let customers = [];
 let currentPayments = []; // temp payments for modal editing
+let currentChecklist = { checkin: [], checkout: [] };
+let currentChecklistTab = 'checkin';
 let currentView = 'grid';
 let calendarMonth = new Date().getMonth();
 let calendarYear = new Date().getFullYear();
@@ -838,6 +1039,14 @@ function saveBlocks() {
 
 function saveCustomers() {
     localStorage.setItem('hostal_jijones_customers', JSON.stringify(customers));
+}
+
+function loadHouseRules() {
+    return localStorage.getItem('hostal_jijones_house_rules') || DEFAULT_HOUSE_RULES;
+}
+
+function saveHouseRules(text) {
+    localStorage.setItem('hostal_jijones_house_rules', text);
 }
 
 // ==================== DATE HELPERS ====================
@@ -1032,12 +1241,14 @@ function showTooltip(event, bookingId) {
     const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
     const paymentLabel = PAYMENT_STATUS_LABELS[b.paymentStatus || 'pending_payment'];
     const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${b.docNumber}` : '';
+    const isRural = ROOMS.find(r => r.number === b.room)?.bedType === 'rural';
+    const depositInfo = isRural && b.ruralDeposit ? `<br>Fianza: ${b.ruralDeposit} € (${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'})` : '';
     tip.innerHTML = `<strong>${b.guestName}</strong>${docInfo}<br>
-        Hab. ${b.room} · ${nights} noche(s)<br>
+        ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)<br>
         ${b.checkin} → ${b.checkout}<br>
         Estado: ${STATUS_LABELS[b.status]}<br>
         Total: ${totalPrice} € · Pagado: ${totalPaid.toFixed(2)} €<br>
-        Pago: ${paymentLabel}`;
+        Pago: ${paymentLabel}${depositInfo}`;
     tip.classList.add('active');
     tip.style.left = (event.pageX + 12) + 'px';
     tip.style.top = (event.pageY - 10) + 'px';
@@ -1072,13 +1283,36 @@ function populateRoomSelect() {
         opt.textContent = r.label;
         sel.appendChild(opt);
     });
-    // Update guest count when room changes
     sel.addEventListener('change', function() {
         const room = ROOMS.find(r => String(r.number) === sel.value);
-        if (room && room.bedType === 'rural') {
-            document.getElementById('guestCount').value = '16';
-        }
+        updateRuralSection(room);
     });
+
+    // Deposit status toggle
+    document.getElementById('depositStatus').addEventListener('change', function() {
+        document.getElementById('depositReturnGroup').style.display =
+            this.value === 'partial_return' ? 'block' : 'none';
+    });
+}
+
+function updateRuralSection(room) {
+    const isRural = room && room.bedType === 'rural';
+    document.getElementById('ruralSection').classList.toggle('visible', isRural);
+    if (isRural) {
+        document.getElementById('guestCount').value = '16';
+        // Only change price if it's the default hostel price
+        const priceEl = document.getElementById('pricePerNight');
+        if (parseFloat(priceEl.value) === 55) {
+            priceEl.value = RURAL_DEFAULT_PRICE;
+        }
+    }
+    calculatePrice();
+}
+
+function isCurrentRoomRural() {
+    const roomVal = document.getElementById('bookingRoom').value;
+    const room = ROOMS.find(r => String(r.number) === roomVal);
+    return room && room.bedType === 'rural';
 }
 
 function openNewBooking(room, date) {
@@ -1099,6 +1333,13 @@ function openNewBooking(room, date) {
     document.getElementById('priceTotal').textContent = '';
     hideAutocomplete();
 
+    // Reset rural fields
+    document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
+    document.getElementById('depositStatus').value = 'pending';
+    document.getElementById('depositReturned').value = '0';
+    document.getElementById('depositReturnGroup').style.display = 'none';
+    currentChecklist = { checkin: [], checkout: [] };
+
     if (room) document.getElementById('bookingRoom').value = room;
     if (date) {
         document.getElementById('bookingCheckin').value = date;
@@ -1107,6 +1348,10 @@ function openNewBooking(room, date) {
         document.getElementById('bookingCheckin').value = todayStr();
         document.getElementById('bookingCheckout').value = dateStr(addDays(new Date(), 1));
     }
+
+    // Show/hide rural section
+    const selectedRoom = ROOMS.find(r => String(r.number) === document.getElementById('bookingRoom').value);
+    updateRuralSection(selectedRoom);
 
     currentPayments = [];
     document.getElementById('paymentStatus').value = 'pending_payment';
@@ -1141,6 +1386,17 @@ function editBooking(id) {
     document.getElementById('confirmActions').style.display = 'flex';
     hideAutocomplete();
 
+    // Rural fields
+    document.getElementById('depositAmount').value = b.ruralDeposit || RURAL_DEFAULT_DEPOSIT;
+    document.getElementById('depositStatus').value = b.ruralDepositStatus || 'pending';
+    document.getElementById('depositReturned').value = b.ruralDepositReturned || 0;
+    document.getElementById('depositReturnGroup').style.display =
+        (b.ruralDepositStatus === 'partial_return') ? 'block' : 'none';
+    currentChecklist = b.ruralChecklist ? JSON.parse(JSON.stringify(b.ruralChecklist)) : { checkin: [], checkout: [] };
+
+    const selectedRoom = ROOMS.find(r => String(r.number) === String(b.room));
+    updateRuralSection(selectedRoom);
+
     currentPayments = JSON.parse(JSON.stringify(b.payments || []));
     document.getElementById('paymentStatus').value = b.paymentStatus || 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
@@ -1161,7 +1417,11 @@ function calculatePrice() {
 
     if (checkin && checkout && checkout > checkin) {
         const nights = nightsBetween(checkin, checkout);
-        document.getElementById('priceTotal').textContent = `Total: ${(nights * price).toFixed(2)} € (${nights} noche${nights > 1 ? 's' : ''})`;
+        const total = (nights * price).toFixed(2);
+        const rural = isCurrentRoomRural();
+        const label = rural ? 'casa completa' : 'noche';
+        const depositInfo = rural ? ` + Fianza: ${document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT} €` : '';
+        document.getElementById('priceTotal').textContent = `Total: ${total} € (${nights} ${label}${nights > 1 ? 's' : ''})${depositInfo}`;
     } else {
         document.getElementById('priceTotal').textContent = '';
     }
@@ -1191,6 +1451,8 @@ function saveBooking() {
     const docNumber = document.getElementById('docNumber').value.trim();
     const nationality = document.getElementById('guestNationality').value.trim();
 
+    const isRural = ROOMS.find(r => r.number === room)?.bedType === 'rural';
+
     const booking = {
         id: id || generateId(),
         guestName: name,
@@ -1200,6 +1462,10 @@ function saveBooking() {
         notes: document.getElementById('bookingNotes').value.trim(),
         paymentStatus: document.getElementById('paymentStatus').value,
         payments: currentPayments,
+        ruralDeposit: isRural ? parseFloat(document.getElementById('depositAmount').value) || 0 : undefined,
+        ruralDepositStatus: isRural ? document.getElementById('depositStatus').value : undefined,
+        ruralDepositReturned: isRural ? parseFloat(document.getElementById('depositReturned').value) || 0 : undefined,
+        ruralChecklist: isRural ? currentChecklist : undefined,
         createdAt: id ? bookings.find(b => b.id === id)?.createdAt : new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
@@ -1641,12 +1907,13 @@ function searchAvailability() {
 
         // Check availability
         if (isRoomAvailable(room.number, from, checkout)) {
+            const nightPrice = room.bedType === 'rural' ? RURAL_DEFAULT_PRICE : 55;
             results.push({
                 room,
                 checkin: from,
                 checkout,
                 nights,
-                totalPrice: nights * 55 // default price
+                totalPrice: nights * nightPrice
             });
         }
     });
@@ -1691,9 +1958,19 @@ function bookFromSearch(room, checkin, checkout) {
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
     document.getElementById('priceTotal').textContent = '';
+    // Reset rural fields
+    document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
+    document.getElementById('depositStatus').value = 'pending';
+    document.getElementById('depositReturned').value = '0';
+    document.getElementById('depositReturnGroup').style.display = 'none';
+    currentChecklist = { checkin: [], checkout: [] };
+
     document.getElementById('bookingRoom').value = room;
     document.getElementById('bookingCheckin').value = checkin;
     document.getElementById('bookingCheckout').value = checkout;
+
+    const selectedRoom = ROOMS.find(r => String(r.number) === String(room));
+    updateRuralSection(selectedRoom);
 
     currentPayments = [];
     document.getElementById('paymentStatus').value = 'pending_payment';
@@ -2042,24 +2319,35 @@ function buildConfirmationText() {
     const nights = (checkin && checkout && checkout > checkin) ? nightsBetween(checkin, checkout) : 0;
     const total = (nights * price).toFixed(2);
 
-    return `Confirmación de Reserva - Hostal Jijones
+    const isRural = room && room.bedType === 'rural';
+    let ruralInfo = '';
+    if (isRural) {
+        const deposit = document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT;
+        ruralInfo = `
+Fianza/Depósito: ${deposit} € (se devolverá tras verificar el estado de la casa)
+
+NORMAS: Se le entregarán las normas de la casa a su llegada. Por favor, léalas con atención.
+`;
+    }
+
+    return `Confirmación de Reserva - ${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}
 
 Estimado/a ${name},
 
 Le confirmamos su reserva con los siguientes detalles:
 
-Habitación: ${roomLabel}
+${isRural ? 'Alojamiento' : 'Habitación'}: ${roomLabel}
 Check-in: ${checkin}
 Check-out: ${checkout}
 Noches: ${nights}
 Huéspedes: ${guests}
-Precio/noche: ${price.toFixed(2)} €
+Precio/noche${isRural ? ' (casa completa)' : ''}: ${price.toFixed(2)} €
 Total: ${total} €
-
+${ruralInfo}
 IMPORTANTE: Recuerde traer su documento de identidad (DNI/NIE/Pasaporte) para el registro obligatorio.
 
 ¡Le esperamos!
-Hostal Jijones`;
+${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}`;
 }
 
 function sendWhatsApp() {
@@ -2097,10 +2385,156 @@ function copyConfirmation() {
     });
 }
 
+// ==================== INVENTORY CHECKLIST ====================
+
+function openChecklist() {
+    currentChecklistTab = 'checkin';
+    // Initialize checklist if empty
+    if (!currentChecklist.checkin || currentChecklist.checkin.length === 0) {
+        currentChecklist.checkin = DEFAULT_INVENTORY.map(item => ({
+            ...item, checked: false, note: ''
+        }));
+    }
+    if (!currentChecklist.checkout || currentChecklist.checkout.length === 0) {
+        currentChecklist.checkout = DEFAULT_INVENTORY.map(item => ({
+            ...item, checked: false, note: ''
+        }));
+    }
+    renderChecklist();
+    document.querySelectorAll('.checklist-tab').forEach(t => {
+        t.classList.toggle('active', t.textContent.toLowerCase().includes('check-in'));
+    });
+    document.getElementById('checklistModal').classList.add('active');
+}
+
+function closeChecklist() {
+    document.getElementById('checklistModal').classList.remove('active');
+}
+
+function switchChecklistTab(tab) {
+    currentChecklistTab = tab;
+    document.querySelectorAll('#checklistModal .checklist-tab').forEach(t => {
+        t.classList.toggle('active',
+            (tab === 'checkin' && t.textContent === 'Check-in') ||
+            (tab === 'checkout' && t.textContent === 'Check-out')
+        );
+    });
+    renderChecklist();
+}
+
+function renderChecklist() {
+    const items = currentChecklist[currentChecklistTab] || [];
+    const container = document.getElementById('checklistItems');
+
+    // Group by category
+    const categories = { general: 'General', dormitorios: 'Dormitorios', baños: 'Baños', cocina: 'Cocina', limpieza: 'Limpieza', exterior: 'Exterior' };
+    let html = '';
+    let lastCat = '';
+
+    items.forEach((item, idx) => {
+        if (item.category !== lastCat) {
+            lastCat = item.category;
+            html += `<div style="background:#e8f0e0;padding:5px 10px;font-size:0.75rem;font-weight:700;color:#3a4a2a;">${categories[item.category] || item.category}</div>`;
+        }
+        html += `<div class="checklist-item">
+            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${idx}, this.checked)">
+            <span class="item-name">${item.name}</span>
+            <span class="item-qty">x${item.qty}</span>
+            <input type="text" class="item-note" placeholder="Nota..." value="${item.note || ''}" onchange="setChecklistNote(${idx}, this.value)">
+        </div>`;
+    });
+
+    container.innerHTML = html;
+
+    // Summary
+    const total = items.length;
+    const checked = items.filter(i => i.checked).length;
+    const withNotes = items.filter(i => i.note && i.note.trim()).length;
+    const summary = document.getElementById('checklistSummary');
+    const allOk = checked === total;
+    summary.innerHTML = `
+        <span>Verificados: <strong>${checked}/${total}</strong></span>
+        <span>${withNotes > 0 ? `<span class="checklist-issues">${withNotes} con observaciones</span>` : ''}</span>
+        <span class="${allOk ? 'checklist-ok' : ''}">${allOk ? 'Todo OK' : `Faltan ${total - checked}`}</span>
+    `;
+}
+
+function toggleChecklistItem(idx, checked) {
+    if (currentChecklist[currentChecklistTab] && currentChecklist[currentChecklistTab][idx]) {
+        currentChecklist[currentChecklistTab][idx].checked = checked;
+        renderChecklist();
+    }
+}
+
+function setChecklistNote(idx, note) {
+    if (currentChecklist[currentChecklistTab] && currentChecklist[currentChecklistTab][idx]) {
+        currentChecklist[currentChecklistTab][idx].note = note;
+    }
+}
+
+function saveChecklist() {
+    // Checklist is saved when booking is saved (it's in currentChecklist)
+    closeChecklist();
+}
+
+// ==================== HOUSE RULES ====================
+
+function openRulesModal() {
+    const rules = loadHouseRules();
+    document.getElementById('rulesText').value = rules;
+    document.getElementById('rulesEditContainer').style.display = 'block';
+    document.getElementById('rulesPreviewContainer').style.display = 'none';
+    document.querySelectorAll('#rulesModal .checklist-tab').forEach(t => {
+        t.classList.toggle('active', t.textContent === 'Editar');
+    });
+    document.getElementById('rulesModal').classList.add('active');
+}
+
+function closeRulesModal() {
+    document.getElementById('rulesModal').classList.remove('active');
+}
+
+function switchRulesTab(tab) {
+    document.querySelectorAll('#rulesModal .checklist-tab').forEach(t => {
+        t.classList.toggle('active',
+            (tab === 'edit' && t.textContent === 'Editar') ||
+            (tab === 'preview' && t.textContent === 'Vista previa')
+        );
+    });
+    if (tab === 'preview') {
+        document.getElementById('rulesEditContainer').style.display = 'none';
+        document.getElementById('rulesPreviewContainer').style.display = 'block';
+        document.getElementById('rulesPreview').textContent = document.getElementById('rulesText').value;
+    } else {
+        document.getElementById('rulesEditContainer').style.display = 'block';
+        document.getElementById('rulesPreviewContainer').style.display = 'none';
+    }
+}
+
+function saveRules() {
+    saveHouseRules(document.getElementById('rulesText').value);
+    closeRulesModal();
+}
+
+function copyRules() {
+    const text = document.getElementById('rulesText').value;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Normas copiadas al portapapeles.');
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('Normas copiadas al portapapeles.');
+    });
+}
+
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); }
 });
 
 // ==================== INIT ====================
