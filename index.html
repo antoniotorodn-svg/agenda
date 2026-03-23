@@ -640,6 +640,108 @@
         }
         .tooltip.active { display: block; }
 
+        /* ==================== SIDEBAR ==================== */
+        .app-layout {
+            display: flex; min-height: calc(100vh - 0px);
+        }
+
+        .sidebar {
+            width: 230px; background: white; border-right: 1px solid #e0e0e0;
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
+            height: 100vh; z-index: 80; transition: transform 0.3s ease;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-header {
+            padding: 18px 18px 14px; border-bottom: 1px solid #e8e8e8;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px; border-radius: 8px; background: #7B96B5;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white; font-size: 1rem;
+            font-family: 'Playfair Display', Georgia, serif; flex-shrink: 0;
+        }
+        .sidebar-title { font-weight: 700; font-size: 0.95rem; color: #2c3e50; line-height: 1.2; }
+        .sidebar-subtitle { font-size: 0.68rem; color: #999; font-weight: 500; }
+
+        .sidebar-nav {
+            flex: 1; overflow-y: auto; padding: 8px 0;
+        }
+        .sidebar-section {
+            padding: 16px 18px 4px; font-size: 0.65rem; font-weight: 700;
+            color: #999; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 18px; cursor: pointer; font-size: 0.82rem;
+            color: #555; font-weight: 500; transition: all 0.15s;
+            border-left: 3px solid transparent; text-decoration: none;
+        }
+        .sidebar-item:hover {
+            background: #F5EFE6; color: #2c3e50;
+        }
+        .sidebar-item.active {
+            background: #7B96B5; color: white; border-left-color: #6A85A3;
+            font-weight: 600;
+        }
+        .sidebar-item .si-icon {
+            width: 20px; text-align: center; font-size: 0.95rem; flex-shrink: 0;
+        }
+        .sidebar-item .si-label { flex: 1; }
+        .sidebar-item .si-badge {
+            background: #7B96B5; color: white; font-size: 0.62rem; font-weight: 700;
+            padding: 1px 6px; border-radius: 10px;
+        }
+        .sidebar-item.active .si-badge {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sidebar-divider {
+            height: 1px; background: #eee; margin: 6px 18px;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #e8e8e8; padding: 10px 12px;
+        }
+        .sidebar-user {
+            display: flex; align-items: center; gap: 10px; padding: 6px 8px;
+            border-radius: 8px; cursor: pointer; transition: background 0.15s;
+        }
+        .sidebar-user:hover { background: #F5EFE6; }
+        .sidebar-user .su-avatar {
+            width: 32px; height: 32px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 700;
+            font-size: 0.75rem; color: white; flex-shrink: 0;
+        }
+        .sidebar-user .su-name { font-weight: 600; font-size: 0.82rem; color: #2c3e50; }
+        .sidebar-user .su-role { font-size: 0.68rem; color: #999; }
+
+        .main-content {
+            flex: 1; margin-left: 230px; display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        /* Hamburger button (hidden on desktop) */
+        .hamburger-btn {
+            display: none; background: none; border: none; font-size: 1.4rem;
+            cursor: pointer; padding: 4px 8px; color: #2c3e50; line-height: 1;
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 79;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* Sidebar close button (mobile only) */
+        .sidebar-close {
+            display: none; position: absolute; top: 14px; right: 14px;
+            background: none; border: none; font-size: 1.2rem; cursor: pointer;
+            color: #999; padding: 4px;
+        }
+        .sidebar-close:hover { color: #2c3e50; }
+
         /* ==================== RESPONSIVE ==================== */
 
         /* Tablet landscape & small desktop */
@@ -653,8 +755,17 @@
             .income-total-card .value { font-size: 1rem; }
         }
 
-        /* Tablet portrait */
+        /* Tablet portrait — sidebar becomes overlay */
         @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-close { display: block; }
+            .main-content { margin-left: 0; }
+            .hamburger-btn { display: block; }
+
             header { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
             header h1 { font-size: 1.2rem; }
             header .subtitle { font-size: 0.75rem; }
@@ -736,7 +847,7 @@
             .invoice-preview .inv-number { text-align: left; }
             .invoice-preview th, .invoice-preview td { padding: 5px 4px; font-size: 0.72rem; }
 
-            .user-indicator .ui-name { display: none; }
+            .user-indicator { display: none; }
 
             .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 15px; right: 15px; }
         }
@@ -843,8 +954,9 @@
 
         /* Print styles */
         @media print {
-            .login-screen, .toolbar, .stats-bar, .fab-btn, .tooltip,
-            .modal-overlay, .nav-arrows, .view-toggle, .legend { display: none !important; }
+            .sidebar, .sidebar-overlay, .toolbar, .stats-bar, .fab-btn, .tooltip,
+            .modal-overlay, .nav-arrows, .view-toggle, .legend, .hamburger-btn { display: none !important; }
+            .main-content { margin-left: 0 !important; }
             header { box-shadow: none; }
             .grid-container { padding: 0; overflow: visible; }
             table.booking-grid { box-shadow: none; }
@@ -867,10 +979,104 @@
     </div>
 </div>
 
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">HJ</div>
+        <div>
+            <div class="sidebar-title">Hostal Jijones</div>
+            <div class="sidebar-subtitle">Sistema de Gestión</div>
+        </div>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="sidebar-section">Reservas</div>
+        <div class="sidebar-item active" onclick="sidebarNav('grid')" data-section="grid">
+            <span class="si-icon">▦</span>
+            <span class="si-label">Tabla de Reservas</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('calendar')" data-section="calendar">
+            <span class="si-icon">📅</span>
+            <span class="si-label">Calendario</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('newBooking')" data-section="newBooking">
+            <span class="si-icon">＋</span>
+            <span class="si-label">Nueva Reserva</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('search')" data-section="search">
+            <span class="si-icon">🔍</span>
+            <span class="si-label">Buscar Disponibilidad</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('block')" data-section="block">
+            <span class="si-icon">🚫</span>
+            <span class="si-label">Bloquear Fechas</span>
+        </div>
+
+        <div class="sidebar-section">Finanzas</div>
+        <div class="sidebar-item" onclick="sidebarNav('income')" data-section="income">
+            <span class="si-icon">💰</span>
+            <span class="si-label">Ingresos</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('reports')" data-section="reports">
+            <span class="si-icon">📊</span>
+            <span class="si-label">Informes</span>
+        </div>
+
+        <div class="sidebar-section">Gestión</div>
+        <div class="sidebar-item" onclick="sidebarNav('clients')" data-section="clients">
+            <span class="si-icon">👤</span>
+            <span class="si-label">Clientes</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
+            <span class="si-icon">📋</span>
+            <span class="si-label">Normas Casa Rural</span>
+        </div>
+
+        <div class="sidebar-section">Datos</div>
+        <div class="sidebar-item" onclick="sidebarNav('export')" data-section="export">
+            <span class="si-icon">📤</span>
+            <span class="si-label">Exportar</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('import')" data-section="import">
+            <span class="si-icon">📥</span>
+            <span class="si-label">Importar</span>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">Estado</div>
+        <div class="legend" style="display:flex; flex-direction:column; gap:4px; padding:4px 18px; font-size:0.75rem; margin-left:0;">
+            <div class="legend-item"><div class="legend-color status-confirmed"></div> Confirmada</div>
+            <div class="legend-item"><div class="legend-color status-pending"></div> Pendiente</div>
+            <div class="legend-item"><div class="legend-color status-checkedin"></div> Check-in</div>
+            <div class="legend-item"><div class="legend-color status-checkedout"></div> Check-out</div>
+            <div class="legend-item"><div class="legend-color status-blocked"></div> Bloqueada</div>
+        </div>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user" id="sidebarUser" onclick="logout()" title="Cerrar sesión">
+            <div class="su-avatar" id="sidebarAvatar"></div>
+            <div>
+                <div class="su-name" id="sidebarUserName"></div>
+                <div class="su-role" id="sidebarUserRole"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Main Content -->
+<div class="main-content">
 <header>
-    <div>
-        <h1>Hostal Jijones</h1>
-        <div class="subtitle">Sistema de Gestión de Reservas</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+        <div>
+            <h1>Hostal Jijones</h1>
+            <div class="subtitle">Sistema de Gestión de Reservas</div>
+        </div>
     </div>
     <div style="text-align: right; font-size: 0.85rem; display:flex; align-items:center; gap:12px;">
         <div>
@@ -907,23 +1113,7 @@
         <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
     </div>
 
-    <button class="btn-success" onclick="openNewBooking()">+ Nueva Reserva</button>
-    <button class="btn-primary" onclick="openSearchModal()">Buscar Disponibilidad</button>
-    <button class="btn-primary" onclick="openBlockModal()">Bloquear Fechas</button>
-    <button class="btn-primary" onclick="openClientsModal()">Clientes</button>
-    <button class="btn-primary" onclick="openIncomeModal()">Ingresos</button>
-    <button class="btn-primary" onclick="openReportsModal()">Informes</button>
-    <button class="btn-secondary" onclick="exportData()">Exportar</button>
-    <button class="btn-secondary" onclick="importData()">Importar</button>
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
-
-    <div class="legend">
-        <div class="legend-item"><div class="legend-color status-confirmed"></div> Confirmada</div>
-        <div class="legend-item"><div class="legend-color status-pending"></div> Pendiente</div>
-        <div class="legend-item"><div class="legend-color status-checkedin"></div> Check-in</div>
-        <div class="legend-item"><div class="legend-color status-checkedout"></div> Check-out</div>
-        <div class="legend-item"><div class="legend-color status-blocked"></div> Bloqueada</div>
-    </div>
 </div>
 
 <div class="grid-container" id="gridContainer">
@@ -931,16 +1121,19 @@
 </div>
 
 <div class="calendar-container" id="calendarContainer">
-    <div class="calendar-nav">
-        <button class="btn-outline" onclick="navigateMonth(-1)">‹</button>
-        <h3 id="calendarTitle"></h3>
-        <button class="btn-outline" onclick="navigateMonth(1)">›</button>
-        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:10px;">Hoy</button>
+    <div class="calendar-nav" style="flex-wrap:wrap;">
+        <button class="btn-outline" onclick="navigateCalendarYear(-1)" title="Año anterior">«</button>
+        <h3 id="calendarYearTitle" style="min-width:50px;"></h3>
+        <button class="btn-outline" onclick="navigateCalendarYear(1)" title="Año siguiente">»</button>
+        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:6px;">Hoy</button>
+    </div>
+    <div class="calendar-month-tabs" id="calendarMonthTabs" style="display:flex; gap:0; margin-bottom:12px; flex-wrap:wrap;">
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
+</div><!-- /main-content -->
 
 <div class="tooltip" id="tooltip"></div>
 
@@ -2274,6 +2467,11 @@ function switchView(view) {
     document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
     document.getElementById('gridContainer').style.display = view === 'grid' ? 'block' : 'none';
     document.getElementById('calendarContainer').classList.toggle('active', view === 'calendar');
+    // Update sidebar active
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    const sidebarSection = view === 'grid' ? 'grid' : 'calendar';
+    const sItem = document.querySelector(`.sidebar-item[data-section="${sidebarSection}"]`);
+    if (sItem) sItem.classList.add('active');
     if (view === 'calendar') renderCalendar();
 }
 
@@ -2294,7 +2492,7 @@ function goToCurrentMonth() {
 }
 
 function renderCalendar() {
-    document.getElementById('calendarTitle').textContent = `${MONTH_NAMES_FULL[calendarMonth]} ${calendarYear}`;
+    renderCalendarMonthTabs();
 
     const firstDay = new Date(calendarYear, calendarMonth, 1);
     const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
@@ -3677,6 +3875,7 @@ function updateUserIndicator() {
         <div class="ui-avatar" style="background:${currentUser.color};">${currentUser.name.charAt(0)}</div>
         <span class="ui-name">${currentUser.name}</span>
     `;
+    updateSidebarUser();
 }
 
 // ==================== AUDIT TRAIL ====================
@@ -3717,6 +3916,78 @@ document.addEventListener('keydown', e => {
 
 // ==================== INIT ====================
 
+// ==================== SIDEBAR ====================
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+
+function sidebarNav(section) {
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) toggleSidebar();
+
+    // Update active state
+    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    const item = document.querySelector(`.sidebar-item[data-section="${section}"]`);
+    if (item) item.classList.add('active');
+
+    switch(section) {
+        case 'grid': switchView('grid'); break;
+        case 'calendar': switchView('calendar'); break;
+        case 'newBooking': openNewBooking(); break;
+        case 'search': openSearchModal(); break;
+        case 'block': openBlockModal(); break;
+        case 'income': openIncomeModal(); break;
+        case 'reports': openReportsModal(); break;
+        case 'clients': openClientsModal(); break;
+        case 'rules': openRulesModal(); break;
+        case 'export': exportData(); break;
+        case 'import': importData(); break;
+    }
+}
+
+function updateSidebarUser() {
+    if (!currentUser) return;
+    document.getElementById('sidebarAvatar').style.background = currentUser.color;
+    document.getElementById('sidebarAvatar').textContent = currentUser.name.charAt(0);
+    document.getElementById('sidebarUserName').textContent = currentUser.name;
+    document.getElementById('sidebarUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : 'Recepción';
+}
+
+// ==================== CALENDAR YEAR/MONTH TABS ====================
+
+function navigateCalendarYear(dir) {
+    calendarYear += dir;
+    renderCalendar();
+}
+
+function goToCalendarMonth(month) {
+    calendarMonth = month;
+    renderCalendar();
+}
+
+function renderCalendarMonthTabs() {
+    const shortMonths = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const container = document.getElementById('calendarMonthTabs');
+    const yearTitle = document.getElementById('calendarYearTitle');
+    if (yearTitle) yearTitle.textContent = calendarYear;
+    if (!container) return;
+    container.innerHTML = shortMonths.map((m, i) =>
+        `<button onclick="goToCalendarMonth(${i})" style="
+            padding:5px 0; flex:1; min-width:0; border:1px solid #ccc; font-size:0.72rem;
+            font-weight:600; cursor:pointer; transition:all 0.15s;
+            background:${i === calendarMonth ? '#7B96B5' : '#f5f5f5'};
+            color:${i === calendarMonth ? 'white' : '#555'};
+            border-color:${i === calendarMonth ? '#7B96B5' : '#ccc'};
+            ${i === 0 ? 'border-radius:4px 0 0 4px;' : ''}
+            ${i === 11 ? 'border-radius:0 4px 4px 0;' : ''}
+        ">${m}</button>`
+    ).join('');
+}
+
 function init() {
     loadBookings();
     populateRoomSelect();
@@ -3730,6 +4001,7 @@ function init() {
     document.getElementById('currentDateDisplay').textContent =
         `${DAY_NAMES[today.getDay()]} ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()}`;
 
+    updateSidebarUser();
     renderGrid();
 }
 
