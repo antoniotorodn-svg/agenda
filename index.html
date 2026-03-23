@@ -640,12 +640,214 @@
         }
         .tooltip.active { display: block; }
 
-        /* Responsive */
+        /* ==================== RESPONSIVE ==================== */
+
+        /* Tablet landscape & small desktop */
+        @media (max-width: 1024px) {
+            .reports-modal, .invoice-modal, .client-modal { width: 95vw; }
+            .income-modal, .search-modal, .client-detail-modal { width: 95vw; }
+            .checklist-modal, .rules-modal, .block-modal { width: 95vw; }
+            .rank-table { font-size: 0.75rem; }
+            .rank-table th, .rank-table td { padding: 6px 6px; }
+            .rank-bar-cell { width: 60px; }
+            .income-total-card .value { font-size: 1rem; }
+        }
+
+        /* Tablet portrait */
         @media (max-width: 768px) {
-            header { padding: 10px 15px; }
-            .toolbar { padding: 10px 15px; }
-            .grid-container { padding: 10px 15px; }
+            header { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            header h1 { font-size: 1.2rem; }
+            header .subtitle { font-size: 0.75rem; }
+
+            .toolbar {
+                padding: 8px 10px; gap: 8px;
+            }
+            .toolbar label { display: none; }
+            .toolbar button { padding: 6px 10px; font-size: 0.78rem; }
+            .toolbar input[type="date"] { font-size: 0.78rem; padding: 5px 6px; max-width: 130px; }
+            .toolbar select { font-size: 0.78rem; padding: 5px 4px; }
+            .nav-arrows button { padding: 6px 8px; font-size: 0.9rem; }
             .legend { display: none; }
+            .view-toggle button { padding: 5px 10px; font-size: 0.72rem; }
+
+            .grid-container { padding: 8px; }
+            .calendar-container { padding: 10px; }
+            .calendar-nav h3 { font-size: 0.95rem; min-width: 140px; }
+            .calendar-grid .cal-day { min-height: 60px; padding: 2px; }
+            .calendar-grid .cal-day .day-num { font-size: 0.7rem; }
+            .calendar-grid .cal-day .cal-booking { font-size: 0.55rem; }
+            .calendar-grid .cal-header { padding: 5px; font-size: 0.7rem; }
+
+            .modal { padding: 20px 15px; width: 98vw; max-height: 95vh; border-radius: 10px; }
+            .modal h2 { font-size: 1.05rem; margin-bottom: 14px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .form-row .form-group { flex: none; }
+            .form-group { margin-bottom: 10px; }
+            .form-group label { font-size: 0.8rem; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.85rem; padding: 8px 10px; }
+            .form-actions { flex-wrap: wrap; gap: 8px; }
+            .form-actions button { flex: 1; min-width: 100px; }
+
+            .add-payment-row { flex-wrap: wrap; }
+            .add-payment-row .form-group { flex: 1 1 45% !important; min-width: 100px; }
+            .btn-add-payment { width: 100%; margin-top: 4px; }
+
+            .payment-section { padding: 10px; }
+            .payment-status-badges { gap: 4px; }
+            .payment-badge { padding: 4px 8px; font-size: 0.7rem; }
+
+            .confirm-actions { gap: 6px; }
+            .confirm-actions button { flex: 1; min-width: 80px; font-size: 0.72rem; padding: 6px 8px; }
+
+            .doc-section { padding: 10px; }
+            .doc-section .form-row { flex-direction: column; gap: 0; }
+
+            .rural-section { padding: 10px; }
+            .rural-section .form-row { flex-direction: column; gap: 0; }
+
+            .search-form { flex-direction: column; }
+            .search-form .form-group { width: 100% !important; min-width: 0 !important; }
+            .search-result-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+            .client-card { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .stay-item { flex-direction: column; align-items: flex-start; gap: 2px; }
+
+            .income-totals { gap: 8px; }
+            .income-total-card { min-width: 120px; padding: 8px; }
+            .income-total-card .label { font-size: 0.68rem; }
+            .income-total-card .value { font-size: 0.9rem; }
+
+            .chart-label { width: 40px; font-size: 0.7rem; }
+            .chart-value { width: 50px; font-size: 0.68rem; }
+            .chart-bar-fill { font-size: 0.62rem; }
+            .ic-values { width: 90px; font-size: 0.62rem; }
+
+            .stats-bar { padding: 8px 10px; gap: 10px; flex-wrap: wrap; font-size: 0.72rem; }
+
+            .wizard-modal { width: 98vw; }
+            .wizard-steps { gap: 0; }
+            .wizard-step { font-size: 0.65rem; padding: 6px 2px; }
+            .wizard-room-card { flex-direction: column; align-items: flex-start; gap: 4px; }
+
+            .login-box { width: 92vw; padding: 25px 20px; }
+
+            .invoice-preview { padding: 15px; font-size: 0.75rem; }
+            .invoice-preview .inv-header { flex-direction: column; gap: 10px; }
+            .invoice-preview .inv-number { text-align: left; }
+            .invoice-preview th, .invoice-preview td { padding: 5px 4px; font-size: 0.72rem; }
+
+            .user-indicator .ui-name { display: none; }
+
+            .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 15px; right: 15px; }
+        }
+
+        /* Mobile small */
+        @media (max-width: 480px) {
+            header { padding: 8px 10px; }
+            header h1 { font-size: 1rem; }
+            header .subtitle { display: none; }
+
+            .toolbar { padding: 6px 8px; gap: 6px; }
+            .toolbar button { padding: 5px 7px; font-size: 0.7rem; }
+            .toolbar input[type="date"] { max-width: 110px; font-size: 0.72rem; }
+            .nav-arrows { gap: 2px; }
+            .nav-arrows button { padding: 5px 6px; font-size: 0.8rem; }
+
+            .grid-container { padding: 4px; }
+            table.booking-grid th, table.booking-grid td { font-size: 0.65rem; }
+            table.booking-grid thead th { padding: 5px 2px; min-width: 30px; }
+            td.day-cell { height: 30px; min-width: 30px; }
+            .room-header { padding: 4px 6px; min-width: 80px; }
+            .room-header .room-number { font-size: 0.72rem; }
+            .room-header .room-type { font-size: 0.6rem; }
+            .booking-block { font-size: 0.6rem; }
+            .floor-separator td, .floor-separator th { font-size: 0.7rem; padding: 3px 6px; }
+
+            .calendar-container { padding: 4px; }
+            .calendar-nav { gap: 6px; margin-bottom: 8px; }
+            .calendar-nav h3 { font-size: 0.85rem; min-width: 110px; }
+            .calendar-grid .cal-day { min-height: 45px; }
+            .calendar-grid .cal-day .cal-booking { font-size: 0.5rem; padding: 0 2px; }
+            .calendar-grid .cal-header { font-size: 0.6rem; padding: 4px 2px; }
+
+            .modal { padding: 15px 10px; border-radius: 8px; }
+            .modal h2 { font-size: 0.95rem; margin-bottom: 10px; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.82rem; padding: 7px 8px; }
+
+            .stats-bar { gap: 6px; font-size: 0.65rem; padding: 6px 8px; }
+            .stat { gap: 3px; }
+
+            .report-tabs, .income-tabs, .checklist-tabs { flex-wrap: wrap; }
+            .report-tab, .income-tab, .checklist-tab { font-size: 0.72rem; padding: 5px 10px; }
+
+            .rank-table { font-size: 0.68rem; }
+            .rank-table th, .rank-table td { padding: 4px 3px; }
+            .rank-bar-cell { display: none; }
+
+            .payment-item { font-size: 0.7rem; flex-wrap: wrap; }
+            .payment-summary { flex-direction: column; gap: 2px; font-size: 0.75rem; }
+
+            .checklist-item { gap: 6px; font-size: 0.75rem; }
+            .checklist-item .item-note { width: 90px; font-size: 0.68rem; }
+            .checklist-item .item-qty { width: 35px; font-size: 0.68rem; }
+
+            .audit-info { font-size: 0.65rem; padding: 6px 8px; }
+
+            .login-box { padding: 20px 15px; }
+            .login-box h1 { font-size: 1.3rem; }
+            .user-card { padding: 10px 12px; }
+            .user-card .user-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
+            .pin-input { width: 140px; font-size: 1.1rem; }
+        }
+
+        /* Very small mobile */
+        @media (max-width: 360px) {
+            header h1 { font-size: 0.9rem; }
+            .toolbar button { font-size: 0.65rem; padding: 4px 5px; }
+            .modal { padding: 12px 8px; }
+            .form-group label { font-size: 0.72rem; }
+            .calendar-grid .cal-day { min-height: 36px; }
+            .calendar-grid .cal-day .day-num { font-size: 0.6rem; }
+            .calendar-grid .cal-day .cal-booking { display: none; }
+            .fab-btn { width: 44px; height: 44px; font-size: 1.3rem; bottom: 10px; right: 10px; }
+        }
+
+        /* Touch device improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .toolbar button { min-height: 40px; }
+            td.day-cell { min-height: 38px; }
+            .form-group input, .form-group select { min-height: 42px; }
+            .payment-badge { min-height: 36px; display: flex; align-items: center; }
+            .wizard-room-card { padding: 14px 12px; }
+            .client-card { padding: 14px; }
+            .user-card { padding: 14px 16px; }
+            .btn-login { min-height: 44px; }
+        }
+
+        /* Safe area for devices with notch */
+        @supports (padding: env(safe-area-inset-bottom)) {
+            .fab-btn { bottom: calc(15px + env(safe-area-inset-bottom)); right: calc(15px + env(safe-area-inset-right)); }
+            .stats-bar { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal { max-height: 98vh; }
+            .login-box { padding: 15px 20px; }
+            .login-box h1 { font-size: 1.1rem; margin-bottom: 2px; }
+            .login-subtitle { margin-bottom: 10px !important; }
+            .user-cards { flex-direction: row; flex-wrap: wrap; }
+            .user-card { flex: 1; min-width: 120px; }
+            .calendar-grid .cal-day { min-height: 50px; }
+        }
+
+        /* Print styles */
+        @media print {
+            .login-screen, .toolbar, .stats-bar, .fab-btn, .tooltip,
+            .modal-overlay, .nav-arrows, .view-toggle, .legend { display: none !important; }
+            header { box-shadow: none; }
+            .grid-container { padding: 0; overflow: visible; }
+            table.booking-grid { box-shadow: none; }
         }
     </style>
 </head>
