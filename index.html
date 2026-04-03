@@ -121,9 +121,10 @@
         .booking-single { border-radius: 4px; }
 
         .status-confirmed { background: #1a73e8; color: white; }
-        .status-pending { background: #fbbc04; color: #3c4043; }
-        .status-checkedin { background: #1e8e3e; color: white; }
-        .status-checkedout { background: #80868b; color: white; }
+        .status-pending { background: #fa903e; color: white; }
+        .status-checkedin { background: #0d904f; color: white; }
+        .status-checkedout { background: #9334e6; color: white; }
+        .status-personal { background: #e8710a; color: white; }
 
         /* Modal */
         .modal-overlay {
@@ -1087,9 +1088,17 @@
         </div>
 
         <div class="sidebar-section">Gestión</div>
+        <div class="sidebar-item" onclick="sidebarNav('pricing')" data-section="pricing">
+            <span class="si-icon">💲</span>
+            <span class="si-label">Precios</span>
+        </div>
         <div class="sidebar-item" onclick="sidebarNav('clients')" data-section="clients">
             <span class="si-icon">👤</span>
             <span class="si-label">Clientes</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('roomConfig')" data-section="roomConfig">
+            <span class="si-icon">🛏️</span>
+            <span class="si-label">Config. Habitaciones</span>
         </div>
         <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
             <span class="si-icon">📋</span>
@@ -1111,10 +1120,11 @@
         <div class="sidebar-section">Estado</div>
         <div class="legend" style="display:flex; flex-direction:column; gap:3px; padding:4px 16px; font-size:0.72rem; margin-left:0;">
             <div class="legend-item"><div class="legend-color" style="background:#1a73e8;"></div> Confirmada</div>
-            <div class="legend-item"><div class="legend-color" style="background:#fbbc04;"></div> Pendiente</div>
-            <div class="legend-item"><div class="legend-color" style="background:#1e8e3e;"></div> Check-in</div>
-            <div class="legend-item"><div class="legend-color" style="background:#80868b;"></div> Check-out</div>
+            <div class="legend-item"><div class="legend-color" style="background:#fa903e;"></div> Pendiente</div>
+            <div class="legend-item"><div class="legend-color" style="background:#0d904f;"></div> Check-in</div>
+            <div class="legend-item"><div class="legend-color" style="background:#9334e6;"></div> Check-out</div>
             <div class="legend-item"><div class="legend-color" style="background:#dadce0;"></div> Bloqueada</div>
+            <div class="legend-item"><div class="legend-color" style="background:#e8710a;"></div> Uso personal</div>
         </div>
     </div>
 
@@ -1174,6 +1184,11 @@
     <div class="view-toggle">
         <button class="active" id="viewGrid" onclick="switchView('grid')">Tabla</button>
         <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
+    </div>
+
+    <div class="view-toggle" style="margin-left:8px;">
+        <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
+        <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
     </div>
 
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
@@ -1589,43 +1604,72 @@
 <script>
 // ==================== DATA MODEL ====================
 
-const ROOMS = [
+// Room 107 is always blocked (personal use)
+const ROOM_107_BLOCKED = true;
+
+// Default room configuration - bedType can be overridden via localStorage
+const DEFAULT_ROOMS = [
     // Planta 1: 101-115
-    { number: 101, floor: 1, bedType: 'double', label: '101 - Matrimonio' },
-    { number: 102, floor: 1, bedType: 'twin', label: '102 - Dos camas' },
-    { number: 103, floor: 1, bedType: 'double', label: '103 - Matrimonio' },
-    { number: 104, floor: 1, bedType: 'twin', label: '104 - Dos camas' },
-    { number: 105, floor: 1, bedType: 'double', label: '105 - Matrimonio' },
-    { number: 106, floor: 1, bedType: 'twin', label: '106 - Dos camas' },
-    { number: 107, floor: 1, bedType: 'double', label: '107 - Matrimonio' },
-    { number: 108, floor: 1, bedType: 'twin', label: '108 - Dos camas' },
-    { number: 109, floor: 1, bedType: 'double', label: '109 - Matrimonio' },
-    { number: 110, floor: 1, bedType: 'twin', label: '110 - Dos camas' },
-    { number: 111, floor: 1, bedType: 'double', label: '111 - Matrimonio' },
-    { number: 112, floor: 1, bedType: 'twin', label: '112 - Dos camas' },
-    { number: 113, floor: 1, bedType: 'double', label: '113 - Matrimonio' },
-    { number: 114, floor: 1, bedType: 'twin', label: '114 - Dos camas' },
-    { number: 115, floor: 1, bedType: 'double', label: '115 - Matrimonio' },
+    { number: 101, floor: 1, bedType: 'double' },
+    { number: 102, floor: 1, bedType: 'twin' },
+    { number: 103, floor: 1, bedType: 'double' },
+    { number: 104, floor: 1, bedType: 'twin' },
+    { number: 105, floor: 1, bedType: 'double' },
+    { number: 106, floor: 1, bedType: 'twin' },
+    { number: 107, floor: 1, bedType: 'double', alwaysBlocked: true },
+    { number: 108, floor: 1, bedType: 'twin' },
+    { number: 109, floor: 1, bedType: 'double' },
+    { number: 110, floor: 1, bedType: 'twin' },
+    { number: 111, floor: 1, bedType: 'double' },
+    { number: 112, floor: 1, bedType: 'twin' },
+    { number: 113, floor: 1, bedType: 'double' },
+    { number: 114, floor: 1, bedType: 'twin' },
+    { number: 115, floor: 1, bedType: 'double' },
     // Planta 2: 201-216
-    { number: 201, floor: 2, bedType: 'double', label: '201 - Matrimonio' },
-    { number: 202, floor: 2, bedType: 'twin', label: '202 - Dos camas' },
-    { number: 203, floor: 2, bedType: 'double', label: '203 - Matrimonio' },
-    { number: 204, floor: 2, bedType: 'twin', label: '204 - Dos camas' },
-    { number: 205, floor: 2, bedType: 'double', label: '205 - Matrimonio' },
-    { number: 206, floor: 2, bedType: 'twin', label: '206 - Dos camas' },
-    { number: 207, floor: 2, bedType: 'double', label: '207 - Matrimonio' },
-    { number: 208, floor: 2, bedType: 'twin', label: '208 - Dos camas' },
-    { number: 209, floor: 2, bedType: 'double', label: '209 - Matrimonio' },
-    { number: 210, floor: 2, bedType: 'twin', label: '210 - Dos camas' },
-    { number: 211, floor: 2, bedType: 'double', label: '211 - Matrimonio' },
-    { number: 212, floor: 2, bedType: 'twin', label: '212 - Dos camas' },
-    { number: 213, floor: 2, bedType: 'double', label: '213 - Matrimonio' },
-    { number: 214, floor: 2, bedType: 'twin', label: '214 - Dos camas' },
-    { number: 215, floor: 2, bedType: 'double', label: '215 - Matrimonio' },
-    { number: 216, floor: 2, bedType: 'twin', label: '216 - Dos camas' },
+    { number: 201, floor: 2, bedType: 'double' },
+    { number: 202, floor: 2, bedType: 'twin' },
+    { number: 203, floor: 2, bedType: 'double' },
+    { number: 204, floor: 2, bedType: 'twin' },
+    { number: 205, floor: 2, bedType: 'double' },
+    { number: 206, floor: 2, bedType: 'twin' },
+    { number: 207, floor: 2, bedType: 'double' },
+    { number: 208, floor: 2, bedType: 'twin' },
+    { number: 209, floor: 2, bedType: 'double' },
+    { number: 210, floor: 2, bedType: 'twin' },
+    { number: 211, floor: 2, bedType: 'double' },
+    { number: 212, floor: 2, bedType: 'twin' },
+    { number: 213, floor: 2, bedType: 'double' },
+    { number: 214, floor: 2, bedType: 'twin' },
+    { number: 215, floor: 2, bedType: 'double' },
+    { number: 216, floor: 2, bedType: 'twin' },
     // Casa Rural Villarrubia
-    { number: 'CR1', floor: 'rural', bedType: 'rural', label: 'Casa Rural Villarrubia (16 pers.)' },
+    { number: 'CR1', floor: 'rural', bedType: 'rural' },
 ];
+
+// Load room bed type overrides from localStorage
+function loadRoomConfig() {
+    try {
+        return JSON.parse(localStorage.getItem('hostal_jijones_room_config') || '{}');
+    } catch { return {}; }
+}
+
+function saveRoomConfig(config) {
+    localStorage.setItem('hostal_jijones_room_config', JSON.stringify(config));
+}
+
+function buildRooms() {
+    const config = loadRoomConfig();
+    return DEFAULT_ROOMS.map(r => {
+        const bedType = (r.bedType !== 'rural' && config[r.number]) ? config[r.number] : r.bedType;
+        const bedLabel = bedType === 'rural' ? 'Casa Rural Villarrubia (16 pers.)' : (bedType === 'double' ? r.number + ' - Matrimonio' : r.number + ' - Dos camas');
+        return { ...r, bedType, label: bedLabel, alwaysBlocked: r.alwaysBlocked || false };
+    });
+}
+
+let ROOMS = buildRooms();
+
+// Current property view: 'hostal' or 'rural'
+let currentProperty = 'hostal';
 
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -1872,7 +1916,13 @@ function renderGrid() {
 
     let currentFloor = 0;
 
-    ROOMS.forEach(room => {
+    // Filter rooms by current property tab
+    const filteredRooms = ROOMS.filter(room => {
+        if (currentProperty === 'rural') return room.floor === 'rural';
+        return room.floor !== 'rural';
+    });
+
+    filteredRooms.forEach(room => {
         // Floor separator
         if (room.floor !== currentFloor) {
             currentFloor = room.floor;
@@ -1881,6 +1931,21 @@ function renderGrid() {
             } else {
                 html += `<tr class="floor-separator"><td colspan="${days + 1}">Planta ${currentFloor} ${currentFloor === 1 ? '(Habitaciones 101-115)' : '(Habitaciones 201-216)'}</td></tr>`;
             }
+        }
+
+        // Room 107 always blocked
+        if (room.alwaysBlocked) {
+            const bedIcon = room.bedType === 'double' ? '🛏️' : '🛏️🛏️';
+            const bedLabel = room.bedType === 'double' ? 'Matrimonio' : 'Dos camas';
+            html += `<tr><td class="room-header"><span class="room-number">${room.number} ${bedIcon}</span><span class="room-type">${bedLabel} · USO PERSONAL</span></td>`;
+            dates.forEach(ds => {
+                const we = isWeekend(parseDate(ds)) ? ' weekend' : '';
+                const tod = ds === today ? ' today' : '';
+                html += `<td class="day-cell${we}${tod}" style="background:#fff3e0;">
+                    <div class="booking-block status-personal" style="opacity:0.6;">Personal</div></td>`;
+            });
+            html += '</tr>';
+            return;
         }
 
         const bedIcon = room.bedType === 'rural' ? '🏡' : (room.bedType === 'double' ? '🛏️' : '🛏️🛏️');
@@ -1946,8 +2011,9 @@ function renderGrid() {
 
 function updateStats() {
     const today = todayStr();
-    const occupied = ROOMS.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
-    const total = ROOMS.length;
+    const availableRooms = ROOMS.filter(r => !r.alwaysBlocked);
+    const occupied = availableRooms.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
+    const total = availableRooms.length;
     const free = total - occupied;
     const occupancy = Math.round((occupied / total) * 100);
 
@@ -2017,7 +2083,7 @@ function goToToday() {
 function populateRoomSelect() {
     const sel = document.getElementById('bookingRoom');
     sel.innerHTML = '';
-    ROOMS.forEach(r => {
+    ROOMS.filter(r => !r.alwaysBlocked).forEach(r => {
         const opt = document.createElement('option');
         opt.value = r.number;
         opt.textContent = r.label;
@@ -2711,6 +2777,9 @@ function searchAvailability() {
     const results = [];
 
     ROOMS.forEach(room => {
+        // Skip always-blocked rooms
+        if (room.alwaysBlocked) return;
+
         // Filter by bed type
         if (bedType !== 'any' && room.bedType !== bedType) return;
 
@@ -3728,6 +3797,7 @@ function wizardSearch() {
 
     const results = [];
     ROOMS.forEach(room => {
+        if (room.alwaysBlocked) return;
         if (type !== 'any' && room.bedType !== type) return;
         // Casa rural: guests doesn't matter
         if (room.bedType !== 'rural') {
@@ -4036,7 +4106,7 @@ function formatAuditDate(isoStr) {
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); }
 });
 
 // ==================== INIT ====================
@@ -4069,7 +4139,9 @@ function sidebarNav(section) {
         case 'income': openIncomeModal(); break;
         case 'invoices': openInvoicesListModal(); break;
         case 'reports': openReportsModal(); break;
+        case 'pricing': openPricingModal(); break;
         case 'clients': openClientsModal(); break;
+        case 'roomConfig': openRoomConfigModal(); break;
         case 'rules': openRulesModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
@@ -4398,8 +4470,200 @@ function renderExtraRooms() {
     }).join('');
 }
 
+// ==================== PROPERTY TAB SWITCHING ====================
+
+function switchProperty(prop) {
+    currentProperty = prop;
+    document.getElementById('tabHostal').classList.toggle('active', prop === 'hostal');
+    document.getElementById('tabRural').classList.toggle('active', prop === 'rural');
+    renderGrid();
+    if (currentView === 'calendar') renderCalendar();
+}
+
+// ==================== PRICING CALENDAR ====================
+
+let pricingMonth = new Date().getMonth();
+let pricingYear = new Date().getFullYear();
+
+function loadPricing() {
+    try {
+        return JSON.parse(localStorage.getItem('hostal_jijones_pricing') || '{}');
+    } catch { return {}; }
+}
+
+function savePricingData(data) {
+    localStorage.setItem('hostal_jijones_pricing', JSON.stringify(data));
+}
+
+function openPricingModal() {
+    pricingMonth = new Date().getMonth();
+    pricingYear = new Date().getFullYear();
+    renderPricingCalendar();
+    document.getElementById('pricingModal').classList.add('active');
+}
+
+function closePricingModal() {
+    document.getElementById('pricingModal').classList.remove('active');
+}
+
+function changePricingMonth(dir) {
+    pricingMonth += dir;
+    if (pricingMonth > 11) { pricingMonth = 0; pricingYear++; }
+    if (pricingMonth < 0) { pricingMonth = 11; pricingYear--; }
+    renderPricingCalendar();
+}
+
+function getOccupancyForDate(ds) {
+    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural' && !r.alwaysBlocked);
+    const occupied = hostalRooms.filter(r => getBookingsForRoomAndDate(r.number, ds).length > 0).length;
+    return hostalRooms.length > 0 ? occupied / hostalRooms.length : 0;
+}
+
+function getPriceForDate(ds, roomType) {
+    const pricing = loadPricing();
+    const key = ds + '_' + roomType;
+    if (pricing[key]) return pricing[key];
+    // Default prices
+    const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
+    return defaults[roomType] || 55;
+}
+
+function getSuggestedPrice(ds, roomType) {
+    const basePrice = getPriceForDate(ds, roomType);
+    const d = parseDate(ds);
+    const isWe = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;
+    if (isWe) {
+        const occupancy = getOccupancyForDate(ds);
+        if (occupancy >= 0.8) {
+            return Math.round(basePrice * 1.10);
+        }
+    }
+    return basePrice;
+}
+
+function renderPricingCalendar() {
+    const label = document.getElementById('pricingMonthLabel');
+    label.textContent = MONTH_NAMES_FULL[pricingMonth] + ' ' + pricingYear;
+
+    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+    const pricing = loadPricing();
+    const roomTypes = ['individual', 'doble', 'triple', 'cuadruple'];
+    const typeLabels = { individual: 'Individual', doble: 'Doble', triple: 'Triple', cuadruple: 'Cuádruple' };
+
+    let html = `<table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f1f3f4;">
+            <th style="padding:6px 8px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0; position:sticky; left:0; background:#f1f3f4; min-width:90px;">Día</th>`;
+    roomTypes.forEach(rt => {
+        html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">${typeLabels[rt]}</th>`;
+    });
+    html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Ocup.</th>
+        <th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Surge</th>
+    </tr></thead><tbody>`;
+
+    const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(pricingYear, pricingMonth, d);
+        const ds = dateStr(date);
+        const dayName = dayNames[date.getDay()];
+        const isWe = date.getDay() === 0 || date.getDay() === 5 || date.getDay() === 6;
+        const occ = getOccupancyForDate(ds);
+        const occPct = Math.round(occ * 100);
+        const surge = isWe && occ >= 0.8;
+        const rowBg = isWe ? 'background:#fef7f0;' : '';
+
+        html += `<tr style="${rowBg}">
+            <td style="padding:4px 8px; border-bottom:1px solid #e8eaed; font-weight:500; position:sticky; left:0; background:${isWe ? '#fef7f0' : '#fff'};">${dayName} ${d}</td>`;
+
+        roomTypes.forEach(rt => {
+            const key = ds + '_' + rt;
+            const baseVal = pricing[key] || '';
+            const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85 };
+            const placeholder = defaults[rt] || 55;
+            const surgePrice = surge ? Math.round((parseFloat(baseVal) || placeholder) * 1.10) : null;
+            html += `<td style="padding:2px 4px; border-bottom:1px solid #e8eaed; text-align:center;">
+                <input type="number" value="${baseVal}" placeholder="${placeholder}" min="0" step="1"
+                    style="width:60px; text-align:center; padding:3px; border:1px solid #dadce0; border-radius:4px; font-size:0.72rem; font-family:inherit;"
+                    onchange="updatePricingCell('${key}', this.value)">
+                ${surgePrice ? `<div style="font-size:0.6rem; color:#d93025; font-weight:500;">→ ${surgePrice}€</div>` : ''}
+            </td>`;
+        });
+
+        html += `<td style="padding:4px 8px; border-bottom:1px solid #e8eaed; text-align:center; font-weight:500; color:${occPct >= 80 ? '#d93025' : '#5f6368'};">${occPct}%</td>
+            <td style="padding:4px 8px; border-bottom:1px solid #e8eaed; text-align:center;">${surge ? '<span style="color:#d93025; font-weight:500;">+10%</span>' : '-'}</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('pricingCalendar').innerHTML = html;
+}
+
+function updatePricingCell(key, value) {
+    const pricing = loadPricing();
+    if (value && parseFloat(value) > 0) {
+        pricing[key] = parseFloat(value);
+    } else {
+        delete pricing[key];
+    }
+    savePricingData(pricing);
+}
+
+function savePricing() {
+    alert('Precios guardados correctamente.');
+    closePricingModal();
+}
+
+// ==================== ROOM CONFIG (BED TYPE TOGGLE) ====================
+
+function openRoomConfigModal() {
+    renderRoomConfigList();
+    document.getElementById('roomConfigModal').classList.add('active');
+}
+
+function closeRoomConfigModal() {
+    document.getElementById('roomConfigModal').classList.remove('active');
+}
+
+function renderRoomConfigList() {
+    const config = loadRoomConfig();
+    const hostalRooms = DEFAULT_ROOMS.filter(r => r.floor !== 'rural');
+    const container = document.getElementById('roomConfigList');
+
+    let html = '';
+    let lastFloor = 0;
+    hostalRooms.forEach(r => {
+        if (r.floor !== lastFloor) {
+            lastFloor = r.floor;
+            html += `<div style="background:#e8f0fe; padding:6px 12px; font-size:0.78rem; font-weight:500; color:#1a73e8; margin-top:${lastFloor > 1 ? '12px' : '0'};">Planta ${lastFloor}</div>`;
+        }
+        const currentType = config[r.number] || r.bedType;
+        const isDouble = currentType === 'double';
+        const isBlocked = r.alwaysBlocked;
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #e8eaed;">
+            <div>
+                <span style="font-weight:500; color:#202124;">Habitación ${r.number}</span>
+                ${isBlocked ? '<span style="font-size:0.68rem; color:#e8710a; margin-left:6px;">USO PERSONAL</span>' : ''}
+            </div>
+            <div style="display:flex; gap:4px;">
+                <button onclick="setRoomBedType(${r.number}, 'double')" class="${isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️ Matrimonio</button>
+                <button onclick="setRoomBedType(${r.number}, 'twin')" class="${!isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️🛏️ Dos camas</button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function setRoomBedType(roomNumber, bedType) {
+    const config = loadRoomConfig();
+    config[roomNumber] = bedType;
+    saveRoomConfig(config);
+    // Rebuild ROOMS array
+    ROOMS = buildRooms();
+    renderRoomConfigList();
+    renderGrid();
+}
+
 function init() {
     loadBookings();
+    ROOMS = buildRooms(); // Rebuild with saved config
     populateRoomSelect();
     populateBlockRoomSelect();
 
@@ -4571,6 +4835,36 @@ renderLoginScreen();
         <div class="form-actions">
             <button class="btn-secondary" onclick="closeAddClientModal()">Cancelar</button>
             <button class="btn-success" onclick="saveNewClient()">Guardar Cliente</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Precios -->
+<div class="modal-overlay" id="pricingModal">
+    <div class="modal" style="width:850px;">
+        <h2>Gestión de Precios</h2>
+        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Configura los precios base por tipo de habitación y día. Los fines de semana/festivos con +80% de ocupación se incrementan automáticamente un 10%.</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
+            <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
+            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:500; color:#202124;"></h4>
+            <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
+        </div>
+        <div id="pricingCalendar" style="max-height:450px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar Precios</button>
+            <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Config Habitaciones -->
+<div class="modal-overlay" id="roomConfigModal">
+    <div class="modal" style="width:600px;">
+        <h2>Configuración de Habitaciones</h2>
+        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Selecciona si cada habitación tiene cama de matrimonio o dos camas. Los cambios se guardan automáticamente.</p>
+        <div id="roomConfigList" style="max-height:450px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeRoomConfigModal()">Cerrar</button>
         </div>
     </div>
 </div>
