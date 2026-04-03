@@ -92,6 +92,13 @@
         }
         .room-header .room-number { font-size: 0.72rem; color: #222; font-weight: 600; }
         .room-header .room-type { font-size: 0.58rem; color: #717171; display: block; font-weight: 400; }
+        .room-header.room-dirty { border-left: 4px solid #C13515; background: #FFF5F5; }
+        .room-header.room-clean { border-left: 4px solid #008A05; background: #F5FFF5; }
+        .room-header.room-attention { border-left: 4px solid #1A73E8; background: #F0F6FF; }
+        .room-header .room-status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 3px; vertical-align: middle; }
+        .room-header .room-status-dot.dirty { background: #C13515; }
+        .room-header .room-status-dot.clean { background: #008A05; }
+        .room-header .room-status-dot.needs-attention { background: #1A73E8; }
 
         .floor-separator td, .floor-separator th {
             background: #f7f7f7 !important; color: #222; font-weight: 600;
@@ -1361,12 +1368,18 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Personas por habitación</label>
+                <label>Ocupación</label>
                 <select id="roomType" onchange="onRoomCountChange()">
-                    <option value="individual">1 persona</option>
-                    <option value="doble" selected>2 personas</option>
-                    <option value="triple">3 personas</option>
-                    <option value="cuadruple">4 personas</option>
+                    <option value="individual">Individual (1 persona)</option>
+                    <option value="doble" selected>Doble (2 personas)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Supletorios</label>
+                <select id="extraBeds" onchange="onRoomCountChange()">
+                    <option value="0" selected>Sin supletorio</option>
+                    <option value="1">1 supletorio (+15€)</option>
+                    <option value="2">2 supletorios (+30€)</option>
                 </select>
             </div>
         </div>
@@ -1398,7 +1411,7 @@
             </div>
             <div class="form-group">
                 <label>Precio/noche (€)</label>
-                <input type="number" id="pricePerNight" value="55" min="0" step="0.5" onchange="calculatePrice()">
+                <input type="number" id="pricePerNight" value="48" min="0" step="0.5" onchange="calculatePrice()">
             </div>
         </div>
         <div class="form-group">
@@ -1881,8 +1894,75 @@ function getBlocksForRoomAndDate(roomNumber, date) {
     );
 }
 
-function isRoomAvailable(roomNumber, checkin, checkout) {
-    return !hasConflict(roomNumber, checkin, checkout, null);
+function isRoomAvailable(roomNumber, checkin, checkout, excludeId) {
+    return !hasConflict(roomNumber, checkin, checkout, excludeId || null);
+}
+
+// ==================== ROOM CLEANING STATUS ====================
+
+let roomStatusData = {};
+
+function loadRoomStatus() {
+    try {
+        roomStatusData = JSON.parse(localStorage.getItem('hostal_jijones_room_status') || '{}');
+    } catch { roomStatusData = {}; }
+}
+
+function saveRoomStatus() {
+    localStorage.setItem('hostal_jijones_room_status', JSON.stringify(roomStatusData));
+}
+
+function toggleRoomStatus(roomNumber) {
+    const today = todayStr();
+    const current = roomStatusData[roomNumber];
+    const currentStatus = (current && current.date === today) ? current.status : null;
+    const cycle = [null, 'dirty', 'clean', 'needs-attention'];
+    const idx = cycle.indexOf(currentStatus);
+    const next = cycle[(idx + 1) % cycle.length];
+    if (next) {
+        roomStatusData[roomNumber] = { status: next, date: today };
+    } else {
+        delete roomStatusData[roomNumber];
+    }
+    saveRoomStatus();
+    renderGrid();
+}
+
+function getRoomStatusClass(roomNumber) {
+    const today = todayStr();
+    const entry = roomStatusData[roomNumber];
+    if (!entry || entry.date !== today) return '';
+    if (entry.status === 'dirty') return 'room-dirty';
+    if (entry.status === 'clean') return 'room-clean';
+    if (entry.status === 'needs-attention') return 'room-attention';
+    return '';
+}
+
+function getRoomStatusDot(roomNumber) {
+    const today = todayStr();
+    const entry = roomStatusData[roomNumber];
+    if (!entry || entry.date !== today) return '';
+    return `<span class="room-status-dot ${entry.status}"></span>`;
+}
+
+// ==================== PRICING HELPERS ====================
+
+function getBasePrice(checkin, checkout, roomType) {
+    if (!checkin || !checkout || checkout <= checkin) return 0;
+    let total = 0;
+    let d = parseDate(checkin);
+    const end = parseDate(checkout);
+    while (d < end) {
+        const dow = d.getDay(); // 0=Sun,1=Mon,...,6=Sat
+        const isWeekendNight = (dow === 5 || dow === 6); // Fri/Sat nights
+        if (roomType === 'individual') {
+            total += isWeekendNight ? 49 : 38.50;
+        } else {
+            total += isWeekendNight ? 58 : 48;
+        }
+        d = addDays(d, 1);
+    }
+    return total;
 }
 
 // ==================== GRID RENDERING ====================
@@ -1933,7 +2013,9 @@ function renderGrid() {
 
         const bedLabel = room.bedType === 'rural' ? 'Rural' : ({double:'Matrim.', twin:'2 camas', triple:'Triple', quadruple:'Cuádr.'}[room.bedType] || 'Matrim.');
         const roomDisplay = room.bedType === 'rural' ? 'CR1' : `${room.number}`;
-        html += `<tr><td class="room-header"><span class="room-number">${roomDisplay}</span><span class="room-type">${bedLabel}</span></td>`;
+        const statusClass = getRoomStatusClass(room.number);
+        const statusDot = getRoomStatusDot(room.number);
+        html += `<tr><td class="room-header ${statusClass}" onclick="toggleRoomStatus(${typeof room.number === 'string' ? "'" + room.number + "'" : room.number})" style="cursor:pointer;" title="Clic para cambiar estado de limpieza"><span class="room-number">${roomDisplay}${statusDot}</span><span class="room-type">${bedLabel}</span></td>`;
 
         dates.forEach(ds => {
             const matches = getBookingsForRoomAndDate(room.number, ds);
@@ -2115,6 +2197,14 @@ function quickCheckOut(bookingId) {
     b.updatedBy = currentUser ? currentUser.name : 'Sistema';
     if (!b.history) b.history = [];
     b.history.push({ action: 'check-out rápido', user: b.updatedBy, date: b.updatedAt });
+    // Set room to dirty after checkout
+    roomStatusData[b.room] = { status: 'dirty', date: todayStr() };
+    if (b.extraRooms) {
+        b.extraRooms.forEach(er => {
+            roomStatusData[er.room] = { status: 'dirty', date: todayStr() };
+        });
+    }
+    saveRoomStatus();
     saveBookings();
     closeQuickActions();
     renderGrid();
@@ -2179,7 +2269,7 @@ function updateRuralSection(room) {
         document.getElementById('guestCount').value = '16';
         // Only change price if it's the default hostel price
         const priceEl = document.getElementById('pricePerNight');
-        if (parseFloat(priceEl.value) === 55) {
+        if (parseFloat(priceEl.value) === 48) {
             priceEl.value = RURAL_DEFAULT_PRICE;
         }
     }
@@ -2204,7 +2294,7 @@ function openNewBooking(room, date) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -2236,6 +2326,7 @@ function openNewBooking(room, date) {
     currentExtraRooms = [];
     document.getElementById('roomCount').value = '1';
     document.getElementById('roomType').value = 'doble';
+    document.getElementById('extraBeds').value = '0';
     renderRoomAssignments();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
@@ -2284,8 +2375,9 @@ function editBooking(id) {
     const selectedRoom = ROOMS.find(r => String(r.number) === String(b.room));
     updateRuralSection(selectedRoom);
 
-    // Room type and extra rooms
+    // Room type, extra beds and extra rooms
     document.getElementById('roomType').value = b.roomType || 'doble';
+    document.getElementById('extraBeds').value = b.extraBeds || '0';
     const extraCount = (b.extraRooms && b.extraRooms.length > 0) ? b.extraRooms.length + 1 : 1;
     document.getElementById('roomCount').value = extraCount;
     currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
@@ -2317,15 +2409,31 @@ function closeModal() {
 function calculatePrice() {
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
+    const priceOverride = parseFloat(document.getElementById('pricePerNight').value) || 0;
 
     if (checkin && checkout && checkout > checkin) {
         const nights = nightsBetween(checkin, checkout);
-        const total = (nights * price).toFixed(2);
         const rural = isCurrentRoomRural();
+        const roomType = document.getElementById('roomType').value;
+        const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
+        const roomCount = parseInt(document.getElementById('roomCount').value) || 1;
+
+        let total;
+        if (rural) {
+            total = nights * priceOverride;
+        } else {
+            const baseTotal = getBasePrice(checkin, checkout, roomType);
+            const extraBedCost = extraBeds * 15 * nights;
+            total = (baseTotal + extraBedCost) * roomCount;
+            // Update the per-night display price to average
+            const avgPerNight = total / nights / roomCount;
+            document.getElementById('pricePerNight').value = avgPerNight.toFixed(2);
+        }
+
         const label = rural ? 'casa completa' : 'noche';
         const depositInfo = rural ? ` + Fianza: ${document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT} €` : '';
-        document.getElementById('priceTotal').textContent = `Total: ${total} € (${nights} ${label}${nights > 1 ? 's' : ''})${depositInfo}`;
+        const extraInfo = (!rural && extraBeds > 0) ? ` (incl. ${extraBeds} supletorio${extraBeds > 1 ? 's' : ''})` : '';
+        document.getElementById('priceTotal').textContent = `Total: ${total.toFixed(2)} € (${nights} ${label}${nights > 1 ? 's' : ''})${extraInfo}${depositInfo}`;
     } else {
         document.getElementById('priceTotal').textContent = '';
     }
@@ -2382,12 +2490,13 @@ function saveBooking() {
     }
 
     const roomType = document.getElementById('roomType').value;
+    const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
 
     const booking = {
         id: id || generateId(),
         guestName: name,
         phone, email, docType, docNumber, nationality,
-        room, roomType,
+        room, roomType, extraBeds,
         extraRooms: getAssignedRooms().slice(1).map(r => ({ room: r, roomType: document.getElementById('roomType').value })),
         checkin, checkout, status, pricePerNight: price,
         guests: parseInt(document.getElementById('guestCount').value),
@@ -2896,13 +3005,13 @@ function searchAvailability() {
 
         // Check availability
         if (isRoomAvailable(room.number, from, checkout)) {
-            const nightPrice = room.bedType === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+            const totalPrice = room.bedType === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(from, checkout, 'doble');
             results.push({
                 room,
                 checkin: from,
                 checkout,
                 nights,
-                totalPrice: nights * nightPrice
+                totalPrice
             });
         }
     });
@@ -2942,7 +3051,7 @@ function bookFromSearch(room, checkin, checkout) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -3940,8 +4049,15 @@ function wizardSearchRooms() {
 
     // Auto-select first N available rooms
     wizSelectedRooms = available.slice(0, wizRoomCount);
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
-    const totalPerRoom = nights * nightPrice;
+    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : (() => {
+        const d = parseDate(checkin);
+        const dow = d.getDay();
+        const isWeekendNight = (dow === 5 || dow === 6);
+        if (wizRoomType === 'individual') return isWeekendNight ? 49 : 38.50;
+        return isWeekendNight ? 58 : 48;
+    })();
+    const totalPerRoom = currentProperty === 'rural' ? nights * nightPrice : getBasePrice(checkin, checkout, wizRoomType);
     const totalAll = totalPerRoom * wizRoomCount;
     const persLabel = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuádruple' };
 
@@ -3977,7 +4093,8 @@ function wizardBook() {
     const checkin = document.getElementById('wizCheckin').value;
     const checkout = document.getElementById('wizCheckout').value;
     const mainRoom = wizSelectedRooms[0];
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     const persMap = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuadruple' };
     closeWizard();
 
@@ -3992,6 +4109,7 @@ function wizardBook() {
     document.getElementById('guestNationality').value = '';
     document.getElementById('roomCount').value = wizRoomCount;
     document.getElementById('roomType').value = persMap[wizPersons] || 'doble';
+    document.getElementById('extraBeds').value = '0';
     document.getElementById('guestCount').value = wizRoomCount * wizPersons;
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = nightPrice;
@@ -4667,17 +4785,25 @@ function setViewRange(days) {
 function onRoomCountChange() {
     const count = parseInt(document.getElementById('roomCount').value) || 1;
     const type = document.getElementById('roomType').value;
-    const guestMap = { individual: 1, doble: 2, triple: 3, cuadruple: 4 };
-    document.getElementById('guestCount').value = count * (guestMap[type] || 2);
+    const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
+    const baseGuests = type === 'individual' ? 1 : 2;
+    document.getElementById('guestCount').value = count * (baseGuests + extraBeds);
     renderRoomAssignments();
+    calculatePrice();
 }
 
 function renderRoomAssignments() {
     const count = parseInt(document.getElementById('roomCount').value) || 1;
     const container = document.getElementById('roomAssignmentsList');
+    const checkin = document.getElementById('bookingCheckin').value;
+    const checkout = document.getElementById('bookingCheckout').value;
+    const editId = document.getElementById('bookingId').value;
     const availableRooms = ROOMS.filter(r => {
         if (currentProperty === 'rural') return r.floor === 'rural';
         return r.floor !== 'rural';
+    }).filter(r => {
+        if (checkin && checkout) return isRoomAvailable(r.number, checkin, checkout, editId);
+        return true;
     });
 
     let html = '';
@@ -4822,8 +4948,8 @@ function getPriceForDate(ds, roomType) {
     const key = ds + '_' + roomType;
     if (pricing[key]) return pricing[key];
     // Default prices
-    const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
-    return defaults[roomType] || 55;
+    const defaults = { individual: 38.50, doble: 48, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
+    return defaults[roomType] || 48;
 }
 
 function getSuggestedPrice(ds, roomType) {
@@ -4875,8 +5001,8 @@ function renderPricingCalendar() {
         roomTypes.forEach(rt => {
             const key = ds + '_' + rt;
             const baseVal = pricing[key] || '';
-            const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85 };
-            const placeholder = defaults[rt] || 55;
+            const defaults = { individual: 38.50, doble: 48, triple: 70, cuadruple: 85 };
+            const placeholder = defaults[rt] || 48;
             const surgePrice = surge ? Math.round((parseFloat(baseVal) || placeholder) * 1.10) : null;
             html += `<td style="padding:2px 4px; border-bottom:1px solid #e8eaed; text-align:center;">
                 <input type="number" value="${baseVal}" placeholder="${placeholder}" min="0" step="1"
@@ -5001,6 +5127,7 @@ function setRoomBedType(roomNumber, bedType) {
 
 function init() {
     loadBookings();
+    loadRoomStatus();
     ROOMS = buildRooms(); // Rebuild with saved config
     populateRoomSelect();
     populateBlockRoomSelect();
@@ -5199,7 +5326,7 @@ renderLoginScreen();
                 </div>
                 <div class="form-group" style="margin:0; width:80px;">
                     <label style="font-size:0.72rem;">Nuevo precio €</label>
-                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="55" style="padding:6px 8px; font-size:0.78rem;">
+                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
                 <div class="form-group" style="margin:0; flex:1; min-width:100px;">
                     <label style="font-size:0.72rem;">Aplicar a</label>
