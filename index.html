@@ -24,7 +24,7 @@
         .toolbar {
             background: #fff; padding: 10px 24px;
             display: flex; align-items: center; gap: 10px;
-            border-bottom: 1px solid #ebebeb; flex-wrap: wrap;
+            flex-wrap: wrap;
         }
         .toolbar label { font-weight: 500; font-size: 0.78rem; color: #717171; }
         .toolbar input[type="date"] {
@@ -121,10 +121,8 @@
         .booking-single { border-radius: 4px; }
 
         .status-confirmed { background: #FF385C; color: white; }
-        .status-pending { background: #F5A623; color: white; }
         .status-checkedin { background: #008A05; color: white; }
         .status-checkedout { background: #6B4FA0; color: white; }
-        .status-personal { background: #C4956A; color: white; }
 
         /* Modal */
         .modal-overlay {
@@ -287,7 +285,7 @@
 
         /* Year-Month-Day Calendar Selector */
         .year-month-selector {
-            background: #fff; padding: 12px 24px 0; border-bottom: 1px solid #ebebeb;
+            background: #fff; padding: 12px 24px; border-bottom: 1px solid #ebebeb;
         }
         .year-selector {
             display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
@@ -702,14 +700,18 @@
         }
 
         .sidebar {
-            width: 240px; background: #fff; border-right: 1px solid #ebebeb;
+            width: 60px; background: #fff; border-right: 1px solid #ebebeb;
             display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
-            height: 100vh; z-index: 80; transition: transform 0.3s ease;
+            height: 100vh; z-index: 80; transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        .sidebar:hover, .sidebar.expanded {
+            width: 220px;
         }
 
         .sidebar-header {
-            padding: 16px 16px 12px; border-bottom: 1px solid #ebebeb;
-            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-bottom: 1px solid #ebebeb;
+            display: flex; align-items: center; gap: 10px; min-height: 56px;
         }
         .sidebar-logo {
             width: 36px; height: 36px; border-radius: 50%; background: #FF385C;
@@ -717,22 +719,23 @@
             font-weight: 600; color: white; font-size: 0.9rem;
             font-family: 'Roboto', sans-serif; flex-shrink: 0;
         }
-        .sidebar-title { font-weight: 600; font-size: 0.95rem; color: #222; line-height: 1.2; }
-        .sidebar-subtitle { font-size: 0.68rem; color: #717171; font-weight: 400; }
+        .sidebar-title { font-weight: 600; font-size: 0.9rem; color: #222; line-height: 1.2; white-space: nowrap; }
+        .sidebar-subtitle { font-size: 0.62rem; color: #717171; font-weight: 400; white-space: nowrap; }
 
         .sidebar-nav {
-            flex: 1; overflow-y: auto; padding: 8px 0;
+            flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px 0;
         }
         .sidebar-section {
-            padding: 16px 16px 4px; font-size: 0.62rem; font-weight: 600;
+            padding: 12px 12px 2px; font-size: 0.58rem; font-weight: 600;
             color: #717171; letter-spacing: 0.05em; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden;
         }
         .sidebar-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+            padding: 9px 12px; cursor: pointer; font-size: 0.8rem;
             color: #222; font-weight: 400; transition: all 0.15s;
-            border-radius: 8px; margin: 1px 8px;
-            text-decoration: none;
+            border-radius: 8px; margin: 1px 6px;
+            text-decoration: none; white-space: nowrap; overflow: hidden;
         }
         .sidebar-item:hover {
             background: #f7f7f7;
@@ -742,12 +745,12 @@
             font-weight: 500;
         }
         .sidebar-item .si-icon {
-            width: 20px; text-align: center; font-size: 0.95rem; flex-shrink: 0;
+            width: 20px; min-width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0;
         }
-        .sidebar-item .si-label { flex: 1; }
+        .sidebar-item .si-label { flex: 1; overflow: hidden; }
         .sidebar-item .si-badge {
-            background: #FF385C; color: white; font-size: 0.62rem; font-weight: 600;
-            padding: 1px 6px; border-radius: 10px;
+            background: #FF385C; color: white; font-size: 0.6rem; font-weight: 600;
+            padding: 1px 5px; border-radius: 10px; flex-shrink: 0;
         }
         .sidebar-item.active .si-badge {
             background: #FF385C; color: white;
@@ -774,8 +777,37 @@
         .sidebar-user .su-role { font-size: 0.68rem; color: #717171; }
 
         .main-content {
-            flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh;
+            flex: 1; margin-left: 60px; display: flex; flex-direction: column; min-height: 100vh;
+            transition: margin-left 0.2s ease;
         }
+
+        /* Search bar in header */
+        .header-search {
+            display: flex; align-items: center; background: #f7f7f7; border: 1px solid #ebebeb;
+            border-radius: 24px; padding: 0 16px; height: 36px; min-width: 220px; transition: all 0.2s;
+        }
+        .header-search:focus-within { border-color: #222; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header-search input {
+            border: none; background: transparent; font-size: 0.8rem; font-family: inherit;
+            color: #222; outline: none; width: 100%; padding: 0 8px;
+        }
+        .header-search input::placeholder { color: #b0b0b0; }
+        .header-search .search-icon { color: #FF385C; font-size: 0.9rem; flex-shrink: 0; }
+        .search-results-dropdown {
+            display: none; position: absolute; top: 100%; left: 0; right: 0;
+            background: #fff; border: 1px solid #ebebeb; border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15); max-height: 350px; overflow-y: auto;
+            z-index: 200; margin-top: 4px;
+        }
+        .search-results-dropdown.active { display: block; }
+        .search-result-row {
+            padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f7f7f7;
+            font-size: 0.8rem; transition: background 0.1s;
+        }
+        .search-result-row:hover { background: #f7f7f7; }
+        .search-result-row:last-child { border-bottom: none; }
+        .search-result-row .sr-name { font-weight: 600; color: #222; }
+        .search-result-row .sr-detail { font-size: 0.72rem; color: #717171; }
 
         /* Hamburger button (hidden on desktop) */
         .hamburger-btn {
@@ -1050,25 +1082,12 @@
         <div class="sidebar-section">Reservas</div>
         <div class="sidebar-item active" onclick="sidebarNav('grid')" data-section="grid">
             <span class="si-icon">▦</span>
-            <span class="si-label">Tabla de Reservas</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('calendar')" data-section="calendar">
-            <span class="si-icon">📅</span>
-            <span class="si-label">Calendario</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('newBooking')" data-section="newBooking">
-            <span class="si-icon">＋</span>
-            <span class="si-label">Nueva Reserva</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('search')" data-section="search">
-            <span class="si-icon">🔍</span>
-            <span class="si-label">Buscar Disponibilidad</span>
+            <span class="si-label">Reservas</span>
         </div>
         <div class="sidebar-item" onclick="sidebarNav('block')" data-section="block">
             <span class="si-icon">🚫</span>
-            <span class="si-label">Bloquear Fechas</span>
+            <span class="si-label">Bloquear</span>
         </div>
-
         <div class="sidebar-item" onclick="sidebarNav('cancellations')" data-section="cancellations">
             <span class="si-icon">✕</span>
             <span class="si-label">Cancelaciones</span>
@@ -1100,11 +1119,7 @@
         </div>
         <div class="sidebar-item" onclick="sidebarNav('roomConfig')" data-section="roomConfig">
             <span class="si-icon">🛏️</span>
-            <span class="si-label">Config. Habitaciones</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
-            <span class="si-icon">📋</span>
-            <span class="si-label">Normas Casa Rural</span>
+            <span class="si-label">Habitaciones</span>
         </div>
 
         <div class="sidebar-section">Datos</div>
@@ -1122,11 +1137,9 @@
         <div class="sidebar-section">Estado</div>
         <div class="legend" style="display:flex; flex-direction:column; gap:3px; padding:4px 16px; font-size:0.7rem; margin-left:0;">
             <div class="legend-item"><div class="legend-color" style="background:#FF385C;"></div> Confirmada</div>
-            <div class="legend-item"><div class="legend-color" style="background:#F5A623;"></div> Pendiente</div>
             <div class="legend-item"><div class="legend-color" style="background:#008A05;"></div> Check-in</div>
             <div class="legend-item"><div class="legend-color" style="background:#6B4FA0;"></div> Check-out</div>
             <div class="legend-item"><div class="legend-color" style="background:#ddd;"></div> Bloqueada</div>
-            <div class="legend-item"><div class="legend-color" style="background:#C4956A;"></div> Uso personal</div>
         </div>
     </div>
 
@@ -1146,18 +1159,17 @@
 <!-- Main Content -->
 <div class="main-content">
 <header>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:12px; flex:1;">
         <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-        <div>
-            <h1>Hostal Jijones</h1>
-            <div class="subtitle">Sistema de Gestión de Reservas</div>
+        <h1 style="white-space:nowrap;">Hostal Jijones</h1>
+        <div class="header-search" style="position:relative; flex:1; max-width:400px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearch" placeholder="Buscar por nombre, teléfono o email..." oninput="onGlobalSearch(this.value)" onfocus="onGlobalSearch(this.value)" autocomplete="off">
+            <div class="search-results-dropdown" id="globalSearchResults"></div>
         </div>
     </div>
-    <div style="text-align: right; font-size: 0.85rem; display:flex; align-items:center; gap:12px;">
-        <div>
-            <div id="currentDateDisplay"></div>
-            <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
-        </div>
+    <div style="display:flex; align-items:center; gap:12px; font-size:0.8rem;">
+        <span id="currentDateDisplay" style="color:#717171;"></span>
         <div class="user-indicator" id="userIndicator" onclick="logout()" title="Cerrar sesión"></div>
     </div>
 </header>
@@ -1184,11 +1196,6 @@
     </select>
 
     <div class="view-toggle">
-        <button class="active" id="viewGrid" onclick="switchView('grid')">Tabla</button>
-        <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
-    </div>
-
-    <div class="view-toggle" style="margin-left:8px;">
         <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
         <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
     </div>
@@ -1200,19 +1207,14 @@
 <div class="year-month-selector" id="yearMonthSelector">
     <div class="year-selector" id="yearSelector"></div>
     <div class="month-tabs" id="calendarMonthTabs"></div>
-    <div class="day-numbers-bar" id="dayNumbersBar"></div>
 </div>
 
 <div class="grid-container" id="gridContainer">
     <table class="booking-grid" id="bookingGrid"></table>
 </div>
 
-<div class="calendar-container" id="calendarContainer">
-    <!-- Day Detail (bookings for selected day) -->
-    <div id="dayBookingsDetail" style="display:none; margin-bottom:12px;"></div>
-    <!-- Monthly Grid -->
-    <div class="calendar-grid" id="calendarGrid"></div>
-</div>
+<!-- Day Detail for day click -->
+<div id="dayBookingsDetail" style="display:none; padding:0 24px 12px;"></div>
 
 <div class="stats-bar" id="statsBar"></div>
 </div><!-- /main-content -->
@@ -1395,7 +1397,6 @@
             <div class="form-group">
                 <label>Estado</label>
                 <select id="bookingStatus">
-                    <option value="pending">Pendiente</option>
                     <option value="confirmed">Confirmada</option>
                     <option value="checkedin">Check-in realizado</option>
                     <option value="checkedout">Check-out realizado</option>
@@ -1607,9 +1608,6 @@
 <script>
 // ==================== DATA MODEL ====================
 
-// Room 107 is always blocked (personal use)
-const ROOM_107_BLOCKED = true;
-
 // Default room configuration - bedType can be overridden via localStorage
 const DEFAULT_ROOMS = [
     // Planta 1: 101-115
@@ -1619,7 +1617,6 @@ const DEFAULT_ROOMS = [
     { number: 104, floor: 1, bedType: 'twin' },
     { number: 105, floor: 1, bedType: 'double' },
     { number: 106, floor: 1, bedType: 'twin' },
-    { number: 107, floor: 1, bedType: 'double', alwaysBlocked: true },
     { number: 108, floor: 1, bedType: 'twin' },
     { number: 109, floor: 1, bedType: 'double' },
     { number: 110, floor: 1, bedType: 'twin' },
@@ -1662,10 +1659,11 @@ function saveRoomConfig(config) {
 
 function buildRooms() {
     const config = loadRoomConfig();
+    const BED_LABELS = { double: 'Matrimonio', twin: 'Dos camas', triple: 'Triple', quadruple: 'Cuádruple' };
     return DEFAULT_ROOMS.map(r => {
         const bedType = (r.bedType !== 'rural' && config[r.number]) ? config[r.number] : r.bedType;
-        const bedLabel = bedType === 'rural' ? 'Casa Rural Villarrubia (16 pers.)' : (bedType === 'double' ? r.number + ' - Matrimonio' : r.number + ' - Dos camas');
-        return { ...r, bedType, label: bedLabel, alwaysBlocked: r.alwaysBlocked || false };
+        const bedLabel = bedType === 'rural' ? 'Casa Rural Villarrubia (16 pers.)' : r.number + ' - ' + (BED_LABELS[bedType] || 'Matrimonio');
+        return { ...r, bedType, label: bedLabel };
     });
 }
 
@@ -1677,7 +1675,7 @@ let currentProperty = 'hostal';
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const STATUS_LABELS = {
-    pending: 'Pendiente', confirmed: 'Confirmada',
+    confirmed: 'Confirmada',
     checkedin: 'Check-in', checkedout: 'Check-out', blocked: 'Bloqueada'
 };
 const BLOCK_REASON_LABELS = {
@@ -1898,7 +1896,6 @@ function isRoomAvailable(roomNumber, checkin, checkout) {
 function renderGrid() {
     renderYearSelector();
     renderCalendarMonthTabs();
-    renderDayNumbersBar();
 
     const startInput = document.getElementById('startDate').value;
     const startDate = startInput ? parseDate(startInput) : new Date();
@@ -1940,20 +1937,7 @@ function renderGrid() {
             }
         }
 
-        // Room 107 always blocked
-        if (room.alwaysBlocked) {
-            html += `<tr><td class="room-header"><span class="room-number">${room.number}</span><span class="room-type">Propia</span></td>`;
-            dates.forEach(ds => {
-                const we = isWeekend(parseDate(ds)) ? ' weekend' : '';
-                const tod = ds === today ? ' today' : '';
-                html += `<td class="day-cell${we}${tod}" style="background:#f7f2ee;">
-                    <div class="booking-block status-personal" style="opacity:0.5;font-size:0.55rem;">—</div></td>`;
-            });
-            html += '</tr>';
-            return;
-        }
-
-        const bedLabel = room.bedType === 'rural' ? 'Rural' : (room.bedType === 'double' ? 'Matrim.' : '2 camas');
+        const bedLabel = room.bedType === 'rural' ? 'Rural' : ({double:'Matrim.', twin:'2 camas', triple:'Triple', quadruple:'Cuádr.'}[room.bedType] || 'Matrim.');
         const roomDisplay = room.bedType === 'rural' ? 'CR1' : `${room.number}`;
         html += `<tr><td class="room-header"><span class="room-number">${roomDisplay}</span><span class="room-type">${bedLabel}</span></td>`;
 
@@ -1978,9 +1962,10 @@ function renderGrid() {
                 const label = isStart ? b.guestName.split(' ')[0] + extraBadge : '';
                 const pDotClass = b.paymentStatus === 'paid' ? 'paid' : (b.paymentStatus === 'deposit_paid' ? 'deposit' : 'unpaid');
                 const payDot = isEnd || isSingle ? `<span class="payment-dot ${pDotClass}"></span>` : '';
+                const clickAction = ds === today ? `showQuickActions(event,'${b.id}')` : `editBooking('${b.id}')`;
                 html += `<td class="day-cell booked${we}${tod}" data-booking-id="${b.id}"
                     onmouseenter="showTooltip(event,'${b.id}')" onmouseleave="hideTooltip()"
-                    onclick="editBooking('${b.id}')">
+                    onclick="${clickAction}">
                     <div class="booking-block status-${b.status} ${posClass}">${label}${payDot}</div></td>`;
             } else if (blockMatches.length > 0) {
                 const bl = blockMatches[0];
@@ -2015,7 +2000,7 @@ function renderGrid() {
 
 function updateStats() {
     const today = todayStr();
-    const availableRooms = ROOMS.filter(r => !r.alwaysBlocked);
+    const availableRooms = ROOMS;
     const occupied = availableRooms.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
     const total = availableRooms.length;
     const free = total - occupied;
@@ -2023,14 +2008,12 @@ function updateStats() {
 
     const todayCheckins = bookings.filter(b => b.checkin === today).length;
     const todayCheckouts = bookings.filter(b => b.checkout === today).length;
-    const pending = bookings.filter(b => b.status === 'pending' && b.checkout > today).length;
 
     document.getElementById('statsBar').innerHTML = `
         <div class="stat">Ocupación hoy: <strong>${occupied}/${total} (${occupancy}%)</strong></div>
         <div class="stat">Libres: <strong>${free}</strong></div>
         <div class="stat">Check-ins hoy: <strong>${todayCheckins}</strong></div>
         <div class="stat">Check-outs hoy: <strong>${todayCheckouts}</strong></div>
-        <div class="stat">Pendientes: <strong>${pending}</strong></div>
         <div class="stat">Total reservas: <strong>${bookings.length}</strong></div>
     `;
 }
@@ -2068,6 +2051,81 @@ function hideTooltip() {
     document.getElementById('tooltip').classList.remove('active');
 }
 
+// ==================== QUICK ACTIONS (Today's bookings) ====================
+
+function showQuickActions(event, bookingId) {
+    event.stopPropagation();
+    const b = bookings.find(x => x.id === bookingId);
+    if (!b) return;
+
+    // Remove any existing quick action popup
+    const existing = document.getElementById('quickActionPopup');
+    if (existing) existing.remove();
+
+    const popup = document.createElement('div');
+    popup.id = 'quickActionPopup';
+    popup.style.cssText = 'position:fixed;z-index:200;background:#fff;border-radius:10px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,0.25);min-width:220px;';
+    popup.style.left = Math.min(event.clientX, window.innerWidth - 240) + 'px';
+    popup.style.top = Math.min(event.clientY - 10, window.innerHeight - 200) + 'px';
+
+    const statusLabel = STATUS_LABELS[b.status] || b.status;
+    popup.innerHTML = `
+        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">${b.guestName}</div>
+        <div style="font-size:0.75rem;color:#717171;margin-bottom:12px;">Hab. ${b.room} · Estado: ${statusLabel}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+            ${b.status === 'confirmed' ? `<button class="btn-success" onclick="quickCheckIn('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;">Check-in</button>` : ''}
+            ${b.status === 'checkedin' ? `<button class="btn-primary" onclick="quickCheckOut('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;background:#6B4FA0;">Check-out</button>` : ''}
+            <button class="btn-outline" onclick="closeQuickActions();editBooking('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;">Editar reserva</button>
+            <button class="btn-secondary" onclick="closeQuickActions()" style="width:100%;padding:6px;font-size:0.75rem;">Cerrar</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Close on outside click
+    setTimeout(() => {
+        document.addEventListener('click', closeQuickActionsOutside, { once: true });
+    }, 10);
+}
+
+function closeQuickActions() {
+    const popup = document.getElementById('quickActionPopup');
+    if (popup) popup.remove();
+}
+
+function closeQuickActionsOutside(e) {
+    const popup = document.getElementById('quickActionPopup');
+    if (popup && !popup.contains(e.target)) {
+        popup.remove();
+    }
+}
+
+function quickCheckIn(bookingId) {
+    const b = bookings.find(x => x.id === bookingId);
+    if (!b) return;
+    b.status = 'checkedin';
+    b.updatedAt = new Date().toISOString();
+    b.updatedBy = currentUser ? currentUser.name : 'Sistema';
+    if (!b.history) b.history = [];
+    b.history.push({ action: 'check-in rápido', user: b.updatedBy, date: b.updatedAt });
+    saveBookings();
+    closeQuickActions();
+    renderGrid();
+}
+
+function quickCheckOut(bookingId) {
+    const b = bookings.find(x => x.id === bookingId);
+    if (!b) return;
+    b.status = 'checkedout';
+    b.updatedAt = new Date().toISOString();
+    b.updatedBy = currentUser ? currentUser.name : 'Sistema';
+    if (!b.history) b.history = [];
+    b.history.push({ action: 'check-out rápido', user: b.updatedBy, date: b.updatedAt });
+    saveBookings();
+    closeQuickActions();
+    renderGrid();
+}
+
 // ==================== NAVIGATION ====================
 
 function navigateWeeks(n) {
@@ -2087,7 +2145,10 @@ function goToToday() {
 function populateRoomSelect() {
     const sel = document.getElementById('bookingRoom');
     sel.innerHTML = '';
-    ROOMS.filter(r => !r.alwaysBlocked).forEach(r => {
+    ROOMS.filter(r => {
+        if (currentProperty === 'rural') return r.floor === 'rural';
+        return r.floor !== 'rural';
+    }).forEach(r => {
         const opt = document.createElement('option');
         opt.value = r.number;
         opt.textContent = r.label;
@@ -2116,6 +2177,7 @@ function updateRuralSection(room) {
             priceEl.value = RURAL_DEFAULT_PRICE;
         }
     }
+    updatePaymentBadgesVisibility();
     calculatePrice();
 }
 
@@ -2136,7 +2198,7 @@ function openNewBooking(room, date) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = '55';
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -2171,6 +2233,7 @@ function openNewBooking(room, date) {
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus('pending_payment');
+    updatePaymentBadgesVisibility();
     renderPayments();
     calculatePrice();
     document.getElementById('bookingModal').classList.add('active');
@@ -2223,6 +2286,7 @@ function editBooking(id) {
     document.getElementById('paymentStatus').value = b.paymentStatus || 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus(b.paymentStatus || 'pending_payment');
+    updatePaymentBadgesVisibility();
     renderPayments();
     calculatePrice();
     document.getElementById('bookingModal').classList.add('active');
@@ -2264,7 +2328,19 @@ function saveBooking() {
     if (checkout <= checkin) return alert('La fecha de check-out debe ser posterior al check-in.');
 
     if (hasConflict(room, checkin, checkout, id)) {
-        return alert('La habitación ya está ocupada en esas fechas.');
+        return alert('La habitación principal ya está ocupada en esas fechas.');
+    }
+
+    // Validate extra rooms for conflicts
+    const validExtraRooms = currentExtraRooms.filter(er => er.room);
+    for (const er of validExtraRooms) {
+        const erRoom = isNaN(er.room) ? er.room : parseInt(er.room);
+        if (erRoom === room) {
+            return alert(`La habitación ${erRoom} no puede ser habitación principal y adicional a la vez.`);
+        }
+        if (hasConflict(erRoom, checkin, checkout, id)) {
+            return alert(`La habitación adicional ${erRoom} ya está ocupada en esas fechas.`);
+        }
     }
 
     const phone = document.getElementById('guestPhone').value.trim();
@@ -2414,6 +2490,18 @@ function handleImport(event) {
 
 // ==================== PAYMENT MANAGEMENT ====================
 
+function updatePaymentBadgesVisibility() {
+    const isRural = isCurrentRoomRural();
+    const depositBadge = document.querySelector('.payment-badge.deposit-paid');
+    if (depositBadge) {
+        depositBadge.style.display = isRural ? '' : 'none';
+    }
+    // If hostal and current status is deposit_paid, switch to pending_payment
+    if (!isRural && document.getElementById('paymentStatus').value === 'deposit_paid') {
+        setPaymentStatus('pending_payment');
+    }
+}
+
 function setPaymentStatus(status) {
     document.getElementById('paymentStatus').value = status;
     document.querySelectorAll('.payment-badge').forEach(el => {
@@ -2473,7 +2561,7 @@ function autoUpdatePaymentStatus() {
     if (paid >= total && total > 0) {
         setPaymentStatus('paid');
     } else if (paid > 0) {
-        setPaymentStatus('deposit_paid');
+        setPaymentStatus(isCurrentRoomRural() ? 'deposit_paid' : 'pending_payment');
     } else {
         setPaymentStatus('pending_payment');
     }
@@ -2682,7 +2770,6 @@ function renderCalendar() {
     // Year/month/day selectors are now rendered by renderGrid too (always visible)
     renderYearSelector();
     renderCalendarMonthTabs();
-    renderDayNumbersBar();
 
     const firstDay = new Date(calendarYear, calendarMonth, 1);
     const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
@@ -2782,9 +2869,6 @@ function searchAvailability() {
     const results = [];
 
     ROOMS.forEach(room => {
-        // Skip always-blocked rooms
-        if (room.alwaysBlocked) return;
-
         // Filter by bed type
         if (bedType !== 'any' && room.bedType !== bedType) return;
 
@@ -2840,7 +2924,7 @@ function bookFromSearch(room, checkin, checkout) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = '55';
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -3802,7 +3886,6 @@ function wizardSearch() {
 
     const results = [];
     ROOMS.forEach(room => {
-        if (room.alwaysBlocked) return;
         if (type !== 'any' && room.bedType !== type) return;
         // Casa rural: guests doesn't matter
         if (room.bedType !== 'rural') {
@@ -3937,52 +4020,60 @@ function generateInvoice() {
 
     document.getElementById('invoicePreview').innerHTML = `
         <div class="invoice-preview" id="invoicePrintArea">
-            <div class="inv-header">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;margin-bottom:20px;border-bottom:3px solid #FF385C;">
                 <div>
-                    <div class="inv-company">${BUSINESS_DATA.tradeName}</div>
-                    <div class="inv-details">
+                    <div style="font-size:1.3rem;font-weight:700;color:#FF385C;letter-spacing:0.5px;">${BUSINESS_DATA.tradeName}</div>
+                    <div style="font-size:0.82rem;color:#717171;margin-top:6px;line-height:1.6;">
                         ${BUSINESS_DATA.name}<br>
                         NIF: ${BUSINESS_DATA.nif}<br>
                         ${BUSINESS_DATA.address}<br>
                         ${BUSINESS_DATA.city}
                     </div>
                 </div>
-                <div>
-                    <div class="inv-number">FACTURA</div>
-                    <div class="inv-details" style="text-align:right;">
-                        N.º: ${invoiceNum}<br>
-                        Fecha: ${todayStr()}<br>
+                <div style="text-align:right;">
+                    <div style="font-size:1.4rem;font-weight:700;color:#222;letter-spacing:1px;">FACTURA</div>
+                    <div style="font-size:0.82rem;color:#717171;margin-top:6px;line-height:1.6;">
+                        N.º: <strong>${invoiceNum}</strong><br>
+                        Fecha: ${todayStr()}
                     </div>
                 </div>
             </div>
 
-            <div style="margin-bottom:15px;">
-                <strong>Cliente:</strong> ${b.guestName}<br>
+            <div style="background:#f8f9fa;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
+                <div style="font-size:0.72rem;color:#717171;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cliente</div>
+                <div style="font-weight:600;font-size:0.95rem;color:#222;">${b.guestName}</div>
+                <div style="font-size:0.82rem;color:#555;margin-top:2px;">
                 ${b.docNumber ? `${(b.docType || 'DNI').toUpperCase()}: ${b.docNumber}<br>` : ''}
                 ${b.phone ? `Tel: ${b.phone}<br>` : ''}
                 ${b.email ? `Email: ${b.email}` : ''}
+                </div>
             </div>
 
-            <table>
-                <thead><tr><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Precio ud.</th><th style="text-align:right;">Importe</th></tr></thead>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:5px;">
+                <thead><tr style="background:#f7f7f7;">
+                    <th style="padding:10px 12px;text-align:left;font-size:0.8rem;border-bottom:2px solid #ebebeb;">Concepto</th>
+                    <th style="padding:10px 12px;text-align:center;font-size:0.8rem;border-bottom:2px solid #ebebeb;">Uds.</th>
+                    <th style="padding:10px 12px;text-align:right;font-size:0.8rem;border-bottom:2px solid #ebebeb;">Precio ud.</th>
+                    <th style="padding:10px 12px;text-align:right;font-size:0.8rem;border-bottom:2px solid #ebebeb;">Importe</th>
+                </tr></thead>
                 <tbody>
                     <tr>
-                        <td>${isRural ? 'Alquiler Casa Rural Villarrubia (casa completa)' : 'Alojamiento ' + roomLabel}${b.roomType ? ' (' + ({individual:'Individual',doble:'Doble',triple:'Triple',cuadruple:'Cuádruple'}[b.roomType] || b.roomType) + ')' : ''}<br>
-                        <span style="font-size:0.72rem;color:#666;">${b.checkin} → ${b.checkout}</span>${(b.extraRooms && b.extraRooms.length > 0) ? '<br><span style="font-size:0.72rem;color:#666;">+ ' + b.extraRooms.length + ' hab. adicional(es)</span>' : ''}</td>
-                        <td style="text-align:center;">${nights} noche${nights > 1 ? 's' : ''}</td>
-                        <td style="text-align:right;">${b.pricePerNight.toFixed(2)} €</td>
-                        <td style="text-align:right;">${total.toFixed(2)} €</td>
+                        <td style="padding:12px;border-bottom:1px solid #f0f0f0;">${isRural ? 'Alquiler Casa Rural Villarrubia (casa completa)' : 'Alojamiento ' + roomLabel}${b.roomType ? ' (' + ({individual:'Individual',doble:'Doble',triple:'Triple',cuadruple:'Cuádruple'}[b.roomType] || b.roomType) + ')' : ''}<br>
+                        <span style="font-size:0.75rem;color:#717171;">${b.checkin} → ${b.checkout}</span>${(b.extraRooms && b.extraRooms.length > 0) ? '<br><span style="font-size:0.75rem;color:#717171;">+ ' + b.extraRooms.length + ' hab. adicional(es)</span>' : ''}</td>
+                        <td style="padding:12px;text-align:center;border-bottom:1px solid #f0f0f0;">${nights} noche${nights > 1 ? 's' : ''}</td>
+                        <td style="padding:12px;text-align:right;border-bottom:1px solid #f0f0f0;">${b.pricePerNight.toFixed(2)} €</td>
+                        <td style="padding:12px;text-align:right;border-bottom:1px solid #f0f0f0;font-weight:600;">${total.toFixed(2)} €</td>
                     </tr>
                     ${depositHtml}
                 </tbody>
             </table>
             ${depositNote}
 
-            <div class="inv-total">TOTAL: ${total.toFixed(2)} €</div>
+            <div style="text-align:right;font-weight:700;font-size:1.15rem;color:#222;margin-top:12px;padding:14px 18px;background:#f8f9fa;border-radius:8px;">TOTAL: ${total.toFixed(2)} €</div>
 
             ${paymentsHtml}
 
-            <div style="margin-top:20px;font-size:0.72rem;color:#999;border-top:1px solid #eee;padding-top:10px;">
+            <div style="margin-top:24px;font-size:0.72rem;color:#999;border-top:1px solid #ebebeb;padding-top:12px;text-align:center;">
                 ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
             </div>
         </div>`;
@@ -3998,19 +4089,15 @@ function printInvoice() {
     const content = document.getElementById('invoicePrintArea').innerHTML;
     const win = window.open('', '_blank');
     win.document.write(`<!DOCTYPE html><html><head><title>Factura</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
-            body { font-family: 'Inter', sans-serif; padding: 20px; color: #333; }
-            .inv-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
-            .inv-company { font-weight: 700; font-size: 1.1rem; color: #2c3e50; }
-            .inv-details { font-size: 0.85rem; color: #666; }
-            .inv-number { font-size: 1.2rem; font-weight: 700; color: #2c3e50; text-align: right; }
-            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-            th { background: #f0f0f0; padding: 8px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid #ccc; }
-            td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.88rem; }
-            .inv-total { text-align: right; font-weight: 700; font-size: 1.1rem; margin-top: 10px; }
-            .inv-payment-method { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; margin-top: 10px; font-size: 0.85rem; }
-            @media print { body { padding: 0; } }
+            body { font-family: 'Inter', sans-serif; padding: 30px 40px; color: #222; font-size: 14px; line-height: 1.5; }
+            table { width: 100%; border-collapse: collapse; }
+            th { padding: 10px 12px; text-align: left; font-size: 0.8rem; }
+            td { padding: 12px; font-size: 0.88rem; }
+            .inv-payment-method { background: #f8f9fa; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; }
+            h4 { font-size: 0.85rem; margin-top: 18px; margin-bottom: 8px; }
+            @media print { body { padding: 15px; } }
         </style></head><body>${content}</body></html>`);
     win.document.close();
     setTimeout(() => win.print(), 300);
@@ -4135,10 +4222,7 @@ function sidebarNav(section) {
     if (item) item.classList.add('active');
 
     switch(section) {
-        case 'grid': switchView('grid'); break;
-        case 'calendar': switchView('calendar'); break;
-        case 'newBooking': openNewBooking(); break;
-        case 'search': openSearchModal(); break;
+        case 'grid': renderGrid(); break;
         case 'block': openBlockModal(); break;
         case 'cancellations': openCancellationsModal(); break;
         case 'income': openIncomeModal(); break;
@@ -4147,7 +4231,6 @@ function sidebarNav(section) {
         case 'pricing': openPricingModal(); break;
         case 'clients': openClientsModal(); break;
         case 'roomConfig': openRoomConfigModal(); break;
-        case 'rules': openRulesModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
     }
@@ -4463,8 +4546,14 @@ function renderExtraRooms() {
         container.innerHTML = '<div style="font-size:0.75rem; color:#80868b; padding:4px 0;">Sin habitaciones adicionales</div>';
         return;
     }
+    const mainRoom = document.getElementById('bookingRoom').value;
+    const filteredRooms = ROOMS.filter(r => {
+        if (String(r.number) === String(mainRoom)) return false;
+        if (currentProperty === 'rural') return r.floor === 'rural';
+        return r.floor !== 'rural';
+    });
     container.innerHTML = currentExtraRooms.map((er, idx) => {
-        const roomOptions = ROOMS.map(r => `<option value="${r.number}" ${String(r.number) === String(er.room) ? 'selected' : ''}>${r.label}</option>`).join('');
+        const roomOptions = filteredRooms.map(r => `<option value="${r.number}" ${String(r.number) === String(er.room) ? 'selected' : ''}>${r.label}</option>`).join('');
         return `<div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
             <select onchange="updateExtraRoom(${idx},'room',this.value)" style="flex:1; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.78rem; font-family:inherit;">
                 <option value="">-- Seleccionar --</option>${roomOptions}
@@ -4486,9 +4575,54 @@ function switchProperty(prop) {
     currentProperty = prop;
     document.getElementById('tabHostal').classList.toggle('active', prop === 'hostal');
     document.getElementById('tabRural').classList.toggle('active', prop === 'rural');
+    populateRoomSelect();
     renderGrid();
     if (currentView === 'calendar') renderCalendar();
 }
+
+// ==================== GLOBAL SEARCH ====================
+
+function onGlobalSearch(query) {
+    const container = document.getElementById('globalSearchResults');
+    if (!query || query.length < 2) {
+        container.classList.remove('active');
+        return;
+    }
+    const q = query.toLowerCase();
+    const results = bookings.filter(b =>
+        (b.guestName && b.guestName.toLowerCase().includes(q)) ||
+        (b.phone && b.phone.includes(q)) ||
+        (b.email && b.email.toLowerCase().includes(q))
+    ).sort((a, b) => b.checkin.localeCompare(a.checkin)).slice(0, 10);
+
+    if (results.length === 0) {
+        container.innerHTML = '<div style="padding:16px; text-align:center; color:#717171; font-size:0.8rem;">No se encontraron reservas</div>';
+    } else {
+        container.innerHTML = results.map(b => {
+            const room = ROOMS.find(r => r.number === b.room);
+            const roomLabel = room ? room.label : b.room;
+            const nights = nightsBetween(b.checkin, b.checkout);
+            return `<div class="search-result-row" onclick="closeGlobalSearch();editBooking('${b.id}')">
+                <div class="sr-name">${b.guestName}</div>
+                <div class="sr-detail">${roomLabel} · ${b.checkin} → ${b.checkout} (${nights}n) · ${STATUS_LABELS[b.status] || b.status}</div>
+            </div>`;
+        }).join('');
+    }
+    container.classList.add('active');
+}
+
+function closeGlobalSearch() {
+    document.getElementById('globalSearchResults').classList.remove('active');
+    document.getElementById('globalSearch').value = '';
+}
+
+// Close search dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.header-search')) {
+        const dd = document.getElementById('globalSearchResults');
+        if (dd) dd.classList.remove('active');
+    }
+});
 
 // ==================== PRICING CALENDAR ====================
 
@@ -4524,7 +4658,7 @@ function changePricingMonth(dir) {
 }
 
 function getOccupancyForDate(ds) {
-    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural' && !r.alwaysBlocked);
+    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural');
     const occupied = hostalRooms.filter(r => getBookingsForRoomAndDate(r.number, ds).length > 0).length;
     return hostalRooms.length > 0 ? occupied / hostalRooms.length : 0;
 }
@@ -4561,13 +4695,13 @@ function renderPricingCalendar() {
     const typeLabels = { individual: 'Individual', doble: 'Doble', triple: 'Triple', cuadruple: 'Cuádruple' };
 
     let html = `<table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f1f3f4;">
-            <th style="padding:6px 8px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0; position:sticky; left:0; background:#f1f3f4; min-width:90px;">Día</th>`;
+        <thead><tr style="background:#f7f7f7;">
+            <th style="padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #ebebeb; position:sticky; left:0; background:#f7f7f7; min-width:80px;">Día</th>`;
     roomTypes.forEach(rt => {
-        html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">${typeLabels[rt]}</th>`;
+        html += `<th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">${typeLabels[rt]}</th>`;
     });
-    html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Ocup.</th>
-        <th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Surge</th>
+    html += `<th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">Ocup.</th>
+        <th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">+10%</th>
     </tr></thead><tbody>`;
 
     const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -4616,6 +4750,34 @@ function updatePricingCell(key, value) {
     savePricingData(pricing);
 }
 
+function applyBulkPrice() {
+    const type = document.getElementById('bulkPriceType').value;
+    const price = parseFloat(document.getElementById('bulkPriceValue').value);
+    const range = document.getElementById('bulkPriceRange').value;
+    if (!price || price <= 0) return alert('Introduce un precio válido.');
+
+    const pricing = loadPricing();
+    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+    const types = type === 'all' ? ['individual', 'doble', 'triple', 'cuadruple'] : [type];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(pricingYear, pricingMonth, d);
+        const ds = dateStr(date);
+        const dow = date.getDay();
+        const isWeekend = dow === 0 || dow === 5 || dow === 6;
+
+        if (range === 'weekdays' && isWeekend) continue;
+        if (range === 'weekends' && !isWeekend) continue;
+
+        types.forEach(rt => {
+            pricing[ds + '_' + rt] = price;
+        });
+    }
+
+    savePricingData(pricing);
+    renderPricingCalendar();
+}
+
 function savePricing() {
     alert('Precios guardados correctamente.');
     closePricingModal();
@@ -4623,7 +4785,16 @@ function savePricing() {
 
 // ==================== ROOM CONFIG (BED TYPE TOGGLE) ====================
 
+function loadMaxExtraBeds() {
+    return parseInt(localStorage.getItem('hostal_jijones_max_extra_beds') || '0');
+}
+
+function saveMaxExtraBeds(value) {
+    localStorage.setItem('hostal_jijones_max_extra_beds', String(parseInt(value) || 0));
+}
+
 function openRoomConfigModal() {
+    document.getElementById('maxExtraBeds').value = loadMaxExtraBeds();
     renderRoomConfigList();
     document.getElementById('roomConfigModal').classList.add('active');
 }
@@ -4646,15 +4817,18 @@ function renderRoomConfigList() {
         }
         const currentType = config[r.number] || r.bedType;
         const isDouble = currentType === 'double';
-        const isBlocked = r.alwaysBlocked;
+        const isTwin = currentType === 'twin';
+        const isTriple = currentType === 'triple';
+        const isQuad = currentType === 'quadruple';
         html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #e8eaed;">
             <div>
                 <span style="font-weight:500; color:#202124;">Habitación ${r.number}</span>
-                ${isBlocked ? '<span style="font-size:0.68rem; color:#e8710a; margin-left:6px;">USO PERSONAL</span>' : ''}
             </div>
-            <div style="display:flex; gap:4px;">
-                <button onclick="setRoomBedType(${r.number}, 'double')" class="${isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️ Matrimonio</button>
-                <button onclick="setRoomBedType(${r.number}, 'twin')" class="${!isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️🛏️ Dos camas</button>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                <button onclick="setRoomBedType(${r.number}, 'double')" class="${isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 10px;">Matrimonio</button>
+                <button onclick="setRoomBedType(${r.number}, 'twin')" class="${isTwin ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 10px;">Dos camas</button>
+                <button onclick="setRoomBedType(${r.number}, 'triple')" class="${isTriple ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 10px;">Triple</button>
+                <button onclick="setRoomBedType(${r.number}, 'quadruple')" class="${isQuad ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 10px;">Cuádruple</button>
             </div>
         </div>`;
     });
@@ -4851,17 +5025,48 @@ renderLoginScreen();
 
 <!-- Modal Precios -->
 <div class="modal-overlay" id="pricingModal">
-    <div class="modal" style="width:850px;">
+    <div class="modal" style="width:900px;">
         <h2>Gestión de Precios</h2>
-        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Configura los precios base por tipo de habitación y día. Los fines de semana/festivos con +80% de ocupación se incrementan automáticamente un 10%.</p>
+        <p style="font-size:0.78rem; color:#717171; margin-bottom:16px;">Los fines de semana con +80% de ocupación se incrementan automáticamente un 10%.</p>
+
+        <!-- Bulk edit section -->
+        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Cambio masivo de precios</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                    <label style="font-size:0.72rem;">Tipo</label>
+                    <select id="bulkPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="all">Todos</option>
+                        <option value="individual">Individual</option>
+                        <option value="doble">Doble</option>
+                        <option value="triple">Triple</option>
+                        <option value="cuadruple">Cuádruple</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; width:80px;">
+                    <label style="font-size:0.72rem;">Nuevo precio €</label>
+                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="55" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                    <label style="font-size:0.72rem;">Aplicar a</label>
+                    <select id="bulkPriceRange" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="month">Este mes</option>
+                        <option value="weekdays">Solo L-V este mes</option>
+                        <option value="weekends">Solo V-D este mes</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="applyBulkPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap;">Aplicar</button>
+            </div>
+        </div>
+
         <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
             <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
-            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:500; color:#202124;"></h4>
+            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:600; color:#222;"></h4>
             <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
         </div>
-        <div id="pricingCalendar" style="max-height:450px; overflow-y:auto;"></div>
+        <div id="pricingCalendar" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
-            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar Precios</button>
+            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar</button>
             <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
         </div>
     </div>
@@ -4871,8 +5076,12 @@ renderLoginScreen();
 <div class="modal-overlay" id="roomConfigModal">
     <div class="modal" style="width:600px;">
         <h2>Configuración de Habitaciones</h2>
-        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Selecciona si cada habitación tiene cama de matrimonio o dos camas. Los cambios se guardan automáticamente.</p>
-        <div id="roomConfigList" style="max-height:450px; overflow-y:auto;"></div>
+        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Configura el tipo de cada habitación. Los cambios se guardan automáticamente.</p>
+        <div style="background:#e8f0fe; padding:10px 14px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
+            <label style="font-size:0.8rem; font-weight:500; color:#1a73e8; white-space:nowrap;">Máximo camas supletorias disponibles por día:</label>
+            <input type="number" id="maxExtraBeds" min="0" max="50" value="0" onchange="saveMaxExtraBeds(this.value)" style="width:60px; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.85rem;">
+        </div>
+        <div id="roomConfigList" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
             <button class="btn-secondary" onclick="closeRoomConfigModal()">Cerrar</button>
         </div>
