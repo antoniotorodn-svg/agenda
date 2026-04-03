@@ -700,14 +700,18 @@
         }
 
         .sidebar {
-            width: 240px; background: #fff; border-right: 1px solid #ebebeb;
+            width: 60px; background: #fff; border-right: 1px solid #ebebeb;
             display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
-            height: 100vh; z-index: 80; transition: transform 0.3s ease;
+            height: 100vh; z-index: 80; transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        .sidebar:hover, .sidebar.expanded {
+            width: 220px;
         }
 
         .sidebar-header {
-            padding: 16px 16px 12px; border-bottom: 1px solid #ebebeb;
-            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-bottom: 1px solid #ebebeb;
+            display: flex; align-items: center; gap: 10px; min-height: 56px;
         }
         .sidebar-logo {
             width: 36px; height: 36px; border-radius: 50%; background: #FF385C;
@@ -715,22 +719,23 @@
             font-weight: 600; color: white; font-size: 0.9rem;
             font-family: 'Roboto', sans-serif; flex-shrink: 0;
         }
-        .sidebar-title { font-weight: 600; font-size: 0.95rem; color: #222; line-height: 1.2; }
-        .sidebar-subtitle { font-size: 0.68rem; color: #717171; font-weight: 400; }
+        .sidebar-title { font-weight: 600; font-size: 0.9rem; color: #222; line-height: 1.2; white-space: nowrap; }
+        .sidebar-subtitle { font-size: 0.62rem; color: #717171; font-weight: 400; white-space: nowrap; }
 
         .sidebar-nav {
-            flex: 1; overflow-y: auto; padding: 8px 0;
+            flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px 0;
         }
         .sidebar-section {
-            padding: 16px 16px 4px; font-size: 0.62rem; font-weight: 600;
+            padding: 12px 12px 2px; font-size: 0.58rem; font-weight: 600;
             color: #717171; letter-spacing: 0.05em; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden;
         }
         .sidebar-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+            padding: 9px 12px; cursor: pointer; font-size: 0.8rem;
             color: #222; font-weight: 400; transition: all 0.15s;
-            border-radius: 8px; margin: 1px 8px;
-            text-decoration: none;
+            border-radius: 8px; margin: 1px 6px;
+            text-decoration: none; white-space: nowrap; overflow: hidden;
         }
         .sidebar-item:hover {
             background: #f7f7f7;
@@ -740,12 +745,12 @@
             font-weight: 500;
         }
         .sidebar-item .si-icon {
-            width: 20px; text-align: center; font-size: 0.95rem; flex-shrink: 0;
+            width: 20px; min-width: 20px; text-align: center; font-size: 1rem; flex-shrink: 0;
         }
-        .sidebar-item .si-label { flex: 1; }
+        .sidebar-item .si-label { flex: 1; overflow: hidden; }
         .sidebar-item .si-badge {
-            background: #FF385C; color: white; font-size: 0.62rem; font-weight: 600;
-            padding: 1px 6px; border-radius: 10px;
+            background: #FF385C; color: white; font-size: 0.6rem; font-weight: 600;
+            padding: 1px 5px; border-radius: 10px; flex-shrink: 0;
         }
         .sidebar-item.active .si-badge {
             background: #FF385C; color: white;
@@ -772,8 +777,37 @@
         .sidebar-user .su-role { font-size: 0.68rem; color: #717171; }
 
         .main-content {
-            flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh;
+            flex: 1; margin-left: 60px; display: flex; flex-direction: column; min-height: 100vh;
+            transition: margin-left 0.2s ease;
         }
+
+        /* Search bar in header */
+        .header-search {
+            display: flex; align-items: center; background: #f7f7f7; border: 1px solid #ebebeb;
+            border-radius: 24px; padding: 0 16px; height: 36px; min-width: 220px; transition: all 0.2s;
+        }
+        .header-search:focus-within { border-color: #222; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header-search input {
+            border: none; background: transparent; font-size: 0.8rem; font-family: inherit;
+            color: #222; outline: none; width: 100%; padding: 0 8px;
+        }
+        .header-search input::placeholder { color: #b0b0b0; }
+        .header-search .search-icon { color: #FF385C; font-size: 0.9rem; flex-shrink: 0; }
+        .search-results-dropdown {
+            display: none; position: absolute; top: 100%; left: 0; right: 0;
+            background: #fff; border: 1px solid #ebebeb; border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15); max-height: 350px; overflow-y: auto;
+            z-index: 200; margin-top: 4px;
+        }
+        .search-results-dropdown.active { display: block; }
+        .search-result-row {
+            padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f7f7f7;
+            font-size: 0.8rem; transition: background 0.1s;
+        }
+        .search-result-row:hover { background: #f7f7f7; }
+        .search-result-row:last-child { border-bottom: none; }
+        .search-result-row .sr-name { font-weight: 600; color: #222; }
+        .search-result-row .sr-detail { font-size: 0.72rem; color: #717171; }
 
         /* Hamburger button (hidden on desktop) */
         .hamburger-btn {
@@ -1048,25 +1082,12 @@
         <div class="sidebar-section">Reservas</div>
         <div class="sidebar-item active" onclick="sidebarNav('grid')" data-section="grid">
             <span class="si-icon">▦</span>
-            <span class="si-label">Tabla de Reservas</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('calendar')" data-section="calendar">
-            <span class="si-icon">📅</span>
-            <span class="si-label">Calendario</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('newBooking')" data-section="newBooking">
-            <span class="si-icon">＋</span>
-            <span class="si-label">Nueva Reserva</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('search')" data-section="search">
-            <span class="si-icon">🔍</span>
-            <span class="si-label">Buscar Disponibilidad</span>
+            <span class="si-label">Reservas</span>
         </div>
         <div class="sidebar-item" onclick="sidebarNav('block')" data-section="block">
             <span class="si-icon">🚫</span>
-            <span class="si-label">Bloquear Fechas</span>
+            <span class="si-label">Bloquear</span>
         </div>
-
         <div class="sidebar-item" onclick="sidebarNav('cancellations')" data-section="cancellations">
             <span class="si-icon">✕</span>
             <span class="si-label">Cancelaciones</span>
@@ -1098,11 +1119,7 @@
         </div>
         <div class="sidebar-item" onclick="sidebarNav('roomConfig')" data-section="roomConfig">
             <span class="si-icon">🛏️</span>
-            <span class="si-label">Config. Habitaciones</span>
-        </div>
-        <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
-            <span class="si-icon">📋</span>
-            <span class="si-label">Normas Casa Rural</span>
+            <span class="si-label">Habitaciones</span>
         </div>
 
         <div class="sidebar-section">Datos</div>
@@ -1142,18 +1159,17 @@
 <!-- Main Content -->
 <div class="main-content">
 <header>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:12px; flex:1;">
         <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-        <div>
-            <h1>Hostal Jijones</h1>
-            <div class="subtitle">Sistema de Gestión de Reservas</div>
+        <h1 style="white-space:nowrap;">Hostal Jijones</h1>
+        <div class="header-search" style="position:relative; flex:1; max-width:400px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearch" placeholder="Buscar por nombre, teléfono o email..." oninput="onGlobalSearch(this.value)" onfocus="onGlobalSearch(this.value)" autocomplete="off">
+            <div class="search-results-dropdown" id="globalSearchResults"></div>
         </div>
     </div>
-    <div style="text-align: right; font-size: 0.85rem; display:flex; align-items:center; gap:12px;">
-        <div>
-            <div id="currentDateDisplay"></div>
-            <div style="opacity:0.7; font-size:0.75rem;">31 habitaciones · 2 plantas + Casa Rural</div>
-        </div>
+    <div style="display:flex; align-items:center; gap:12px; font-size:0.8rem;">
+        <span id="currentDateDisplay" style="color:#717171;"></span>
         <div class="user-indicator" id="userIndicator" onclick="logout()" title="Cerrar sesión"></div>
     </div>
 </header>
@@ -1180,11 +1196,6 @@
     </select>
 
     <div class="view-toggle">
-        <button class="active" id="viewGrid" onclick="switchView('grid')">Tabla</button>
-        <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
-    </div>
-
-    <div class="view-toggle" style="margin-left:8px;">
         <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
         <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
     </div>
@@ -1202,12 +1213,8 @@
     <table class="booking-grid" id="bookingGrid"></table>
 </div>
 
-<div class="calendar-container" id="calendarContainer">
-    <!-- Day Detail (bookings for selected day) -->
-    <div id="dayBookingsDetail" style="display:none; margin-bottom:12px;"></div>
-    <!-- Monthly Grid -->
-    <div class="calendar-grid" id="calendarGrid"></div>
-</div>
+<!-- Day Detail for day click -->
+<div id="dayBookingsDetail" style="display:none; padding:0 24px 12px;"></div>
 
 <div class="stats-bar" id="statsBar"></div>
 </div><!-- /main-content -->
@@ -4215,10 +4222,7 @@ function sidebarNav(section) {
     if (item) item.classList.add('active');
 
     switch(section) {
-        case 'grid': switchView('grid'); break;
-        case 'calendar': switchView('calendar'); break;
-        case 'newBooking': openNewBooking(); break;
-        case 'search': openSearchModal(); break;
+        case 'grid': renderGrid(); break;
         case 'block': openBlockModal(); break;
         case 'cancellations': openCancellationsModal(); break;
         case 'income': openIncomeModal(); break;
@@ -4227,7 +4231,6 @@ function sidebarNav(section) {
         case 'pricing': openPricingModal(); break;
         case 'clients': openClientsModal(); break;
         case 'roomConfig': openRoomConfigModal(); break;
-        case 'rules': openRulesModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
     }
@@ -4577,6 +4580,50 @@ function switchProperty(prop) {
     if (currentView === 'calendar') renderCalendar();
 }
 
+// ==================== GLOBAL SEARCH ====================
+
+function onGlobalSearch(query) {
+    const container = document.getElementById('globalSearchResults');
+    if (!query || query.length < 2) {
+        container.classList.remove('active');
+        return;
+    }
+    const q = query.toLowerCase();
+    const results = bookings.filter(b =>
+        (b.guestName && b.guestName.toLowerCase().includes(q)) ||
+        (b.phone && b.phone.includes(q)) ||
+        (b.email && b.email.toLowerCase().includes(q))
+    ).sort((a, b) => b.checkin.localeCompare(a.checkin)).slice(0, 10);
+
+    if (results.length === 0) {
+        container.innerHTML = '<div style="padding:16px; text-align:center; color:#717171; font-size:0.8rem;">No se encontraron reservas</div>';
+    } else {
+        container.innerHTML = results.map(b => {
+            const room = ROOMS.find(r => r.number === b.room);
+            const roomLabel = room ? room.label : b.room;
+            const nights = nightsBetween(b.checkin, b.checkout);
+            return `<div class="search-result-row" onclick="closeGlobalSearch();editBooking('${b.id}')">
+                <div class="sr-name">${b.guestName}</div>
+                <div class="sr-detail">${roomLabel} · ${b.checkin} → ${b.checkout} (${nights}n) · ${STATUS_LABELS[b.status] || b.status}</div>
+            </div>`;
+        }).join('');
+    }
+    container.classList.add('active');
+}
+
+function closeGlobalSearch() {
+    document.getElementById('globalSearchResults').classList.remove('active');
+    document.getElementById('globalSearch').value = '';
+}
+
+// Close search dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.header-search')) {
+        const dd = document.getElementById('globalSearchResults');
+        if (dd) dd.classList.remove('active');
+    }
+});
+
 // ==================== PRICING CALENDAR ====================
 
 let pricingMonth = new Date().getMonth();
@@ -4648,13 +4695,13 @@ function renderPricingCalendar() {
     const typeLabels = { individual: 'Individual', doble: 'Doble', triple: 'Triple', cuadruple: 'Cuádruple' };
 
     let html = `<table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-        <thead><tr style="background:#f1f3f4;">
-            <th style="padding:6px 8px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0; position:sticky; left:0; background:#f1f3f4; min-width:90px;">Día</th>`;
+        <thead><tr style="background:#f7f7f7;">
+            <th style="padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #ebebeb; position:sticky; left:0; background:#f7f7f7; min-width:80px;">Día</th>`;
     roomTypes.forEach(rt => {
-        html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">${typeLabels[rt]}</th>`;
+        html += `<th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">${typeLabels[rt]}</th>`;
     });
-    html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Ocup.</th>
-        <th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Surge</th>
+    html += `<th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">Ocup.</th>
+        <th style="padding:8px 10px; text-align:center; font-weight:600; border-bottom:2px solid #ebebeb;">+10%</th>
     </tr></thead><tbody>`;
 
     const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -4701,6 +4748,34 @@ function updatePricingCell(key, value) {
         delete pricing[key];
     }
     savePricingData(pricing);
+}
+
+function applyBulkPrice() {
+    const type = document.getElementById('bulkPriceType').value;
+    const price = parseFloat(document.getElementById('bulkPriceValue').value);
+    const range = document.getElementById('bulkPriceRange').value;
+    if (!price || price <= 0) return alert('Introduce un precio válido.');
+
+    const pricing = loadPricing();
+    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+    const types = type === 'all' ? ['individual', 'doble', 'triple', 'cuadruple'] : [type];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(pricingYear, pricingMonth, d);
+        const ds = dateStr(date);
+        const dow = date.getDay();
+        const isWeekend = dow === 0 || dow === 5 || dow === 6;
+
+        if (range === 'weekdays' && isWeekend) continue;
+        if (range === 'weekends' && !isWeekend) continue;
+
+        types.forEach(rt => {
+            pricing[ds + '_' + rt] = price;
+        });
+    }
+
+    savePricingData(pricing);
+    renderPricingCalendar();
 }
 
 function savePricing() {
@@ -4950,17 +5025,48 @@ renderLoginScreen();
 
 <!-- Modal Precios -->
 <div class="modal-overlay" id="pricingModal">
-    <div class="modal" style="width:850px;">
+    <div class="modal" style="width:900px;">
         <h2>Gestión de Precios</h2>
-        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Configura los precios base por tipo de habitación y día. Los fines de semana/festivos con +80% de ocupación se incrementan automáticamente un 10%.</p>
+        <p style="font-size:0.78rem; color:#717171; margin-bottom:16px;">Los fines de semana con +80% de ocupación se incrementan automáticamente un 10%.</p>
+
+        <!-- Bulk edit section -->
+        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Cambio masivo de precios</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                    <label style="font-size:0.72rem;">Tipo</label>
+                    <select id="bulkPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="all">Todos</option>
+                        <option value="individual">Individual</option>
+                        <option value="doble">Doble</option>
+                        <option value="triple">Triple</option>
+                        <option value="cuadruple">Cuádruple</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; width:80px;">
+                    <label style="font-size:0.72rem;">Nuevo precio €</label>
+                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="55" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                    <label style="font-size:0.72rem;">Aplicar a</label>
+                    <select id="bulkPriceRange" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="month">Este mes</option>
+                        <option value="weekdays">Solo L-V este mes</option>
+                        <option value="weekends">Solo V-D este mes</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="applyBulkPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap;">Aplicar</button>
+            </div>
+        </div>
+
         <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
             <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
-            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:500; color:#202124;"></h4>
+            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:600; color:#222;"></h4>
             <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
         </div>
-        <div id="pricingCalendar" style="max-height:450px; overflow-y:auto;"></div>
+        <div id="pricingCalendar" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
-            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar Precios</button>
+            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar</button>
             <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
         </div>
     </div>
