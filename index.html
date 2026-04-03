@@ -79,7 +79,7 @@
             font-weight: 500; font-size: 0.68rem;
         }
         table.booking-grid thead th.corner {
-            position: sticky; left: 0; z-index: 20; min-width: 70px; max-width: 80px;
+            position: sticky; left: 0; z-index: 20; min-width: 52px; max-width: 60px;
             background: #f7f7f7;
         }
         table.booking-grid thead th.weekend { background: #FFF8F6; color: #FF385C; }
@@ -87,8 +87,8 @@
 
         .room-header {
             position: sticky; left: 0; z-index: 5;
-            background: #fff; font-weight: 500; padding: 4px 6px;
-            white-space: nowrap; text-align: left !important; min-width: 70px; max-width: 80px;
+            background: #fff; font-weight: 500; padding: 3px 5px;
+            white-space: nowrap; text-align: left !important; min-width: 52px; max-width: 60px;
         }
         .room-header .room-number { font-size: 0.72rem; color: #222; font-weight: 600; }
         .room-header .room-type { font-size: 0.58rem; color: #717171; display: block; font-weight: 400; }
@@ -2121,7 +2121,19 @@ function navigateWeeks(n) {
 }
 
 function goToToday() {
-    document.getElementById('startDate').value = todayStr();
+    const now = new Date();
+    calendarMonth = now.getMonth();
+    calendarYear = now.getFullYear();
+    const days = parseInt(document.getElementById('daysToShow').value);
+    if (days <= 7) {
+        // Weekly: start from Monday of current week
+        const dow = (now.getDay() + 6) % 7; // Monday=0
+        const monday = addDays(now, -dow);
+        document.getElementById('startDate').value = dateStr(monday);
+    } else {
+        // Monthly: start from 1st of current month
+        document.getElementById('startDate').value = dateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+    }
     renderGrid();
 }
 
@@ -4250,17 +4262,28 @@ function navigateCalendarYear(dir) {
 
 function goToCalendarMonth(month) {
     calendarMonth = month;
-    // Also update grid start date to first of this month
-    document.getElementById('startDate').value = dateStr(new Date(calendarYear, calendarMonth, 1));
+    const days = parseInt(document.getElementById('daysToShow').value);
+    const first = new Date(calendarYear, calendarMonth, 1);
+    if (days <= 7) {
+        const dow = (first.getDay() + 6) % 7;
+        document.getElementById('startDate').value = dateStr(addDays(first, -dow));
+    } else {
+        document.getElementById('startDate').value = dateStr(first);
+    }
     renderGrid();
-    if (currentView === 'calendar') renderCalendar();
 }
 
 function setCalendarYear(year) {
     calendarYear = year;
-    document.getElementById('startDate').value = dateStr(new Date(calendarYear, calendarMonth, 1));
+    const days = parseInt(document.getElementById('daysToShow').value);
+    const first = new Date(calendarYear, calendarMonth, 1);
+    if (days <= 7) {
+        const dow = (first.getDay() + 6) % 7;
+        document.getElementById('startDate').value = dateStr(addDays(first, -dow));
+    } else {
+        document.getElementById('startDate').value = dateStr(first);
+    }
     renderGrid();
-    if (currentView === 'calendar') renderCalendar();
 }
 
 function renderYearSelector() {
@@ -4582,6 +4605,16 @@ function setViewRange(days) {
     document.getElementById('daysToShow').value = days;
     document.getElementById('viewWeek').classList.toggle('active', days === 7);
     document.getElementById('viewMonth').classList.toggle('active', days === 30);
+    const current = document.getElementById('startDate').value;
+    const d = current ? parseDate(current) : new Date();
+    if (days <= 7) {
+        // Start from Monday of that week
+        const dow = (d.getDay() + 6) % 7;
+        document.getElementById('startDate').value = dateStr(addDays(d, -dow));
+    } else {
+        // Start from 1st of that month
+        document.getElementById('startDate').value = dateStr(new Date(d.getFullYear(), d.getMonth(), 1));
+    }
     renderGrid();
 }
 
