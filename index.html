@@ -33,20 +33,22 @@
         }
         .toolbar input[type="date"]:focus { border-color: #222; outline: none; }
         .toolbar button {
-            padding: 7px 16px; border: none; border-radius: 8px;
-            cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
+            padding: 10px 20px; border: none; border-radius: 24px;
+            cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all 0.15s;
             font-family: inherit;
         }
-        .btn-primary { background: #FF385C; color: white; font-weight: 600; border-radius: 8px; }
-        .btn-primary:hover { background: #E31C5F; }
-        .btn-success { background: #008A05; color: white; font-weight: 600; border-radius: 8px; }
+        .btn-primary { background: #222; color: white; font-weight: 600; border-radius: 24px; padding: 10px 24px; }
+        .btn-primary:hover { background: #000; }
+        .btn-success { background: #008A05; color: white; font-weight: 600; border-radius: 24px; padding: 10px 24px; }
         .btn-success:hover { background: #007A04; }
-        .btn-danger { background: #C13515; color: white; font-weight: 600; border-radius: 8px; }
+        .btn-danger { background: #C13515; color: white; font-weight: 600; border-radius: 24px; padding: 10px 24px; }
         .btn-danger:hover { background: #A82D12; }
-        .btn-secondary { background: #f7f7f7; color: #222; font-weight: 500; border-radius: 8px; border: 1px solid #b0b0b0; }
-        .btn-secondary:hover { background: #ebebeb; }
-        .btn-outline { background: #fff; border: 1px solid #b0b0b0; color: #222; border-radius: 8px; }
+        .btn-secondary { background: #fff; color: #222; font-weight: 500; border-radius: 24px; border: 1px solid #222; padding: 10px 24px; }
+        .btn-secondary:hover { background: #f7f7f7; }
+        .btn-outline { background: #fff; border: 1px solid #b0b0b0; color: #222; border-radius: 24px; }
         .btn-outline:hover { background: #f7f7f7; }
+        .btn-accent { background: #FF385C; color: white; font-weight: 600; border-radius: 24px; padding: 10px 24px; }
+        .btn-accent:hover { background: #E31C5F; }
 
         .nav-arrows { display: flex; gap: 4px; }
         .nav-arrows button { padding: 6px 10px; font-size: 0.95rem; }
@@ -1160,12 +1162,15 @@
 <div class="main-content">
 <header>
     <div style="display:flex; align-items:center; gap:12px; flex:1;">
-        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-        <h1 style="white-space:nowrap;">Hostal Jijones</h1>
+        <h1 style="white-space:nowrap; margin-right:4px;">Hostal Jijones</h1>
         <div class="header-search" style="position:relative; flex:1; max-width:400px;">
             <span class="search-icon">🔍</span>
             <input type="text" id="globalSearch" placeholder="Buscar por nombre, teléfono o email..." oninput="onGlobalSearch(this.value)" onfocus="onGlobalSearch(this.value)" autocomplete="off">
             <div class="search-results-dropdown" id="globalSearchResults"></div>
+        </div>
+        <div class="view-toggle" style="margin-left:4px;">
+            <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
+            <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
         </div>
     </div>
     <div style="display:flex; align-items:center; gap:12px; font-size:0.8rem;">
@@ -1186,24 +1191,20 @@
     <label>Desde:</label>
     <input type="date" id="startDate" onchange="renderGrid()">
 
-    <label>Días:</label>
-    <select id="daysToShow" onchange="renderGrid()">
-        <option value="14">14 días</option>
-        <option value="21">21 días</option>
-        <option value="30" selected>30 días</option>
-        <option value="45">45 días</option>
-        <option value="60">60 días</option>
-    </select>
-
     <div class="view-toggle">
-        <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
-        <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
+        <button class="active" id="viewWeek" onclick="setViewRange(7)">Semanal</button>
+        <button id="viewMonth" onclick="setViewRange(30)">Mensual</button>
     </div>
 
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
+    <select id="daysToShow" onchange="renderGrid()" style="display:none;">
+        <option value="7">7 días</option>
+        <option value="14">14 días</option>
+        <option value="30" selected>30 días</option>
+    </select>
 </div>
 
-<!-- Year/Month selector - visible always -->
+<!-- Year/Month selector -->
 <div class="year-month-selector" id="yearMonthSelector">
     <div class="year-selector" id="yearSelector"></div>
     <div class="month-tabs" id="calendarMonthTabs"></div>
@@ -1341,48 +1342,32 @@
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Habitación principal *</label>
-                <select id="bookingRoom"></select>
+                <label>¿Cuántas habitaciones? *</label>
+                <select id="roomCount" onchange="onRoomCountChange()">
+                    <option value="1" selected>1 habitación</option>
+                    <option value="2">2 habitaciones</option>
+                    <option value="3">3 habitaciones</option>
+                    <option value="4">4 habitaciones</option>
+                    <option value="5">5 habitaciones</option>
+                </select>
             </div>
             <div class="form-group">
-                <label>Tipo habitación</label>
-                <select id="roomType">
-                    <option value="individual">Individual (1 persona)</option>
-                    <option value="doble" selected>Doble (2 personas)</option>
-                    <option value="triple">Triple (3 pers. + supletoria)</option>
-                    <option value="cuadruple">Cuádruple (4 pers. + 2 supletorias)</option>
+                <label>Personas por habitación</label>
+                <select id="roomType" onchange="onRoomCountChange()">
+                    <option value="individual">1 persona</option>
+                    <option value="doble" selected>2 personas</option>
+                    <option value="triple">3 personas</option>
+                    <option value="cuadruple">4 personas</option>
                 </select>
             </div>
         </div>
-        <!-- Multiple rooms section -->
-        <div id="multiRoomSection" style="background:#f8f9fa; border:1px solid #e8eaed; border-radius:8px; padding:12px; margin-bottom:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <label style="font-weight:500; font-size:0.8rem; color:#3c4043; margin:0;">Habitaciones reservadas</label>
-                <button type="button" class="btn-outline" onclick="addExtraRoom()" style="font-size:0.72rem; padding:4px 12px;">+ Añadir habitación</button>
-            </div>
-            <div id="extraRoomsList"></div>
+        <!-- Room assignments generated dynamically -->
+        <div id="roomAssignments" style="background:#f7f7f7; border:1px solid #ebebeb; border-radius:12px; padding:14px; margin-bottom:14px;">
+            <label style="font-weight:600; font-size:0.8rem; color:#222; margin-bottom:8px; display:block;">Asignación de habitaciones</label>
+            <div id="roomAssignmentsList"></div>
         </div>
-        <div class="form-group">
-            <label>Huéspedes totales</label>
-            <select id="guestCount">
-                <option value="1">1 persona</option>
-                <option value="2" selected>2 personas</option>
-                <option value="3">3 personas</option>
-                <option value="4">4 personas</option>
-                <option value="5">5 personas</option>
-                <option value="6">6 personas</option>
-                <option value="7">7 personas</option>
-                <option value="8">8 personas</option>
-                <option value="9">9 personas</option>
-                <option value="10">10 personas</option>
-                <option value="11">11 personas</option>
-                <option value="12">12 personas</option>
-                <option value="13">13 personas</option>
-                <option value="14">14 personas</option>
-                <option value="15">15 personas</option>
-                <option value="16">16 personas</option>
-            </select>
-        </div>
+        <input type="hidden" id="bookingRoom" value="">
+        <input type="hidden" id="guestCount" value="2">
         <div class="form-row">
             <div class="form-group">
                 <label>Check-in *</label>
@@ -2228,8 +2213,9 @@ function openNewBooking(room, date) {
 
     currentPayments = [];
     currentExtraRooms = [];
+    document.getElementById('roomCount').value = '1';
     document.getElementById('roomType').value = 'doble';
-    renderExtraRooms();
+    renderRoomAssignments();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus('pending_payment');
@@ -2279,8 +2265,19 @@ function editBooking(id) {
 
     // Room type and extra rooms
     document.getElementById('roomType').value = b.roomType || 'doble';
+    const extraCount = (b.extraRooms && b.extraRooms.length > 0) ? b.extraRooms.length + 1 : 1;
+    document.getElementById('roomCount').value = extraCount;
     currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
-    renderExtraRooms();
+    renderRoomAssignments();
+    // Set room values after rendering
+    const mainSel = document.getElementById('roomAssign_0');
+    if (mainSel) mainSel.value = b.room;
+    if (b.extraRooms) {
+        b.extraRooms.forEach((er, idx) => {
+            const sel = document.getElementById('roomAssign_' + (idx + 1));
+            if (sel) sel.value = er.room;
+        });
+    }
 
     currentPayments = JSON.parse(JSON.stringify(b.payments || []));
     document.getElementById('paymentStatus').value = b.paymentStatus || 'pending_payment';
@@ -2370,7 +2367,7 @@ function saveBooking() {
         guestName: name,
         phone, email, docType, docNumber, nationality,
         room, roomType,
-        extraRooms: currentExtraRooms.filter(er => er.room),
+        extraRooms: getAssignedRooms().slice(1).map(r => ({ room: r, roomType: document.getElementById('roomType').value })),
         checkin, checkout, status, pricePerNight: price,
         guests: parseInt(document.getElementById('guestCount').value),
         notes: document.getElementById('bookingNotes').value.trim(),
@@ -4577,7 +4574,87 @@ function switchProperty(prop) {
     document.getElementById('tabRural').classList.toggle('active', prop === 'rural');
     populateRoomSelect();
     renderGrid();
-    if (currentView === 'calendar') renderCalendar();
+}
+
+// ==================== VIEW RANGE (WEEKLY/MONTHLY) ====================
+
+function setViewRange(days) {
+    document.getElementById('daysToShow').value = days;
+    document.getElementById('viewWeek').classList.toggle('active', days === 7);
+    document.getElementById('viewMonth').classList.toggle('active', days === 30);
+    renderGrid();
+}
+
+// ==================== ROOM COUNT / ASSIGNMENT ====================
+
+function onRoomCountChange() {
+    const count = parseInt(document.getElementById('roomCount').value) || 1;
+    const type = document.getElementById('roomType').value;
+    const guestMap = { individual: 1, doble: 2, triple: 3, cuadruple: 4 };
+    document.getElementById('guestCount').value = count * (guestMap[type] || 2);
+    renderRoomAssignments();
+}
+
+function renderRoomAssignments() {
+    const count = parseInt(document.getElementById('roomCount').value) || 1;
+    const container = document.getElementById('roomAssignmentsList');
+    const availableRooms = ROOMS.filter(r => {
+        if (currentProperty === 'rural') return r.floor === 'rural';
+        return r.floor !== 'rural';
+    });
+
+    let html = '';
+    for (let i = 0; i < count; i++) {
+        const label = count === 1 ? 'Habitación' : `Habitación ${i + 1}`;
+        const roomOptions = availableRooms.map(r =>
+            `<option value="${r.number}">${r.label}</option>`
+        ).join('');
+        html += `<div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.75rem; color:#717171; min-width:70px; font-weight:500;">${label}</span>
+            <select id="roomAssign_${i}" style="flex:1; padding:8px 10px; border:1px solid #b0b0b0; border-radius:8px; font-size:0.8rem; font-family:inherit;"
+                onchange="updateMainRoom()">
+                ${roomOptions}
+            </select>
+        </div>`;
+    }
+    container.innerHTML = html;
+
+    // Auto-assign different rooms
+    const selects = [];
+    for (let i = 0; i < count; i++) {
+        selects.push(document.getElementById('roomAssign_' + i));
+    }
+    const usedRooms = new Set();
+    selects.forEach((sel, idx) => {
+        for (let j = 0; j < sel.options.length; j++) {
+            if (!usedRooms.has(sel.options[j].value)) {
+                sel.selectedIndex = j;
+                usedRooms.add(sel.options[j].value);
+                break;
+            }
+        }
+    });
+    updateMainRoom();
+}
+
+function updateMainRoom() {
+    const sel = document.getElementById('roomAssign_0');
+    if (sel) {
+        document.getElementById('bookingRoom').value = sel.value;
+    }
+}
+
+function getAssignedRooms() {
+    const count = parseInt(document.getElementById('roomCount').value) || 1;
+    const rooms = [];
+    for (let i = 0; i < count; i++) {
+        const sel = document.getElementById('roomAssign_' + i);
+        if (sel && sel.value) {
+            const val = sel.value;
+            rooms.push(isNaN(val) ? val : parseInt(val));
+        }
+    }
+    return rooms;
 }
 
 // ==================== GLOBAL SEARCH ====================
