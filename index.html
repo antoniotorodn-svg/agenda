@@ -6,102 +6,106 @@
     <title>Hostal Jijones - Sistema de Reservas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #F2EDE5; color: #3d3d3d; }
+        body { font-family: 'Google Sans', 'Roboto', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #f8f9fa; color: #3c4043; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
         header {
-            background: linear-gradient(135deg, #7B96B5, #AECFE0);
-            color: #2c3e50; padding: 15px 30px;
+            background: #fff;
+            color: #3c4043; padding: 12px 24px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #dadce0;
         }
-        header h1 { font-size: 1.5rem; font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; }
-        header .subtitle { font-size: 0.85rem; opacity: 0.7; color: #2c3e50; }
+        header h1 { font-size: 1.375rem; font-family: 'Google Sans', 'Roboto', sans-serif; color: #1a73e8; font-weight: 500; }
+        header .subtitle { font-size: 0.8rem; color: #5f6368; font-weight: 400; }
 
         .toolbar {
-            background: white; padding: 12px 30px;
-            display: flex; align-items: center; gap: 15px;
-            border-bottom: 1px solid #ddd; flex-wrap: wrap;
+            background: #fff; padding: 10px 24px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid #dadce0; flex-wrap: wrap;
         }
-        .toolbar label { font-weight: 600; font-size: 0.85rem; }
+        .toolbar label { font-weight: 500; font-size: 0.8rem; color: #5f6368; }
         .toolbar input[type="date"] {
-            padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem;
+            padding: 6px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 0.8rem;
+            font-family: inherit; color: #3c4043;
         }
+        .toolbar input[type="date"]:focus { border-color: #1a73e8; outline: none; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
         .toolbar button {
             padding: 7px 16px; border: none; border-radius: 4px;
-            cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+            cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;
+            font-family: inherit;
         }
-        .btn-primary { background: #7B96B5; color: white; font-weight: 600; }
-        .btn-primary:hover { background: #6A85A3; }
-        .btn-success { background: #AECFE0; color: #2c3e50; font-weight: 600; }
-        .btn-success:hover { background: #96BFD4; }
-        .btn-danger { background: #d4a0a0; color: #5a2020; font-weight: 600; }
-        .btn-danger:hover { background: #d98888; }
-        .btn-secondary { background: #C0AD94; color: #3d2e1a; font-weight: 600; }
-        .btn-secondary:hover { background: #A89578; }
-        .btn-outline { background: transparent; border: 2px solid #7B96B5; color: #6A85A3; }
-        .btn-outline:hover { background: #7B96B5; color: white; }
+        .btn-primary { background: #1a73e8; color: white; font-weight: 500; border-radius: 20px; }
+        .btn-primary:hover { background: #1765cc; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .btn-success { background: #1e8e3e; color: white; font-weight: 500; border-radius: 20px; }
+        .btn-success:hover { background: #1b7d37; }
+        .btn-danger { background: #d93025; color: white; font-weight: 500; border-radius: 20px; }
+        .btn-danger:hover { background: #c5221f; }
+        .btn-secondary { background: #f1f3f4; color: #3c4043; font-weight: 500; border-radius: 20px; }
+        .btn-secondary:hover { background: #e8eaed; }
+        .btn-outline { background: transparent; border: 1px solid #dadce0; color: #3c4043; border-radius: 20px; }
+        .btn-outline:hover { background: #f1f3f4; }
 
-        .nav-arrows { display: flex; gap: 5px; }
-        .nav-arrows button { padding: 7px 12px; font-size: 1rem; }
+        .nav-arrows { display: flex; gap: 4px; }
+        .nav-arrows button { padding: 6px 10px; font-size: 0.95rem; }
 
         .legend {
-            display: flex; gap: 15px; margin-left: auto; font-size: 0.8rem; align-items: center;
+            display: flex; gap: 12px; margin-left: auto; font-size: 0.75rem; align-items: center;
         }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; color: #5f6368; }
         .legend-color {
-            width: 16px; height: 16px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15);
+            width: 14px; height: 14px; border-radius: 3px;
         }
 
         .grid-container {
-            overflow-x: auto; padding: 20px 30px; position: relative;
+            overflow-x: auto; padding: 16px 24px; position: relative;
         }
 
         table.booking-grid {
             border-collapse: collapse; width: auto; min-width: 100%;
             background: white; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px rgba(60,64,67,0.15);
         }
         table.booking-grid th, table.booking-grid td {
-            border: 1px solid #e0e0e0; text-align: center; font-size: 0.75rem;
+            border: 1px solid #e8eaed; text-align: center; font-size: 0.75rem;
         }
         table.booking-grid thead th {
-            background: #7B96B5; color: white; padding: 8px 4px;
+            background: #f1f3f4; color: #3c4043; padding: 8px 4px;
             position: sticky; top: 0; z-index: 10; min-width: 38px;
-            font-weight: 600;
+            font-weight: 500; font-size: 0.72rem;
         }
         table.booking-grid thead th.corner {
             position: sticky; left: 0; z-index: 20; min-width: 110px;
-            background: #6A85A3;
+            background: #e8eaed;
         }
-        table.booking-grid thead th.weekend { background: #C0AD94; color: #3d2e1a; }
-        table.booking-grid thead th.today-header { background: #AECFE0; color: #2c3e50; }
+        table.booking-grid thead th.weekend { background: #fce8e6; color: #c5221f; }
+        table.booking-grid thead th.today-header { background: #e8f0fe; color: #1a73e8; }
 
         .room-header {
             position: sticky; left: 0; z-index: 5;
-            background: #f8f9fa; font-weight: 700; padding: 6px 10px;
+            background: #fff; font-weight: 500; padding: 6px 10px;
             white-space: nowrap; text-align: left !important; min-width: 110px;
         }
-        .room-header .room-number { font-size: 0.85rem; color: #2c3e50; font-weight: 700; }
-        .room-header .room-type { font-size: 0.7rem; color: #777; display: block; font-weight: 500; }
+        .room-header .room-number { font-size: 0.8rem; color: #3c4043; font-weight: 500; }
+        .room-header .room-type { font-size: 0.68rem; color: #80868b; display: block; font-weight: 400; }
 
         .floor-separator td, .floor-separator th {
-            background: #AECFE0 !important; color: #2c3e50; font-weight: 700;
-            padding: 5px 10px; font-size: 0.8rem; text-align: left !important;
+            background: #e8f0fe !important; color: #1a73e8; font-weight: 500;
+            padding: 5px 10px; font-size: 0.75rem; text-align: left !important;
         }
         .floor-separator.rural td, .floor-separator.rural th {
-            background: #E6D8C3 !important; color: #5a4a3a;
+            background: #fce8e6 !important; color: #c5221f;
         }
 
         td.day-cell {
             padding: 0; height: 36px; min-width: 38px; cursor: pointer;
             position: relative; transition: background 0.15s;
         }
-        td.day-cell:hover { background: #E0D6C8; }
-        td.day-cell.weekend { background: #F5EFE6; }
-        td.day-cell.today { box-shadow: inset 0 0 0 2px #7B96B5; }
+        td.day-cell:hover { background: #f1f3f4; }
+        td.day-cell.weekend { background: #fef7f0; }
+        td.day-cell.today { box-shadow: inset 0 0 0 2px #1a73e8; }
 
         td.day-cell.booked {
             cursor: pointer; padding: 0;
@@ -116,34 +120,38 @@
         .booking-end { border-radius: 0 4px 4px 0; }
         .booking-single { border-radius: 4px; }
 
-        .status-confirmed { background: #7B96B5; color: white; }
-        .status-pending { background: #E6D8C3; color: #5a4a3a; }
-        .status-checkedin { background: #AECFE0; color: #2c3e50; }
-        .status-checkedout { background: #C0AD94; color: #3d2e1a; }
+        .status-confirmed { background: #1a73e8; color: white; }
+        .status-pending { background: #fa903e; color: white; }
+        .status-checkedin { background: #0d904f; color: white; }
+        .status-checkedout { background: #9334e6; color: white; }
+        .status-personal { background: #e8710a; color: white; }
 
         /* Modal */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.32); z-index: 100; justify-content: center; align-items: center;
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: white; border-radius: 12px; padding: 30px;
+            background: white; border-radius: 8px; padding: 24px;
             width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 10px -5px rgba(0,0,0,0.2), 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12);
         }
-        .modal h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; font-family: 'Playfair Display', Georgia, serif; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; }
+        .modal h2 { margin-bottom: 20px; color: #202124; font-size: 1.15rem; font-family: 'Google Sans', 'Roboto', sans-serif; font-weight: 500; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 4px; font-size: 0.8rem; color: #5f6368; }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;
-            font-size: 0.9rem;
+            width: 100%; padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px;
+            font-size: 0.875rem; font-family: inherit; color: #3c4043; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #1a73e8; outline: none; box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
         }
         .form-group textarea { height: 60px; resize: vertical; }
-        .form-row { display: flex; gap: 15px; }
+        .form-row { display: flex; gap: 12px; }
         .form-row .form-group { flex: 1; }
-        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-        .price-display { font-size: 1.1rem; font-weight: 700; color: #6A85A3; margin-top: 5px; }
+        .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+        .price-display { font-size: 1.05rem; font-weight: 500; color: #1a73e8; margin-top: 5px; }
 
         /* Payment status indicators on grid */
         .payment-dot {
@@ -165,10 +173,10 @@
             padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
             cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
         }
-        .payment-badge.pending-payment { background: #f0e4dd; color: #8a6050; border-color: #C0AD94; }
-        .payment-badge.deposit-paid { background: #F5EFE6; color: #8a7560; border-color: #E6D8C3; }
-        .payment-badge.fully-paid { background: #dce8f0; color: #6A85A3; border-color: #AECFE0; }
-        .payment-badge.active { box-shadow: 0 0 0 2px #2c3e50; }
+        .payment-badge.pending-payment { background: #fce8e6; color: #c5221f; border-color: #f28b82; }
+        .payment-badge.deposit-paid { background: #fef7e0; color: #e37400; border-color: #fbbc04; }
+        .payment-badge.fully-paid { background: #e6f4ea; color: #137333; border-color: #34a853; }
+        .payment-badge.active { box-shadow: 0 0 0 2px #1a73e8; }
 
         .add-payment-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-end; }
         .add-payment-row .form-group { margin-bottom: 0; }
@@ -176,10 +184,10 @@
             padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem;
         }
         .btn-add-payment {
-            padding: 6px 14px; background: #7B96B5; color: white; border: none;
-            border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+            padding: 6px 14px; background: #1a73e8; color: white; border: none;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: inherit;
         }
-        .btn-add-payment:hover { background: #6A85A3; }
+        .btn-add-payment:hover { background: #1765cc; }
 
         .payments-list { max-height: 120px; overflow-y: auto; }
         .payment-item {
@@ -187,7 +195,7 @@
             padding: 5px 8px; background: white; border-radius: 4px; margin-bottom: 4px;
             font-size: 0.78rem; border: 1px solid #e8e8e8;
         }
-        .payment-item .payment-amount { font-weight: 700; color: #6A85A3; }
+        .payment-item .payment-amount { font-weight: 500; color: #1a73e8; }
         .payment-item .payment-type { color: #666; font-size: 0.7rem; }
         .payment-item .btn-remove-payment {
             background: none; border: none; color: #c0392b; cursor: pointer;
@@ -209,16 +217,17 @@
         }
         .income-tab:first-child { border-radius: 6px 0 0 6px; }
         .income-tab:last-child { border-radius: 0 6px 6px 0; }
-        .income-tab.active { background: #7B96B5; color: white; border-color: #7B96B5; }
+        .income-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
         .income-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
         .income-table th {
-            background: #7B96B5; color: white; padding: 8px 12px; text-align: left; font-weight: 600;
+            background: #f1f3f4; color: #3c4043; padding: 8px 12px; text-align: left; font-weight: 500;
+            border-bottom: 2px solid #dadce0;
         }
-        .income-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
-        .income-table tr:hover td { background: #F5EFE6; }
-        .income-table .amount { text-align: right; font-weight: 700; }
+        .income-table td { padding: 8px 12px; border-bottom: 1px solid #e8eaed; }
+        .income-table tr:hover td { background: #f1f3f4; }
+        .income-table .amount { text-align: right; font-weight: 500; }
         .income-table .total-row td {
-            background: #E6D8C3; font-weight: 700; border-top: 2px solid #C0AD94;
+            background: #e8f0fe; font-weight: 500; border-top: 2px solid #1a73e8;
         }
         .income-totals {
             display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;
@@ -229,7 +238,7 @@
         }
         .income-total-card .label { font-size: 0.75rem; color: #666; }
         .income-total-card .value { font-size: 1.2rem; font-weight: 700; color: #2c3e50; }
-        .income-total-card .value.green { color: #6A85A3; }
+        .income-total-card .value.green { color: #1e8e3e; }
 
         /* View toggle */
         .view-toggle { display: flex; gap: 0; }
@@ -239,45 +248,89 @@
         }
         .view-toggle button:first-child { border-radius: 4px 0 0 4px; }
         .view-toggle button:last-child { border-radius: 0 4px 4px 0; }
-        .view-toggle button.active { background: #7B96B5; color: white; border-color: #7B96B5; }
+        .view-toggle button.active { background: #1a73e8; color: white; border-color: #1a73e8; }
 
         /* Monthly Calendar */
-        .calendar-container { padding: 20px 30px; display: none; }
+        .calendar-container { padding: 16px 24px; display: none; }
         .calendar-container.active { display: block; }
-        .calendar-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .calendar-nav h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; color: #2c3e50; min-width: 180px; text-align: center; }
+        .calendar-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .calendar-nav h3 { font-family: 'Google Sans', 'Roboto', sans-serif; font-size: 1.1rem; color: #3c4043; min-width: 180px; text-align: center; font-weight: 500; }
         .calendar-grid {
             display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
-            background: #e0e0e0; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            background: #dadce0; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px rgba(60,64,67,0.15);
         }
         .calendar-grid .cal-header {
-            background: #7B96B5; color: white; padding: 8px; text-align: center;
-            font-size: 0.8rem; font-weight: 600;
+            background: #f1f3f4; color: #5f6368; padding: 8px; text-align: center;
+            font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
         }
         .calendar-grid .cal-day {
             background: white; min-height: 90px; padding: 4px; cursor: pointer;
             transition: background 0.15s; position: relative;
         }
-        .calendar-grid .cal-day:hover { background: #F5EFE6; }
-        .calendar-grid .cal-day.other-month { background: #f5f5f5; opacity: 0.5; }
-        .calendar-grid .cal-day.today { box-shadow: inset 0 0 0 2px #7B96B5; }
-        .calendar-grid .cal-day.weekend { background: #F5EFE6; }
+        .calendar-grid .cal-day:hover { background: #f8f9fa; }
+        .calendar-grid .cal-day.other-month { background: #f8f9fa; opacity: 0.5; }
+        .calendar-grid .cal-day.today { box-shadow: inset 0 0 0 2px #1a73e8; }
+        .calendar-grid .cal-day.weekend { background: #fffdf7; }
         .calendar-grid .cal-day .day-num {
-            font-size: 0.8rem; font-weight: 700; color: #2c3e50; margin-bottom: 2px;
+            font-size: 0.8rem; font-weight: 500; color: #3c4043; margin-bottom: 2px;
         }
         .calendar-grid .cal-day .cal-booking {
             font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; margin-bottom: 1px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            cursor: pointer; font-weight: 600;
+            cursor: pointer; font-weight: 500;
         }
         .calendar-grid .cal-day .cal-more {
-            font-size: 0.6rem; color: #666; font-weight: 600; cursor: pointer;
+            font-size: 0.6rem; color: #1a73e8; font-weight: 500; cursor: pointer;
         }
-        .cal-booking.status-blocked { background: #C0AD94; color: #3d2e1a; }
+        .cal-booking.status-blocked { background: #dadce0; color: #3c4043; }
+
+        /* Year-Month-Day Calendar Selector */
+        .year-selector {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+        }
+        .year-tab {
+            padding: 6px 16px; border: 1px solid #dadce0; background: #fff;
+            cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all 0.15s;
+            border-radius: 20px; color: #3c4043; font-family: inherit;
+        }
+        .year-tab:hover { background: #f1f3f4; }
+        .year-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+        .month-tabs {
+            display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .month-tab {
+            padding: 6px 0; flex: 1; min-width: 0; border: 1px solid #dadce0; font-size: 0.72rem;
+            font-weight: 500; cursor: pointer; transition: all 0.15s;
+            background: #fff; color: #5f6368; text-align: center; font-family: inherit;
+        }
+        .month-tab:first-child { border-radius: 20px 0 0 20px; }
+        .month-tab:last-child { border-radius: 0 20px 20px 0; }
+        .month-tab:hover { background: #f1f3f4; }
+        .month-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+        .day-numbers-bar {
+            display: flex; gap: 1px; margin-bottom: 12px; background: #dadce0;
+            border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+        }
+        .day-num-cell {
+            flex: 1; min-width: 0; text-align: center; padding: 8px 2px; background: #fff;
+            font-size: 0.72rem; font-weight: 500; color: #3c4043; cursor: pointer;
+            transition: all 0.15s; position: relative;
+        }
+        .day-num-cell:hover { background: #e8f0fe; }
+        .day-num-cell.today { background: #1a73e8; color: white; font-weight: 700; }
+        .day-num-cell.weekend { background: #fef7f0; }
+        .day-num-cell.has-bookings::after {
+            content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+            width: 4px; height: 4px; border-radius: 50%; background: #1a73e8;
+        }
+        .day-num-cell .day-label {
+            display: block; font-size: 0.58rem; color: #80868b; text-transform: uppercase;
+        }
+        .day-num-cell.today .day-label { color: rgba(255,255,255,0.8); }
 
         /* Blocked dates */
-        .status-blocked { background: #C0AD94; color: #3d2e1a; }
+        .status-blocked { background: #dadce0; color: #3c4043; }
 
         /* Availability search modal */
         .search-modal { width: 650px; }
@@ -289,15 +342,15 @@
             padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px;
             margin-bottom: 8px; background: white; transition: all 0.2s;
         }
-        .search-result-item:hover { border-color: #7B96B5; background: #F5EFE6; }
-        .search-result-item .result-room { font-weight: 700; font-size: 0.9rem; color: #2c3e50; }
-        .search-result-item .result-details { font-size: 0.8rem; color: #666; }
-        .search-result-item .result-price { font-weight: 700; color: #6A85A3; font-size: 0.95rem; }
+        .search-result-item:hover { border-color: #1a73e8; background: #f8f9fa; }
+        .search-result-item .result-room { font-weight: 500; font-size: 0.9rem; color: #202124; }
+        .search-result-item .result-details { font-size: 0.8rem; color: #5f6368; }
+        .search-result-item .result-price { font-weight: 500; color: #1a73e8; font-size: 0.95rem; }
         .btn-book-result {
-            padding: 5px 14px; background: #AECFE0; color: #2c3e50; border: none;
-            border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            padding: 5px 14px; background: #1a73e8; color: white; border: none;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit;
         }
-        .btn-book-result:hover { background: #96BFD4; }
+        .btn-book-result:hover { background: #1765cc; }
         .no-results { text-align: center; color: #999; padding: 30px; font-size: 0.9rem; }
 
         /* Block modal */
@@ -313,10 +366,10 @@
             padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px;
             margin-bottom: 6px; background: white; cursor: pointer; transition: all 0.2s;
         }
-        .client-card:hover { border-color: #7B96B5; background: #F5EFE6; }
-        .client-card .client-name { font-weight: 700; font-size: 0.9rem; color: #2c3e50; }
-        .client-card .client-info { font-size: 0.78rem; color: #666; }
-        .client-card .client-stays { font-size: 0.75rem; color: #7B96B5; font-weight: 600; }
+        .client-card:hover { border-color: #1a73e8; background: #f8f9fa; }
+        .client-card .client-name { font-weight: 500; font-size: 0.9rem; color: #202124; }
+        .client-card .client-info { font-size: 0.78rem; color: #5f6368; }
+        .client-card .client-stays { font-size: 0.75rem; color: #1a73e8; font-weight: 500; }
 
         .client-detail-modal { width: 600px; }
         .client-header-card {
@@ -348,8 +401,8 @@
         .autocomplete-item {
             padding: 6px 12px; cursor: pointer; font-size: 0.82rem; border-bottom: 1px solid #f0f0f0;
         }
-        .autocomplete-item:hover { background: #F5EFE6; }
-        .autocomplete-item .ac-name { font-weight: 600; color: #2c3e50; }
+        .autocomplete-item:hover { background: #f1f3f4; }
+        .autocomplete-item .ac-name { font-weight: 500; color: #202124; }
         .autocomplete-item .ac-detail { font-size: 0.72rem; color: #888; }
 
         /* Document section */
@@ -379,7 +432,7 @@
 
         /* Casa Rural specific */
         .rural-section {
-            background: #F5EFE6; border: 1px solid #E6D8C3; border-radius: 8px;
+            background: #fef7e0; border: 1px solid #fdd663; border-radius: 8px;
             padding: 12px 15px; margin-top: 10px; display: none;
         }
         .rural-section.visible { display: block; }
@@ -399,7 +452,7 @@
         }
         .checklist-tab:first-child { border-radius: 4px 0 0 4px; }
         .checklist-tab:last-child { border-radius: 0 4px 4px 0; }
-        .checklist-tab.active { background: #C0AD94; color: #3d2e1a; border-color: #C0AD94; }
+        .checklist-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
         .checklist-items { max-height: 350px; overflow-y: auto; }
         .checklist-item {
             display: flex; align-items: center; gap: 10px; padding: 8px 10px;
@@ -417,7 +470,7 @@
             margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px;
             font-size: 0.82rem; display: flex; justify-content: space-between;
         }
-        .checklist-ok { color: #6A85A3; font-weight: 700; }
+        .checklist-ok { color: #1e8e3e; font-weight: 500; }
         .checklist-issues { color: #c0392b; font-weight: 700; }
 
         /* House rules modal */
@@ -442,7 +495,7 @@
         }
         .report-tab:first-child { border-radius: 6px 0 0 6px; }
         .report-tab:last-child { border-radius: 0 6px 6px 0; }
-        .report-tab.active { background: #7B96B5; color: white; border-color: #7B96B5; }
+        .report-tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
         .report-content { max-height: 500px; overflow-y: auto; }
 
         /* Bar chart */
@@ -459,10 +512,10 @@
             padding-left: 8px; font-size: 0.72rem; font-weight: 700; color: white;
             transition: width 0.5s ease; min-width: 0;
         }
-        .chart-bar-fill.high { background: linear-gradient(90deg, #7B96B5, #6A85A3); }
-        .chart-bar-fill.medium { background: linear-gradient(90deg, #AECFE0, #8BBAD0); }
-        .chart-bar-fill.low { background: linear-gradient(90deg, #E6D8C3, #C0AD94); }
-        .chart-bar-fill.very-low { background: linear-gradient(90deg, #C0AD94, #A89578); }
+        .chart-bar-fill.high { background: linear-gradient(90deg, #1a73e8, #1765cc); }
+        .chart-bar-fill.medium { background: linear-gradient(90deg, #4285f4, #669df6); }
+        .chart-bar-fill.low { background: linear-gradient(90deg, #a8c7fa, #7baaf7); }
+        .chart-bar-fill.very-low { background: linear-gradient(90deg, #dadce0, #c4c7c5); }
         .chart-value { width: 55px; font-size: 0.78rem; font-weight: 600; color: #666; flex-shrink: 0; }
 
         /* Income comparison chart */
@@ -485,29 +538,30 @@
         /* Room ranking */
         .rank-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
         .rank-table th {
-            background: #7B96B5; color: white; padding: 8px 10px; text-align: left; font-weight: 600;
+            background: #f1f3f4; color: #3c4043; padding: 8px 10px; text-align: left; font-weight: 500;
+            border-bottom: 2px solid #dadce0;
         }
         .rank-table td { padding: 8px 10px; border-bottom: 1px solid #eee; }
-        .rank-table tr:hover td { background: #F5EFE6; }
+        .rank-table tr:hover td { background: #f1f3f4; }
         .rank-table .rank-num { font-weight: 700; color: #2c3e50; width: 30px; text-align: center; }
         .rank-table .rank-bar-cell { width: 120px; }
         .rank-mini-bar {
             height: 8px; border-radius: 4px; background: #7B96B5;
             transition: width 0.5s ease;
         }
-        .rank-mini-bar.top { background: #6A85A3; }
-        .rank-mini-bar.bottom { background: #C0AD94; }
+        .rank-mini-bar.top { background: #1a73e8; }
+        .rank-mini-bar.bottom { background: #dadce0; }
         .report-year-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .report-year-nav h4 { font-size: 0.95rem; color: #2c3e50; min-width: 50px; text-align: center; }
 
         /* FAB button */
         .fab-btn {
-            position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px;
-            border-radius: 50%; background: #7B96B5; color: white; border: none;
-            font-size: 1.8rem; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px;
+            border-radius: 16px; background: #1a73e8; color: white; border: none;
+            font-size: 1.8rem; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 4px 12px rgba(26,115,232,0.3);
             z-index: 90; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
         }
-        .fab-btn:hover { background: #6A85A3; transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .fab-btn:hover { background: #1765cc; box-shadow: 0 4px 8px rgba(0,0,0,0.25), 0 8px 20px rgba(26,115,232,0.35); }
 
         /* Quick booking wizard */
         .wizard-modal { width: 520px; }
@@ -516,8 +570,8 @@
             flex: 1; text-align: center; padding: 8px 4px; font-size: 0.72rem; font-weight: 600;
             border-bottom: 3px solid #ddd; color: #999; transition: all 0.2s;
         }
-        .wizard-step.active { border-bottom-color: #7B96B5; color: #2c3e50; }
-        .wizard-step.done { border-bottom-color: #AECFE0; color: #7B96B5; }
+        .wizard-step.active { border-bottom-color: #1a73e8; color: #202124; }
+        .wizard-step.done { border-bottom-color: #1e8e3e; color: #1a73e8; }
         .wizard-panel { display: none; }
         .wizard-panel.active { display: block; }
         .wizard-nav { display: flex; justify-content: space-between; margin-top: 20px; }
@@ -527,11 +581,11 @@
             padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px;
             margin-bottom: 6px; cursor: pointer; transition: all 0.2s;
         }
-        .wizard-room-card:hover { border-color: #7B96B5; background: #F5EFE6; }
-        .wizard-room-card.selected { border-color: #7B96B5; background: #E6D8C3; box-shadow: 0 0 0 2px #7B96B5; }
-        .wizard-room-card .wr-name { font-weight: 700; font-size: 0.88rem; color: #2c3e50; }
-        .wizard-room-card .wr-detail { font-size: 0.75rem; color: #666; }
-        .wizard-room-card .wr-price { font-weight: 700; color: #6A85A3; }
+        .wizard-room-card:hover { border-color: #1a73e8; background: #f8f9fa; }
+        .wizard-room-card.selected { border-color: #1a73e8; background: #e8f0fe; box-shadow: 0 0 0 2px #1a73e8; }
+        .wizard-room-card .wr-name { font-weight: 500; font-size: 0.88rem; color: #202124; }
+        .wizard-room-card .wr-detail { font-size: 0.75rem; color: #5f6368; }
+        .wizard-room-card .wr-price { font-weight: 500; color: #1a73e8; }
         .wizard-no-results { text-align: center; color: #c0392b; padding: 20px; font-size: 0.88rem; font-weight: 600; }
         .wizard-available { text-align: center; color: #6A85A3; padding: 6px; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
 
@@ -555,38 +609,38 @@
         .pm-badge {
             display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: 600;
         }
-        .pm-badge.cash { background: #E6D8C3; color: #5a4a3a; }
-        .pm-badge.card { background: #dce8f0; color: #6A85A3; }
+        .pm-badge.cash { background: #fef7e0; color: #e37400; }
+        .pm-badge.card { background: #e8f0fe; color: #1a73e8; }
 
         /* Login screen */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #7B96B5, #AECFE0);
+            background: #f8f9fa;
             display: flex; align-items: center; justify-content: center;
             z-index: 9999;
         }
         .login-screen.hidden { display: none; }
         .login-box {
-            background: white; border-radius: 16px; padding: 40px; width: 380px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center;
+            background: white; border-radius: 8px; padding: 40px; width: 380px;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.15); text-align: center;
         }
-        .login-box h1 { font-family: 'Playfair Display', Georgia, serif; color: #2c3e50; margin-bottom: 5px; }
-        .login-box .login-subtitle { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
+        .login-box h1 { font-family: 'Google Sans', 'Roboto', sans-serif; color: #1a73e8; margin-bottom: 5px; font-weight: 500; }
+        .login-box .login-subtitle { color: #5f6368; font-size: 0.85rem; margin-bottom: 25px; }
         .user-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
         .user-card {
             display: flex; align-items: center; gap: 12px; padding: 12px 16px;
             border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;
             transition: all 0.2s; text-align: left;
         }
-        .user-card:hover { border-color: #7B96B5; background: #F5EFE6; }
-        .user-card.selected { border-color: #7B96B5; background: #E6D8C3; box-shadow: 0 0 0 2px #7B96B5; }
+        .user-card:hover { border-color: #1a73e8; background: #f8f9fa; }
+        .user-card.selected { border-color: #1a73e8; background: #e8f0fe; box-shadow: 0 0 0 2px #1a73e8; }
         .user-card .user-avatar {
             width: 40px; height: 40px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; font-weight: 700;
             font-size: 1rem; color: white;
         }
-        .user-card .user-label { font-weight: 600; color: #2c3e50; font-size: 0.9rem; }
-        .user-card .user-role { font-size: 0.72rem; color: #888; }
+        .user-card .user-label { font-weight: 500; color: #202124; font-size: 0.9rem; }
+        .user-card .user-role { font-size: 0.72rem; color: #5f6368; }
         .pin-input-group { margin-top: 15px; display: none; }
         .pin-input-group.visible { display: block; }
         .pin-input {
@@ -594,14 +648,14 @@
             letter-spacing: 8px; border: 2px solid #ccc; border-radius: 8px;
             font-weight: 700; color: #2c3e50;
         }
-        .pin-input:focus { border-color: #7B96B5; outline: none; }
+        .pin-input:focus { border-color: #1a73e8; outline: none; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
         .login-error { color: #c0392b; font-size: 0.8rem; margin-top: 8px; min-height: 20px; }
         .btn-login {
-            margin-top: 12px; padding: 10px 30px; background: #7B96B5; color: white;
-            border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 700;
+            margin-top: 12px; padding: 10px 30px; background: #1a73e8; color: white;
+            border: none; border-radius: 20px; font-size: 0.9rem; font-weight: 500;
             cursor: pointer; transition: all 0.2s;
         }
-        .btn-login:hover { background: #6A85A3; }
+        .btn-login:hover { background: #1765cc; }
 
         /* User indicator in header */
         .user-indicator {
@@ -625,11 +679,11 @@
         .audit-info strong { color: #2c3e50; }
 
         .stats-bar {
-            background: white; padding: 10px 30px; border-top: 1px solid #ddd;
-            display: flex; gap: 30px; font-size: 0.8rem; color: #666;
+            background: #fff; padding: 8px 24px; border-top: 1px solid #e8eaed;
+            display: flex; gap: 24px; font-size: 0.78rem; color: #5f6368;
         }
         .stat { display: flex; align-items: center; gap: 5px; }
-        .stat strong { color: #2c3e50; font-weight: 700; }
+        .stat strong { color: #202124; font-weight: 500; }
 
         /* Tooltip */
         .tooltip {
@@ -646,55 +700,55 @@
         }
 
         .sidebar {
-            width: 230px; background: white; border-right: 1px solid #e0e0e0;
+            width: 256px; background: #fff; border-right: 1px solid #e8eaed;
             display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
             height: 100vh; z-index: 80; transition: transform 0.3s ease;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
         }
 
         .sidebar-header {
-            padding: 18px 18px 14px; border-bottom: 1px solid #e8e8e8;
+            padding: 16px 16px 12px; border-bottom: 1px solid #e8eaed;
             display: flex; align-items: center; gap: 12px;
         }
         .sidebar-logo {
-            width: 36px; height: 36px; border-radius: 8px; background: #7B96B5;
+            width: 36px; height: 36px; border-radius: 50%; background: #1a73e8;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; color: white; font-size: 1rem;
-            font-family: 'Playfair Display', Georgia, serif; flex-shrink: 0;
+            font-weight: 500; color: white; font-size: 0.9rem;
+            font-family: 'Google Sans', 'Roboto', sans-serif; flex-shrink: 0;
         }
-        .sidebar-title { font-weight: 700; font-size: 0.95rem; color: #2c3e50; line-height: 1.2; }
-        .sidebar-subtitle { font-size: 0.68rem; color: #999; font-weight: 500; }
+        .sidebar-title { font-weight: 500; font-size: 0.95rem; color: #202124; line-height: 1.2; font-family: 'Google Sans', 'Roboto', sans-serif; }
+        .sidebar-subtitle { font-size: 0.68rem; color: #80868b; font-weight: 400; }
 
         .sidebar-nav {
             flex: 1; overflow-y: auto; padding: 8px 0;
         }
         .sidebar-section {
-            padding: 16px 18px 4px; font-size: 0.65rem; font-weight: 700;
-            color: #999; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 16px 16px 4px; font-size: 0.65rem; font-weight: 500;
+            color: #80868b; letter-spacing: 0.05em; text-transform: uppercase;
         }
         .sidebar-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 9px 18px; cursor: pointer; font-size: 0.82rem;
-            color: #555; font-weight: 500; transition: all 0.15s;
-            border-left: 3px solid transparent; text-decoration: none;
+            padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+            color: #3c4043; font-weight: 400; transition: all 0.15s;
+            border-radius: 0 25px 25px 0; margin-right: 12px;
+            text-decoration: none;
         }
         .sidebar-item:hover {
-            background: #F5EFE6; color: #2c3e50;
+            background: #f1f3f4; color: #202124;
         }
         .sidebar-item.active {
-            background: #7B96B5; color: white; border-left-color: #6A85A3;
-            font-weight: 600;
+            background: #e8f0fe; color: #1a73e8;
+            font-weight: 500;
         }
         .sidebar-item .si-icon {
             width: 20px; text-align: center; font-size: 0.95rem; flex-shrink: 0;
         }
         .sidebar-item .si-label { flex: 1; }
         .sidebar-item .si-badge {
-            background: #7B96B5; color: white; font-size: 0.62rem; font-weight: 700;
+            background: #1a73e8; color: white; font-size: 0.62rem; font-weight: 500;
             padding: 1px 6px; border-radius: 10px;
         }
         .sidebar-item.active .si-badge {
-            background: rgba(255,255,255,0.3);
+            background: #1a73e8; color: white;
         }
 
         .sidebar-divider {
@@ -702,23 +756,23 @@
         }
 
         .sidebar-footer {
-            border-top: 1px solid #e8e8e8; padding: 10px 12px;
+            border-top: 1px solid #e8eaed; padding: 10px 12px;
         }
         .sidebar-user {
             display: flex; align-items: center; gap: 10px; padding: 6px 8px;
             border-radius: 8px; cursor: pointer; transition: background 0.15s;
         }
-        .sidebar-user:hover { background: #F5EFE6; }
+        .sidebar-user:hover { background: #f1f3f4; }
         .sidebar-user .su-avatar {
             width: 32px; height: 32px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-weight: 700;
+            align-items: center; justify-content: center; font-weight: 500;
             font-size: 0.75rem; color: white; flex-shrink: 0;
         }
-        .sidebar-user .su-name { font-weight: 600; font-size: 0.82rem; color: #2c3e50; }
-        .sidebar-user .su-role { font-size: 0.68rem; color: #999; }
+        .sidebar-user .su-name { font-weight: 500; font-size: 0.82rem; color: #202124; }
+        .sidebar-user .su-role { font-size: 0.68rem; color: #80868b; }
 
         .main-content {
-            flex: 1; margin-left: 230px; display: flex; flex-direction: column; min-height: 100vh;
+            flex: 1; margin-left: 256px; display: flex; flex-direction: column; min-height: 100vh;
         }
 
         /* Hamburger button (hidden on desktop) */
@@ -1013,10 +1067,20 @@
             <span class="si-label">Bloquear Fechas</span>
         </div>
 
+        <div class="sidebar-item" onclick="sidebarNav('cancellations')" data-section="cancellations">
+            <span class="si-icon">✕</span>
+            <span class="si-label">Cancelaciones</span>
+            <span class="si-badge" id="cancelBadge" style="display:none;">0</span>
+        </div>
+
         <div class="sidebar-section">Finanzas</div>
         <div class="sidebar-item" onclick="sidebarNav('income')" data-section="income">
             <span class="si-icon">💰</span>
             <span class="si-label">Ingresos</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('invoices')" data-section="invoices">
+            <span class="si-icon">🧾</span>
+            <span class="si-label">Facturas</span>
         </div>
         <div class="sidebar-item" onclick="sidebarNav('reports')" data-section="reports">
             <span class="si-icon">📊</span>
@@ -1024,9 +1088,17 @@
         </div>
 
         <div class="sidebar-section">Gestión</div>
+        <div class="sidebar-item" onclick="sidebarNav('pricing')" data-section="pricing">
+            <span class="si-icon">💲</span>
+            <span class="si-label">Precios</span>
+        </div>
         <div class="sidebar-item" onclick="sidebarNav('clients')" data-section="clients">
             <span class="si-icon">👤</span>
             <span class="si-label">Clientes</span>
+        </div>
+        <div class="sidebar-item" onclick="sidebarNav('roomConfig')" data-section="roomConfig">
+            <span class="si-icon">🛏️</span>
+            <span class="si-label">Config. Habitaciones</span>
         </div>
         <div class="sidebar-item" onclick="sidebarNav('rules')" data-section="rules">
             <span class="si-icon">📋</span>
@@ -1046,12 +1118,13 @@
         <div class="sidebar-divider"></div>
 
         <div class="sidebar-section">Estado</div>
-        <div class="legend" style="display:flex; flex-direction:column; gap:4px; padding:4px 18px; font-size:0.75rem; margin-left:0;">
-            <div class="legend-item"><div class="legend-color status-confirmed"></div> Confirmada</div>
-            <div class="legend-item"><div class="legend-color status-pending"></div> Pendiente</div>
-            <div class="legend-item"><div class="legend-color status-checkedin"></div> Check-in</div>
-            <div class="legend-item"><div class="legend-color status-checkedout"></div> Check-out</div>
-            <div class="legend-item"><div class="legend-color status-blocked"></div> Bloqueada</div>
+        <div class="legend" style="display:flex; flex-direction:column; gap:3px; padding:4px 16px; font-size:0.72rem; margin-left:0;">
+            <div class="legend-item"><div class="legend-color" style="background:#1a73e8;"></div> Confirmada</div>
+            <div class="legend-item"><div class="legend-color" style="background:#fa903e;"></div> Pendiente</div>
+            <div class="legend-item"><div class="legend-color" style="background:#0d904f;"></div> Check-in</div>
+            <div class="legend-item"><div class="legend-color" style="background:#9334e6;"></div> Check-out</div>
+            <div class="legend-item"><div class="legend-color" style="background:#dadce0;"></div> Bloqueada</div>
+            <div class="legend-item"><div class="legend-color" style="background:#e8710a;"></div> Uso personal</div>
         </div>
     </div>
 
@@ -1113,6 +1186,11 @@
         <button id="viewCalendar" onclick="switchView('calendar')">Calendario</button>
     </div>
 
+    <div class="view-toggle" style="margin-left:8px;">
+        <button class="active" id="tabHostal" onclick="switchProperty('hostal')">Hostal</button>
+        <button id="tabRural" onclick="switchProperty('rural')">Casa Rural</button>
+    </div>
+
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
 </div>
 
@@ -1121,14 +1199,15 @@
 </div>
 
 <div class="calendar-container" id="calendarContainer">
-    <div class="calendar-nav" style="flex-wrap:wrap;">
-        <button class="btn-outline" onclick="navigateCalendarYear(-1)" title="Año anterior">«</button>
-        <h3 id="calendarYearTitle" style="min-width:50px;"></h3>
-        <button class="btn-outline" onclick="navigateCalendarYear(1)" title="Año siguiente">»</button>
-        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:6px;">Hoy</button>
-    </div>
-    <div class="calendar-month-tabs" id="calendarMonthTabs" style="display:flex; gap:0; margin-bottom:12px; flex-wrap:wrap;">
-    </div>
+    <!-- Year Selector -->
+    <div class="year-selector" id="yearSelector"></div>
+    <!-- Month Tabs -->
+    <div class="month-tabs" id="calendarMonthTabs"></div>
+    <!-- Day Numbers Bar -->
+    <div class="day-numbers-bar" id="dayNumbersBar"></div>
+    <!-- Day Detail (bookings for selected day) -->
+    <div id="dayBookingsDetail" style="display:none; margin-bottom:12px;"></div>
+    <!-- Monthly Grid -->
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
@@ -1257,30 +1336,47 @@
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Habitación *</label>
+                <label>Habitación principal *</label>
                 <select id="bookingRoom"></select>
             </div>
             <div class="form-group">
-                <label>Huéspedes</label>
-                <select id="guestCount">
-                    <option value="1">1 persona</option>
-                    <option value="2" selected>2 personas</option>
-                    <option value="3">3 personas</option>
-                    <option value="4">4 personas</option>
-                    <option value="5">5 personas</option>
-                    <option value="6">6 personas</option>
-                    <option value="7">7 personas</option>
-                    <option value="8">8 personas</option>
-                    <option value="9">9 personas</option>
-                    <option value="10">10 personas</option>
-                    <option value="11">11 personas</option>
-                    <option value="12">12 personas</option>
-                    <option value="13">13 personas</option>
-                    <option value="14">14 personas</option>
-                    <option value="15">15 personas</option>
-                    <option value="16">16 personas</option>
+                <label>Tipo habitación</label>
+                <select id="roomType">
+                    <option value="individual">Individual (1 persona)</option>
+                    <option value="doble" selected>Doble (2 personas)</option>
+                    <option value="triple">Triple (3 pers. + supletoria)</option>
+                    <option value="cuadruple">Cuádruple (4 pers. + 2 supletorias)</option>
                 </select>
             </div>
+        </div>
+        <!-- Multiple rooms section -->
+        <div id="multiRoomSection" style="background:#f8f9fa; border:1px solid #e8eaed; border-radius:8px; padding:12px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <label style="font-weight:500; font-size:0.8rem; color:#3c4043; margin:0;">Habitaciones reservadas</label>
+                <button type="button" class="btn-outline" onclick="addExtraRoom()" style="font-size:0.72rem; padding:4px 12px;">+ Añadir habitación</button>
+            </div>
+            <div id="extraRoomsList"></div>
+        </div>
+        <div class="form-group">
+            <label>Huéspedes totales</label>
+            <select id="guestCount">
+                <option value="1">1 persona</option>
+                <option value="2" selected>2 personas</option>
+                <option value="3">3 personas</option>
+                <option value="4">4 personas</option>
+                <option value="5">5 personas</option>
+                <option value="6">6 personas</option>
+                <option value="7">7 personas</option>
+                <option value="8">8 personas</option>
+                <option value="9">9 personas</option>
+                <option value="10">10 personas</option>
+                <option value="11">11 personas</option>
+                <option value="12">12 personas</option>
+                <option value="13">13 personas</option>
+                <option value="14">14 personas</option>
+                <option value="15">15 personas</option>
+                <option value="16">16 personas</option>
+            </select>
         </div>
         <div class="form-row">
             <div class="form-group">
@@ -1406,6 +1502,7 @@
         <h2>Ficha de Clientes</h2>
         <div class="client-search-bar">
             <input type="text" id="clientSearch" placeholder="Buscar por nombre, DNI, teléfono o email..." oninput="filterClients()">
+            <button class="btn-primary" onclick="openAddClientModal()" style="white-space:nowrap;">+ Añadir</button>
         </div>
         <div class="client-list" id="clientList"></div>
         <div class="form-actions" style="margin-top:15px;">
@@ -1507,43 +1604,72 @@
 <script>
 // ==================== DATA MODEL ====================
 
-const ROOMS = [
+// Room 107 is always blocked (personal use)
+const ROOM_107_BLOCKED = true;
+
+// Default room configuration - bedType can be overridden via localStorage
+const DEFAULT_ROOMS = [
     // Planta 1: 101-115
-    { number: 101, floor: 1, bedType: 'double', label: '101 - Matrimonio' },
-    { number: 102, floor: 1, bedType: 'twin', label: '102 - Dos camas' },
-    { number: 103, floor: 1, bedType: 'double', label: '103 - Matrimonio' },
-    { number: 104, floor: 1, bedType: 'twin', label: '104 - Dos camas' },
-    { number: 105, floor: 1, bedType: 'double', label: '105 - Matrimonio' },
-    { number: 106, floor: 1, bedType: 'twin', label: '106 - Dos camas' },
-    { number: 107, floor: 1, bedType: 'double', label: '107 - Matrimonio' },
-    { number: 108, floor: 1, bedType: 'twin', label: '108 - Dos camas' },
-    { number: 109, floor: 1, bedType: 'double', label: '109 - Matrimonio' },
-    { number: 110, floor: 1, bedType: 'twin', label: '110 - Dos camas' },
-    { number: 111, floor: 1, bedType: 'double', label: '111 - Matrimonio' },
-    { number: 112, floor: 1, bedType: 'twin', label: '112 - Dos camas' },
-    { number: 113, floor: 1, bedType: 'double', label: '113 - Matrimonio' },
-    { number: 114, floor: 1, bedType: 'twin', label: '114 - Dos camas' },
-    { number: 115, floor: 1, bedType: 'double', label: '115 - Matrimonio' },
+    { number: 101, floor: 1, bedType: 'double' },
+    { number: 102, floor: 1, bedType: 'twin' },
+    { number: 103, floor: 1, bedType: 'double' },
+    { number: 104, floor: 1, bedType: 'twin' },
+    { number: 105, floor: 1, bedType: 'double' },
+    { number: 106, floor: 1, bedType: 'twin' },
+    { number: 107, floor: 1, bedType: 'double', alwaysBlocked: true },
+    { number: 108, floor: 1, bedType: 'twin' },
+    { number: 109, floor: 1, bedType: 'double' },
+    { number: 110, floor: 1, bedType: 'twin' },
+    { number: 111, floor: 1, bedType: 'double' },
+    { number: 112, floor: 1, bedType: 'twin' },
+    { number: 113, floor: 1, bedType: 'double' },
+    { number: 114, floor: 1, bedType: 'twin' },
+    { number: 115, floor: 1, bedType: 'double' },
     // Planta 2: 201-216
-    { number: 201, floor: 2, bedType: 'double', label: '201 - Matrimonio' },
-    { number: 202, floor: 2, bedType: 'twin', label: '202 - Dos camas' },
-    { number: 203, floor: 2, bedType: 'double', label: '203 - Matrimonio' },
-    { number: 204, floor: 2, bedType: 'twin', label: '204 - Dos camas' },
-    { number: 205, floor: 2, bedType: 'double', label: '205 - Matrimonio' },
-    { number: 206, floor: 2, bedType: 'twin', label: '206 - Dos camas' },
-    { number: 207, floor: 2, bedType: 'double', label: '207 - Matrimonio' },
-    { number: 208, floor: 2, bedType: 'twin', label: '208 - Dos camas' },
-    { number: 209, floor: 2, bedType: 'double', label: '209 - Matrimonio' },
-    { number: 210, floor: 2, bedType: 'twin', label: '210 - Dos camas' },
-    { number: 211, floor: 2, bedType: 'double', label: '211 - Matrimonio' },
-    { number: 212, floor: 2, bedType: 'twin', label: '212 - Dos camas' },
-    { number: 213, floor: 2, bedType: 'double', label: '213 - Matrimonio' },
-    { number: 214, floor: 2, bedType: 'twin', label: '214 - Dos camas' },
-    { number: 215, floor: 2, bedType: 'double', label: '215 - Matrimonio' },
-    { number: 216, floor: 2, bedType: 'twin', label: '216 - Dos camas' },
+    { number: 201, floor: 2, bedType: 'double' },
+    { number: 202, floor: 2, bedType: 'twin' },
+    { number: 203, floor: 2, bedType: 'double' },
+    { number: 204, floor: 2, bedType: 'twin' },
+    { number: 205, floor: 2, bedType: 'double' },
+    { number: 206, floor: 2, bedType: 'twin' },
+    { number: 207, floor: 2, bedType: 'double' },
+    { number: 208, floor: 2, bedType: 'twin' },
+    { number: 209, floor: 2, bedType: 'double' },
+    { number: 210, floor: 2, bedType: 'twin' },
+    { number: 211, floor: 2, bedType: 'double' },
+    { number: 212, floor: 2, bedType: 'twin' },
+    { number: 213, floor: 2, bedType: 'double' },
+    { number: 214, floor: 2, bedType: 'twin' },
+    { number: 215, floor: 2, bedType: 'double' },
+    { number: 216, floor: 2, bedType: 'twin' },
     // Casa Rural Villarrubia
-    { number: 'CR1', floor: 'rural', bedType: 'rural', label: 'Casa Rural Villarrubia (16 pers.)' },
+    { number: 'CR1', floor: 'rural', bedType: 'rural' },
 ];
+
+// Load room bed type overrides from localStorage
+function loadRoomConfig() {
+    try {
+        return JSON.parse(localStorage.getItem('hostal_jijones_room_config') || '{}');
+    } catch { return {}; }
+}
+
+function saveRoomConfig(config) {
+    localStorage.setItem('hostal_jijones_room_config', JSON.stringify(config));
+}
+
+function buildRooms() {
+    const config = loadRoomConfig();
+    return DEFAULT_ROOMS.map(r => {
+        const bedType = (r.bedType !== 'rural' && config[r.number]) ? config[r.number] : r.bedType;
+        const bedLabel = bedType === 'rural' ? 'Casa Rural Villarrubia (16 pers.)' : (bedType === 'double' ? r.number + ' - Matrimonio' : r.number + ' - Dos camas');
+        return { ...r, bedType, label: bedLabel, alwaysBlocked: r.alwaysBlocked || false };
+    });
+}
+
+let ROOMS = buildRooms();
+
+// Current property view: 'hostal' or 'rural'
+let currentProperty = 'hostal';
 
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -1571,7 +1697,7 @@ const PAYMENT_METHOD_LABELS = {
     card: 'Tarjeta'
 };
 const BUSINESS_DATA = {
-    name: 'Antonio Toro Díaz',
+    name: 'Eugenio Toro Gómez Porro',
     nif: '05712696W',
     address: 'Avenida Cristo Rey 81',
     city: 'Villarrubia de los Ojos, Ciudad Real',
@@ -1790,7 +1916,13 @@ function renderGrid() {
 
     let currentFloor = 0;
 
-    ROOMS.forEach(room => {
+    // Filter rooms by current property tab
+    const filteredRooms = ROOMS.filter(room => {
+        if (currentProperty === 'rural') return room.floor === 'rural';
+        return room.floor !== 'rural';
+    });
+
+    filteredRooms.forEach(room => {
         // Floor separator
         if (room.floor !== currentFloor) {
             currentFloor = room.floor;
@@ -1799,6 +1931,21 @@ function renderGrid() {
             } else {
                 html += `<tr class="floor-separator"><td colspan="${days + 1}">Planta ${currentFloor} ${currentFloor === 1 ? '(Habitaciones 101-115)' : '(Habitaciones 201-216)'}</td></tr>`;
             }
+        }
+
+        // Room 107 always blocked
+        if (room.alwaysBlocked) {
+            const bedIcon = room.bedType === 'double' ? '🛏️' : '🛏️🛏️';
+            const bedLabel = room.bedType === 'double' ? 'Matrimonio' : 'Dos camas';
+            html += `<tr><td class="room-header"><span class="room-number">${room.number} ${bedIcon}</span><span class="room-type">${bedLabel} · USO PERSONAL</span></td>`;
+            dates.forEach(ds => {
+                const we = isWeekend(parseDate(ds)) ? ' weekend' : '';
+                const tod = ds === today ? ' today' : '';
+                html += `<td class="day-cell${we}${tod}" style="background:#fff3e0;">
+                    <div class="booking-block status-personal" style="opacity:0.6;">Personal</div></td>`;
+            });
+            html += '</tr>';
+            return;
         }
 
         const bedIcon = room.bedType === 'rural' ? '🏡' : (room.bedType === 'double' ? '🛏️' : '🛏️🛏️');
@@ -1823,7 +1970,8 @@ function renderGrid() {
                 else if (isStart) posClass = 'booking-start';
                 else if (isEnd) posClass = 'booking-end';
 
-                const label = isStart ? b.guestName.split(' ')[0] : '';
+                const extraBadge = (b.extraRooms && b.extraRooms.length > 0 && isStart) ? `<span style="font-size:0.55rem;opacity:0.8;">+${b.extraRooms.length}</span>` : '';
+                const label = isStart ? b.guestName.split(' ')[0] + extraBadge : '';
                 const pDotClass = b.paymentStatus === 'paid' ? 'paid' : (b.paymentStatus === 'deposit_paid' ? 'deposit' : 'unpaid');
                 const payDot = isEnd || isSingle ? `<span class="payment-dot ${pDotClass}"></span>` : '';
                 html += `<td class="day-cell booked${we}${tod}" data-booking-id="${b.id}"
@@ -1863,8 +2011,9 @@ function renderGrid() {
 
 function updateStats() {
     const today = todayStr();
-    const occupied = ROOMS.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
-    const total = ROOMS.length;
+    const availableRooms = ROOMS.filter(r => !r.alwaysBlocked);
+    const occupied = availableRooms.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
+    const total = availableRooms.length;
     const free = total - occupied;
     const occupancy = Math.round((occupied / total) * 100);
 
@@ -1895,13 +2044,17 @@ function showTooltip(event, bookingId) {
     const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${b.docNumber}` : '';
     const isRural = ROOMS.find(r => r.number === b.room)?.bedType === 'rural';
     const depositInfo = isRural && b.ruralDeposit ? `<br>Fianza: ${b.ruralDeposit} € (${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'})` : '';
-    const auditLine = b.createdBy ? `<br><span style="opacity:0.7">${b.updatedBy ? b.updatedBy : b.createdBy} · ${formatAuditDate(b.updatedAt || b.createdAt)}</span>` : '';
+    const ROOM_TYPE_LABELS = { individual: 'Individual', doble: 'Doble', triple: 'Triple (+suplet.)', cuadruple: 'Cuádruple (+2 suplet.)' };
+    const roomTypeInfo = b.roomType ? `<br>Tipo: ${ROOM_TYPE_LABELS[b.roomType] || b.roomType}` : '';
+    const extraRoomsInfo = (b.extraRooms && b.extraRooms.length > 0) ? `<br>+ ${b.extraRooms.length} hab. adicional(es)` : '';
+    const createdByInfo = b.createdBy ? `<br>Profesional: <strong>${b.createdBy}</strong>` : '';
+    const auditLine = b.updatedAt ? `<br><span style="opacity:0.7">${formatAuditDate(b.updatedAt || b.createdAt)}</span>` : '';
     tip.innerHTML = `<strong>${b.guestName}</strong>${docInfo}<br>
-        ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)<br>
+        ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)${roomTypeInfo}${extraRoomsInfo}<br>
         ${b.checkin} → ${b.checkout}<br>
         Estado: ${STATUS_LABELS[b.status]}<br>
         Total: ${totalPrice} € · Pagado: ${totalPaid.toFixed(2)} €<br>
-        Pago: ${paymentLabel}${depositInfo}${auditLine}`;
+        Pago: ${paymentLabel}${depositInfo}${createdByInfo}${auditLine}`;
     tip.classList.add('active');
     tip.style.left = (event.pageX + 12) + 'px';
     tip.style.top = (event.pageY - 10) + 'px';
@@ -1930,7 +2083,7 @@ function goToToday() {
 function populateRoomSelect() {
     const sel = document.getElementById('bookingRoom');
     sel.innerHTML = '';
-    ROOMS.forEach(r => {
+    ROOMS.filter(r => !r.alwaysBlocked).forEach(r => {
         const opt = document.createElement('option');
         opt.value = r.number;
         opt.textContent = r.label;
@@ -2008,6 +2161,9 @@ function openNewBooking(room, date) {
     updateRuralSection(selectedRoom);
 
     currentPayments = [];
+    currentExtraRooms = [];
+    document.getElementById('roomType').value = 'doble';
+    renderExtraRooms();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus('pending_payment');
@@ -2053,6 +2209,11 @@ function editBooking(id) {
 
     const selectedRoom = ROOMS.find(r => String(r.number) === String(b.room));
     updateRuralSection(selectedRoom);
+
+    // Room type and extra rooms
+    document.getElementById('roomType').value = b.roomType || 'doble';
+    currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
+    renderExtraRooms();
 
     currentPayments = JSON.parse(JSON.stringify(b.payments || []));
     document.getElementById('paymentStatus').value = b.paymentStatus || 'pending_payment';
@@ -2122,11 +2283,15 @@ function saveBooking() {
         history.push({ action: 'creada', user: userName, date: now });
     }
 
+    const roomType = document.getElementById('roomType').value;
+
     const booking = {
         id: id || generateId(),
         guestName: name,
         phone, email, docType, docNumber, nationality,
-        room, checkin, checkout, status, pricePerNight: price,
+        room, roomType,
+        extraRooms: currentExtraRooms.filter(er => er.room),
+        checkin, checkout, status, pricePerNight: price,
         guests: parseInt(document.getElementById('guestCount').value),
         notes: document.getElementById('bookingNotes').value.trim(),
         paymentStatus: document.getElementById('paymentStatus').value,
@@ -2151,6 +2316,13 @@ function saveBooking() {
 
     // Update or create customer record
     upsertCustomer(name, phone, email, docType, docNumber, nationality);
+
+    // Auto-generate invoice for card payments
+    const cardPayments = currentPayments.filter(p => p.method === 'card');
+    if (cardPayments.length > 0) {
+        const cardTotal = cardPayments.reduce((s, p) => s + p.amount, 0);
+        saveInvoiceRecord(booking, cardTotal);
+    }
 
     saveBookings();
     closeModal();
@@ -2260,6 +2432,17 @@ function addPayment() {
     });
 
     document.getElementById('paymentAmount').value = '';
+
+    // Auto-generate invoice if card payment
+    if (method === 'card') {
+        const bookingId = document.getElementById('bookingId').value;
+        if (bookingId) {
+            const b = bookings.find(x => x.id === bookingId);
+            if (b) {
+                saveInvoiceRecord(b, amount);
+            }
+        }
+    }
 
     // Auto-update payment status
     autoUpdatePaymentStatus();
@@ -2492,7 +2675,9 @@ function goToCurrentMonth() {
 }
 
 function renderCalendar() {
+    renderYearSelector();
     renderCalendarMonthTabs();
+    renderDayNumbersBar();
 
     const firstDay = new Date(calendarYear, calendarMonth, 1);
     const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
@@ -2592,6 +2777,9 @@ function searchAvailability() {
     const results = [];
 
     ROOMS.forEach(room => {
+        // Skip always-blocked rooms
+        if (room.alwaysBlocked) return;
+
         // Filter by bed type
         if (bedType !== 'any' && room.bedType !== bedType) return;
 
@@ -2667,6 +2855,9 @@ function bookFromSearch(room, checkin, checkout) {
     updateRuralSection(selectedRoom);
 
     currentPayments = [];
+    currentExtraRooms = [];
+    document.getElementById('roomType').value = 'doble';
+    renderExtraRooms();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus('pending_payment');
@@ -3606,6 +3797,7 @@ function wizardSearch() {
 
     const results = [];
     ROOMS.forEach(room => {
+        if (room.alwaysBlocked) return;
         if (type !== 'any' && room.bedType !== type) return;
         // Casa rural: guests doesn't matter
         if (room.bedType !== 'rural') {
@@ -3687,6 +3879,9 @@ function wizardBook() {
     updateRuralSection(selectedRoom);
 
     currentPayments = [];
+    currentExtraRooms = [];
+    document.getElementById('roomType').value = 'doble';
+    renderExtraRooms();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
     setPaymentStatus('pending_payment');
@@ -3767,8 +3962,8 @@ function generateInvoice() {
                 <thead><tr><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Precio ud.</th><th style="text-align:right;">Importe</th></tr></thead>
                 <tbody>
                     <tr>
-                        <td>${isRural ? 'Alquiler Casa Rural Villarrubia (casa completa)' : 'Alojamiento ' + roomLabel}<br>
-                        <span style="font-size:0.72rem;color:#666;">${b.checkin} → ${b.checkout}</span></td>
+                        <td>${isRural ? 'Alquiler Casa Rural Villarrubia (casa completa)' : 'Alojamiento ' + roomLabel}${b.roomType ? ' (' + ({individual:'Individual',doble:'Doble',triple:'Triple',cuadruple:'Cuádruple'}[b.roomType] || b.roomType) + ')' : ''}<br>
+                        <span style="font-size:0.72rem;color:#666;">${b.checkin} → ${b.checkout}</span>${(b.extraRooms && b.extraRooms.length > 0) ? '<br><span style="font-size:0.72rem;color:#666;">+ ' + b.extraRooms.length + ' hab. adicional(es)</span>' : ''}</td>
                         <td style="text-align:center;">${nights} noche${nights > 1 ? 's' : ''}</td>
                         <td style="text-align:right;">${b.pricePerNight.toFixed(2)} €</td>
                         <td style="text-align:right;">${total.toFixed(2)} €</td>
@@ -3911,7 +4106,7 @@ function formatAuditDate(isoStr) {
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); }
 });
 
 // ==================== INIT ====================
@@ -3940,9 +4135,13 @@ function sidebarNav(section) {
         case 'newBooking': openNewBooking(); break;
         case 'search': openSearchModal(); break;
         case 'block': openBlockModal(); break;
+        case 'cancellations': openCancellationsModal(); break;
         case 'income': openIncomeModal(); break;
+        case 'invoices': openInvoicesListModal(); break;
         case 'reports': openReportsModal(); break;
+        case 'pricing': openPricingModal(); break;
         case 'clients': openClientsModal(); break;
+        case 'roomConfig': openRoomConfigModal(); break;
         case 'rules': openRulesModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
@@ -3969,27 +4168,502 @@ function goToCalendarMonth(month) {
     renderCalendar();
 }
 
+function setCalendarYear(year) {
+    calendarYear = year;
+    renderCalendar();
+}
+
+function renderYearSelector() {
+    const container = document.getElementById('yearSelector');
+    if (!container) return;
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear - 1; y <= currentYear + 5; y++) years.push(y);
+    container.innerHTML = `
+        <button class="btn-outline" onclick="navigateCalendarYear(-1)" style="padding:4px 10px;">«</button>
+        ${years.map(y => `<button class="year-tab ${y === calendarYear ? 'active' : ''}" onclick="setCalendarYear(${y})">${y}</button>`).join('')}
+        <button class="btn-outline" onclick="navigateCalendarYear(1)" style="padding:4px 10px;">»</button>
+        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:8px;">Hoy</button>
+    `;
+}
+
 function renderCalendarMonthTabs() {
-    const shortMonths = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const shortMonths = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     const container = document.getElementById('calendarMonthTabs');
-    const yearTitle = document.getElementById('calendarYearTitle');
-    if (yearTitle) yearTitle.textContent = calendarYear;
     if (!container) return;
     container.innerHTML = shortMonths.map((m, i) =>
-        `<button onclick="goToCalendarMonth(${i})" style="
-            padding:5px 0; flex:1; min-width:0; border:1px solid #ccc; font-size:0.72rem;
-            font-weight:600; cursor:pointer; transition:all 0.15s;
-            background:${i === calendarMonth ? '#7B96B5' : '#f5f5f5'};
-            color:${i === calendarMonth ? 'white' : '#555'};
-            border-color:${i === calendarMonth ? '#7B96B5' : '#ccc'};
-            ${i === 0 ? 'border-radius:4px 0 0 4px;' : ''}
-            ${i === 11 ? 'border-radius:0 4px 4px 0;' : ''}
-        ">${m}</button>`
+        `<button class="month-tab ${i === calendarMonth ? 'active' : ''}" onclick="goToCalendarMonth(${i})">${m}</button>`
     ).join('');
+}
+
+function renderDayNumbersBar() {
+    const container = document.getElementById('dayNumbersBar');
+    if (!container) return;
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const today = todayStr();
+    const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    let html = '';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(calendarYear, calendarMonth, d);
+        const ds = dateStr(date);
+        const isToday = ds === today;
+        const isWe = date.getDay() === 0 || date.getDay() === 6;
+        const hasBookings = bookings.some(b => ds >= b.checkin && ds < b.checkout);
+        let cls = 'day-num-cell';
+        if (isToday) cls += ' today';
+        else if (isWe) cls += ' weekend';
+        if (hasBookings) cls += ' has-bookings';
+        html += `<div class="${cls}" onclick="showDayBookings('${ds}')" title="${ds}">
+            <span class="day-label">${dayNames[date.getDay()]}</span>
+            ${d}
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+function showDayBookings(ds) {
+    const container = document.getElementById('dayBookingsDetail');
+    const dayBookings = bookings.filter(b => ds >= b.checkin && ds < b.checkout);
+    const dayBlocks = blocks.filter(bl => ds >= bl.from && ds < bl.to);
+
+    if (dayBookings.length === 0 && dayBlocks.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    let html = `<div style="background:#fff; border:1px solid #dadce0; border-radius:8px; padding:12px; box-shadow:0 1px 2px rgba(60,64,67,0.3);">
+        <h4 style="font-size:0.85rem; color:#202124; margin-bottom:8px; font-weight:500;">Reservas del ${ds}</h4>`;
+
+    dayBookings.forEach(b => {
+        const room = ROOMS.find(r => r.number === b.room);
+        const roomLabel = room ? room.label : b.room;
+        const nights = nightsBetween(b.checkin, b.checkout);
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid #e8eaed; cursor:pointer; font-size:0.8rem;" onclick="editBooking('${b.id}')">
+            <div><strong>${b.guestName}</strong> - ${roomLabel}
+            <span style="color:#5f6368; font-size:0.72rem;"> · ${b.checkin} → ${b.checkout} (${nights}n) · ${STATUS_LABELS[b.status]}${b.createdBy ? ' · por ' + b.createdBy : ''}</span></div>
+            <div style="font-weight:500; color:#1a73e8;">${(nights * b.pricePerNight).toFixed(2)} €</div>
+        </div>`;
+    });
+
+    dayBlocks.forEach(bl => {
+        html += `<div style="padding:6px 8px; border-bottom:1px solid #e8eaed; font-size:0.8rem; color:#80868b;">
+            BLOQUEADO - Hab. ${bl.room} · ${BLOCK_REASON_LABELS[bl.reason] || bl.reason}
+        </div>`;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+    container.style.display = 'block';
+}
+
+// ==================== CANCELLATIONS MODAL ====================
+
+function openCancellationsModal() {
+    renderCancellationsList();
+    document.getElementById('cancellationsModal').classList.add('active');
+}
+
+function closeCancellationsModal() {
+    document.getElementById('cancellationsModal').classList.remove('active');
+}
+
+function renderCancellationsList() {
+    const cancelLog = JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]');
+    const container = document.getElementById('cancellationsList');
+
+    if (cancelLog.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#80868b; padding:30px; font-size:0.9rem;">No hay cancelaciones registradas</div>';
+        return;
+    }
+
+    const sorted = [...cancelLog].sort((a, b) => (b.cancelledAt || '').localeCompare(a.cancelledAt || ''));
+    container.innerHTML = sorted.map(c => {
+        const room = ROOMS.find(r => String(r.number) === String(c.room));
+        const roomLabel = room ? room.label : ('Hab. ' + c.room);
+        const cancelDate = c.cancelledAt ? formatAuditDate(c.cancelledAt) : '-';
+        return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid #e8eaed; border-radius:6px; margin-bottom:6px; background:#fff;">
+            <div>
+                <div style="font-weight:500; color:#202124; font-size:0.88rem;">${c.guestName}</div>
+                <div style="font-size:0.78rem; color:#5f6368;">${roomLabel} · ${c.checkin} → ${c.checkout}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:0.72rem; color:#d93025; font-weight:500;">Cancelada</div>
+                <div style="font-size:0.72rem; color:#80868b;">por ${c.cancelledBy} · ${cancelDate}</div>
+            </div>
+        </div>`;
+    }).join('');
+
+    // Update badge
+    const badge = document.getElementById('cancelBadge');
+    if (badge) {
+        badge.textContent = cancelLog.length;
+        badge.style.display = cancelLog.length > 0 ? 'inline-block' : 'none';
+    }
+}
+
+function updateCancelBadge() {
+    const cancelLog = JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]');
+    const badge = document.getElementById('cancelBadge');
+    if (badge) {
+        badge.textContent = cancelLog.length;
+        badge.style.display = cancelLog.length > 0 ? 'inline-block' : 'none';
+    }
+}
+
+// ==================== INVOICES LIST ====================
+
+function openInvoicesListModal() {
+    renderInvoicesList();
+    document.getElementById('invoicesListModal').classList.add('active');
+}
+
+function closeInvoicesListModal() {
+    document.getElementById('invoicesListModal').classList.remove('active');
+}
+
+function renderInvoicesList() {
+    const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
+    const container = document.getElementById('invoicesListContent');
+
+    if (invoices.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#80868b; padding:30px; font-size:0.9rem;">No hay facturas emitidas.<br>Las facturas se generan automáticamente al pagar con tarjeta.</div>';
+        return;
+    }
+
+    const sorted = [...invoices].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    container.innerHTML = `<table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+        <thead><tr style="background:#f1f3f4;">
+            <th style="padding:8px 10px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0;">N.º Factura</th>
+            <th style="padding:8px 10px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0;">Fecha</th>
+            <th style="padding:8px 10px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0;">Cliente</th>
+            <th style="padding:8px 10px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0;">Habitación</th>
+            <th style="padding:8px 10px; text-align:right; font-weight:500; border-bottom:2px solid #dadce0;">Importe</th>
+            <th style="padding:8px 10px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Método</th>
+            <th style="padding:8px 10px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Acción</th>
+        </tr></thead><tbody>` +
+    sorted.map(inv => `<tr style="border-bottom:1px solid #e8eaed;">
+        <td style="padding:8px 10px; font-weight:500;">${inv.invoiceNum}</td>
+        <td style="padding:8px 10px;">${inv.date}</td>
+        <td style="padding:8px 10px;">${inv.guestName}</td>
+        <td style="padding:8px 10px;">${inv.roomLabel || ''}</td>
+        <td style="padding:8px 10px; text-align:right; font-weight:500; color:#1a73e8;">${inv.amount.toFixed(2)} €</td>
+        <td style="padding:8px 10px; text-align:center;"><span class="pm-badge card">Tarjeta</span></td>
+        <td style="padding:8px 10px; text-align:center;"><button class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="viewSavedInvoice('${inv.bookingId}')">Ver</button></td>
+    </tr>`).join('') + '</tbody></table>';
+}
+
+function viewSavedInvoice(bookingId) {
+    closeInvoicesListModal();
+    const b = bookings.find(x => x.id === bookingId);
+    if (b) {
+        editBooking(bookingId);
+        setTimeout(() => generateInvoice(), 300);
+    }
+}
+
+function saveInvoiceRecord(booking, amount) {
+    const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
+    const room = ROOMS.find(r => r.number === booking.room);
+    const roomLabel = room ? room.label : String(booking.room);
+    const invoiceNum = 'F-' + booking.checkin.replace(/-/g, '') + '-' + String(booking.room).replace(/[^a-zA-Z0-9]/g, '');
+
+    // Don't duplicate
+    if (invoices.some(inv => inv.invoiceNum === invoiceNum)) return;
+
+    invoices.push({
+        invoiceNum,
+        date: todayStr(),
+        bookingId: booking.id,
+        guestName: booking.guestName,
+        guestDoc: booking.docNumber || '',
+        guestDocType: booking.docType || '',
+        guestPhone: booking.phone || '',
+        guestEmail: booking.email || '',
+        roomLabel,
+        room: booking.room,
+        checkin: booking.checkin,
+        checkout: booking.checkout,
+        amount,
+        method: 'card',
+        businessName: BUSINESS_DATA.name,
+        businessNif: BUSINESS_DATA.nif,
+        businessAddress: BUSINESS_DATA.address,
+        businessCity: BUSINESS_DATA.city
+    });
+
+    localStorage.setItem('hostal_jijones_invoices', JSON.stringify(invoices));
+}
+
+// ==================== ADD CLIENT MANUALLY ====================
+
+function openAddClientModal() {
+    document.getElementById('newClientName').value = '';
+    document.getElementById('newClientPhone').value = '';
+    document.getElementById('newClientEmail').value = '';
+    document.getElementById('newClientDocType').value = 'dni';
+    document.getElementById('newClientDocNumber').value = '';
+    document.getElementById('newClientNationality').value = '';
+    document.getElementById('addClientModal').classList.add('active');
+}
+
+function closeAddClientModal() {
+    document.getElementById('addClientModal').classList.remove('active');
+}
+
+function saveNewClient() {
+    const name = document.getElementById('newClientName').value.trim();
+    if (!name) return alert('Introduce el nombre del cliente.');
+
+    const phone = document.getElementById('newClientPhone').value.trim();
+    const email = document.getElementById('newClientEmail').value.trim();
+    const docType = document.getElementById('newClientDocType').value;
+    const docNumber = document.getElementById('newClientDocNumber').value.trim();
+    const nationality = document.getElementById('newClientNationality').value.trim();
+
+    upsertCustomer(name, phone, email, docType, docNumber, nationality);
+    closeAddClientModal();
+    renderClientList();
+    alert('Cliente guardado correctamente.');
+}
+
+// ==================== MULTIPLE ROOMS PER BOOKING ====================
+
+let currentExtraRooms = []; // [{room: number, roomType: 'individual'|'doble'|'triple'|'cuadruple'}]
+
+function addExtraRoom() {
+    currentExtraRooms.push({ room: '', roomType: 'doble' });
+    renderExtraRooms();
+}
+
+function removeExtraRoom(idx) {
+    currentExtraRooms.splice(idx, 1);
+    renderExtraRooms();
+}
+
+function updateExtraRoom(idx, field, value) {
+    if (currentExtraRooms[idx]) {
+        currentExtraRooms[idx][field] = field === 'room' ? (isNaN(value) ? value : parseInt(value)) : value;
+    }
+}
+
+function renderExtraRooms() {
+    const container = document.getElementById('extraRoomsList');
+    if (!container) return;
+    if (currentExtraRooms.length === 0) {
+        container.innerHTML = '<div style="font-size:0.75rem; color:#80868b; padding:4px 0;">Sin habitaciones adicionales</div>';
+        return;
+    }
+    container.innerHTML = currentExtraRooms.map((er, idx) => {
+        const roomOptions = ROOMS.map(r => `<option value="${r.number}" ${String(r.number) === String(er.room) ? 'selected' : ''}>${r.label}</option>`).join('');
+        return `<div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+            <select onchange="updateExtraRoom(${idx},'room',this.value)" style="flex:1; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.78rem; font-family:inherit;">
+                <option value="">-- Seleccionar --</option>${roomOptions}
+            </select>
+            <select onchange="updateExtraRoom(${idx},'roomType',this.value)" style="flex:0.8; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.78rem; font-family:inherit;">
+                <option value="individual" ${er.roomType === 'individual' ? 'selected' : ''}>Individual</option>
+                <option value="doble" ${er.roomType === 'doble' ? 'selected' : ''}>Doble</option>
+                <option value="triple" ${er.roomType === 'triple' ? 'selected' : ''}>Triple</option>
+                <option value="cuadruple" ${er.roomType === 'cuadruple' ? 'selected' : ''}>Cuádruple</option>
+            </select>
+            <button onclick="removeExtraRoom(${idx})" style="background:none; border:none; color:#d93025; cursor:pointer; font-size:1rem; padding:0 4px;">✕</button>
+        </div>`;
+    }).join('');
+}
+
+// ==================== PROPERTY TAB SWITCHING ====================
+
+function switchProperty(prop) {
+    currentProperty = prop;
+    document.getElementById('tabHostal').classList.toggle('active', prop === 'hostal');
+    document.getElementById('tabRural').classList.toggle('active', prop === 'rural');
+    renderGrid();
+    if (currentView === 'calendar') renderCalendar();
+}
+
+// ==================== PRICING CALENDAR ====================
+
+let pricingMonth = new Date().getMonth();
+let pricingYear = new Date().getFullYear();
+
+function loadPricing() {
+    try {
+        return JSON.parse(localStorage.getItem('hostal_jijones_pricing') || '{}');
+    } catch { return {}; }
+}
+
+function savePricingData(data) {
+    localStorage.setItem('hostal_jijones_pricing', JSON.stringify(data));
+}
+
+function openPricingModal() {
+    pricingMonth = new Date().getMonth();
+    pricingYear = new Date().getFullYear();
+    renderPricingCalendar();
+    document.getElementById('pricingModal').classList.add('active');
+}
+
+function closePricingModal() {
+    document.getElementById('pricingModal').classList.remove('active');
+}
+
+function changePricingMonth(dir) {
+    pricingMonth += dir;
+    if (pricingMonth > 11) { pricingMonth = 0; pricingYear++; }
+    if (pricingMonth < 0) { pricingMonth = 11; pricingYear--; }
+    renderPricingCalendar();
+}
+
+function getOccupancyForDate(ds) {
+    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural' && !r.alwaysBlocked);
+    const occupied = hostalRooms.filter(r => getBookingsForRoomAndDate(r.number, ds).length > 0).length;
+    return hostalRooms.length > 0 ? occupied / hostalRooms.length : 0;
+}
+
+function getPriceForDate(ds, roomType) {
+    const pricing = loadPricing();
+    const key = ds + '_' + roomType;
+    if (pricing[key]) return pricing[key];
+    // Default prices
+    const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
+    return defaults[roomType] || 55;
+}
+
+function getSuggestedPrice(ds, roomType) {
+    const basePrice = getPriceForDate(ds, roomType);
+    const d = parseDate(ds);
+    const isWe = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;
+    if (isWe) {
+        const occupancy = getOccupancyForDate(ds);
+        if (occupancy >= 0.8) {
+            return Math.round(basePrice * 1.10);
+        }
+    }
+    return basePrice;
+}
+
+function renderPricingCalendar() {
+    const label = document.getElementById('pricingMonthLabel');
+    label.textContent = MONTH_NAMES_FULL[pricingMonth] + ' ' + pricingYear;
+
+    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+    const pricing = loadPricing();
+    const roomTypes = ['individual', 'doble', 'triple', 'cuadruple'];
+    const typeLabels = { individual: 'Individual', doble: 'Doble', triple: 'Triple', cuadruple: 'Cuádruple' };
+
+    let html = `<table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+        <thead><tr style="background:#f1f3f4;">
+            <th style="padding:6px 8px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0; position:sticky; left:0; background:#f1f3f4; min-width:90px;">Día</th>`;
+    roomTypes.forEach(rt => {
+        html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">${typeLabels[rt]}</th>`;
+    });
+    html += `<th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Ocup.</th>
+        <th style="padding:6px 8px; text-align:center; font-weight:500; border-bottom:2px solid #dadce0;">Surge</th>
+    </tr></thead><tbody>`;
+
+    const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(pricingYear, pricingMonth, d);
+        const ds = dateStr(date);
+        const dayName = dayNames[date.getDay()];
+        const isWe = date.getDay() === 0 || date.getDay() === 5 || date.getDay() === 6;
+        const occ = getOccupancyForDate(ds);
+        const occPct = Math.round(occ * 100);
+        const surge = isWe && occ >= 0.8;
+        const rowBg = isWe ? 'background:#fef7f0;' : '';
+
+        html += `<tr style="${rowBg}">
+            <td style="padding:4px 8px; border-bottom:1px solid #e8eaed; font-weight:500; position:sticky; left:0; background:${isWe ? '#fef7f0' : '#fff'};">${dayName} ${d}</td>`;
+
+        roomTypes.forEach(rt => {
+            const key = ds + '_' + rt;
+            const baseVal = pricing[key] || '';
+            const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85 };
+            const placeholder = defaults[rt] || 55;
+            const surgePrice = surge ? Math.round((parseFloat(baseVal) || placeholder) * 1.10) : null;
+            html += `<td style="padding:2px 4px; border-bottom:1px solid #e8eaed; text-align:center;">
+                <input type="number" value="${baseVal}" placeholder="${placeholder}" min="0" step="1"
+                    style="width:60px; text-align:center; padding:3px; border:1px solid #dadce0; border-radius:4px; font-size:0.72rem; font-family:inherit;"
+                    onchange="updatePricingCell('${key}', this.value)">
+                ${surgePrice ? `<div style="font-size:0.6rem; color:#d93025; font-weight:500;">→ ${surgePrice}€</div>` : ''}
+            </td>`;
+        });
+
+        html += `<td style="padding:4px 8px; border-bottom:1px solid #e8eaed; text-align:center; font-weight:500; color:${occPct >= 80 ? '#d93025' : '#5f6368'};">${occPct}%</td>
+            <td style="padding:4px 8px; border-bottom:1px solid #e8eaed; text-align:center;">${surge ? '<span style="color:#d93025; font-weight:500;">+10%</span>' : '-'}</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('pricingCalendar').innerHTML = html;
+}
+
+function updatePricingCell(key, value) {
+    const pricing = loadPricing();
+    if (value && parseFloat(value) > 0) {
+        pricing[key] = parseFloat(value);
+    } else {
+        delete pricing[key];
+    }
+    savePricingData(pricing);
+}
+
+function savePricing() {
+    alert('Precios guardados correctamente.');
+    closePricingModal();
+}
+
+// ==================== ROOM CONFIG (BED TYPE TOGGLE) ====================
+
+function openRoomConfigModal() {
+    renderRoomConfigList();
+    document.getElementById('roomConfigModal').classList.add('active');
+}
+
+function closeRoomConfigModal() {
+    document.getElementById('roomConfigModal').classList.remove('active');
+}
+
+function renderRoomConfigList() {
+    const config = loadRoomConfig();
+    const hostalRooms = DEFAULT_ROOMS.filter(r => r.floor !== 'rural');
+    const container = document.getElementById('roomConfigList');
+
+    let html = '';
+    let lastFloor = 0;
+    hostalRooms.forEach(r => {
+        if (r.floor !== lastFloor) {
+            lastFloor = r.floor;
+            html += `<div style="background:#e8f0fe; padding:6px 12px; font-size:0.78rem; font-weight:500; color:#1a73e8; margin-top:${lastFloor > 1 ? '12px' : '0'};">Planta ${lastFloor}</div>`;
+        }
+        const currentType = config[r.number] || r.bedType;
+        const isDouble = currentType === 'double';
+        const isBlocked = r.alwaysBlocked;
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #e8eaed;">
+            <div>
+                <span style="font-weight:500; color:#202124;">Habitación ${r.number}</span>
+                ${isBlocked ? '<span style="font-size:0.68rem; color:#e8710a; margin-left:6px;">USO PERSONAL</span>' : ''}
+            </div>
+            <div style="display:flex; gap:4px;">
+                <button onclick="setRoomBedType(${r.number}, 'double')" class="${isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️ Matrimonio</button>
+                <button onclick="setRoomBedType(${r.number}, 'twin')" class="${!isDouble ? 'btn-primary' : 'btn-outline'}" style="font-size:0.72rem; padding:4px 12px;">🛏️🛏️ Dos camas</button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function setRoomBedType(roomNumber, bedType) {
+    const config = loadRoomConfig();
+    config[roomNumber] = bedType;
+    saveRoomConfig(config);
+    // Rebuild ROOMS array
+    ROOMS = buildRooms();
+    renderRoomConfigList();
+    renderGrid();
 }
 
 function init() {
     loadBookings();
+    ROOMS = buildRooms(); // Rebuild with saved config
     populateRoomSelect();
     populateBlockRoomSelect();
 
@@ -4002,6 +4676,7 @@ function init() {
         `${DAY_NAMES[today.getDay()]} ${today.getDate()} ${MONTH_NAMES[today.getMonth()]} ${today.getFullYear()}`;
 
     updateSidebarUser();
+    updateCancelBadge();
     renderGrid();
 }
 
@@ -4095,6 +4770,101 @@ renderLoginScreen();
         <div class="form-actions" style="margin-top:15px;">
             <button class="btn-primary" onclick="printInvoice()" style="margin-right:auto;">Imprimir / PDF</button>
             <button class="btn-secondary" onclick="closeInvoiceModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cancelaciones -->
+<div class="modal-overlay" id="cancellationsModal">
+    <div class="modal" style="width:700px;">
+        <h2>Registro de Cancelaciones</h2>
+        <div id="cancellationsList" style="max-height:500px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeCancellationsModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Facturas Emitidas -->
+<div class="modal-overlay" id="invoicesListModal">
+    <div class="modal" style="width:750px;">
+        <h2>Facturas Emitidas</h2>
+        <div id="invoicesListContent" style="max-height:500px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeInvoicesListModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Añadir Cliente Manual -->
+<div class="modal-overlay" id="addClientModal">
+    <div class="modal" style="width:500px;">
+        <h2>Añadir Cliente</h2>
+        <div class="form-group">
+            <label>Nombre completo *</label>
+            <input type="text" id="newClientName" placeholder="Nombre y apellidos">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="tel" id="newClientPhone" placeholder="+34 600 000 000">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="newClientEmail" placeholder="email@ejemplo.com">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="flex:0.8;">
+                <label>Tipo documento</label>
+                <select id="newClientDocType">
+                    <option value="dni">DNI</option>
+                    <option value="nie">NIE</option>
+                    <option value="passport">Pasaporte</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex:1.2;">
+                <label>Número documento</label>
+                <input type="text" id="newClientDocNumber" placeholder="12345678A">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Nacionalidad</label>
+            <input type="text" id="newClientNationality" placeholder="Española">
+        </div>
+        <div class="form-actions">
+            <button class="btn-secondary" onclick="closeAddClientModal()">Cancelar</button>
+            <button class="btn-success" onclick="saveNewClient()">Guardar Cliente</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Precios -->
+<div class="modal-overlay" id="pricingModal">
+    <div class="modal" style="width:850px;">
+        <h2>Gestión de Precios</h2>
+        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Configura los precios base por tipo de habitación y día. Los fines de semana/festivos con +80% de ocupación se incrementan automáticamente un 10%.</p>
+        <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
+            <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
+            <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:500; color:#202124;"></h4>
+            <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
+        </div>
+        <div id="pricingCalendar" style="max-height:450px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar Precios</button>
+            <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Config Habitaciones -->
+<div class="modal-overlay" id="roomConfigModal">
+    <div class="modal" style="width:600px;">
+        <h2>Configuración de Habitaciones</h2>
+        <p style="font-size:0.78rem; color:#5f6368; margin-bottom:12px;">Selecciona si cada habitación tiene cama de matrimonio o dos camas. Los cambios se guardan automáticamente.</p>
+        <div id="roomConfigList" style="max-height:450px; overflow-y:auto;"></div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeRoomConfigModal()">Cerrar</button>
         </div>
     </div>
 </div>
