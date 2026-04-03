@@ -1305,40 +1305,25 @@
                 </div>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>¿Cuántas habitaciones? *</label>
-                <select id="roomCount" onchange="onRoomCountChange()">
-                    <option value="1" selected>1 habitación</option>
-                    <option value="2">2 habitaciones</option>
-                    <option value="3">3 habitaciones</option>
-                    <option value="4">4 habitaciones</option>
-                    <option value="5">5 habitaciones</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ocupación</label>
-                <select id="roomType" onchange="onRoomCountChange()">
-                    <option value="individual">Individual (1 persona)</option>
-                    <option value="doble" selected>Doble (2 personas)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Supletorios</label>
-                <select id="extraBeds" onchange="onRoomCountChange()">
-                    <option value="0" selected>Sin supletorio</option>
-                    <option value="1">1 supletorio (+15€)</option>
-                    <option value="2">2 supletorios (+30€)</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label>¿Cuántas habitaciones? *</label>
+            <select id="roomCount" onchange="onRoomCountChange()">
+                <option value="1" selected>1 habitación</option>
+                <option value="2">2 habitaciones</option>
+                <option value="3">3 habitaciones</option>
+                <option value="4">4 habitaciones</option>
+                <option value="5">5 habitaciones</option>
+            </select>
         </div>
-        <!-- Room assignments generated dynamically -->
+        <!-- Room assignments generated dynamically - each with its own occupancy & extras -->
         <div id="roomAssignments" style="background:#f7f7f7; border:1px solid #ebebeb; border-radius:12px; padding:14px; margin-bottom:14px;">
             <label style="font-weight:600; font-size:0.8rem; color:#222; margin-bottom:8px; display:block;">Asignación de habitaciones</label>
             <div id="roomAssignmentsList"></div>
         </div>
         <input type="hidden" id="bookingRoom" value="">
         <input type="hidden" id="guestCount" value="2">
+        <input type="hidden" id="roomType" value="doble">
+        <input type="hidden" id="extraBeds" value="0">
         <div class="form-row">
             <div class="form-group">
                 <label>Check-in *</label>
@@ -1413,15 +1398,8 @@
                     <label style="font-size:0.75rem">Importe (€)</label>
                     <input type="number" id="paymentAmount" min="0" step="0.01" placeholder="0.00">
                 </div>
-                <div class="form-group" style="flex:0.9">
-                    <label style="font-size:0.75rem">Tipo</label>
-                    <select id="paymentType">
-                        <option value="deposit">Seña/Anticipo</option>
-                        <option value="partial">Pago parcial</option>
-                        <option value="full">Pago final</option>
-                    </select>
-                </div>
-                <div class="form-group" style="flex:0.7">
+                <input type="hidden" id="paymentType" value="full">
+                <div class="form-group" style="flex:0.8">
                     <label style="font-size:0.75rem">Método</label>
                     <select id="paymentMethod">
                         <option value="cash">Efectivo</option>
@@ -2333,15 +2311,25 @@ function editBooking(id) {
     document.getElementById('roomCount').value = extraCount;
     currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
     renderRoomAssignments();
-    // Set room values after rendering
+    // Set room values after rendering (room 0 = main room)
     const mainSel = document.getElementById('roomAssign_0');
     if (mainSel) mainSel.value = b.room;
+    const mainOcc = document.getElementById('roomOcc_0');
+    if (mainOcc) mainOcc.value = b.roomType || 'doble';
+    const mainExt = document.getElementById('roomExt_0');
+    if (mainExt) mainExt.value = b.extraBeds || '0';
+    // Extra rooms
     if (b.extraRooms) {
         b.extraRooms.forEach((er, idx) => {
             const sel = document.getElementById('roomAssign_' + (idx + 1));
             if (sel) sel.value = er.room;
+            const occ = document.getElementById('roomOcc_' + (idx + 1));
+            if (occ) occ.value = er.roomType || 'doble';
+            const ext = document.getElementById('roomExt_' + (idx + 1));
+            if (ext) ext.value = er.extraBeds || '0';
         });
     }
+    updateGuestCount();
 
     currentPayments = JSON.parse(JSON.stringify(b.payments || []));
     document.getElementById('paymentStatus').value = b.paymentStatus || 'pending_payment';
@@ -2448,7 +2436,7 @@ function saveBooking() {
         guestName: name,
         phone, email, docType, docNumber, nationality,
         room, roomType, extraBeds,
-        extraRooms: getAssignedRooms().slice(1).map(r => ({ room: r, roomType: document.getElementById('roomType').value })),
+        extraRooms: getAssignedRoomsDetail().slice(1),
         checkin, checkout, status, pricePerNight: price,
         guests: parseInt(document.getElementById('guestCount').value),
         notes: document.getElementById('bookingNotes').value.trim(),
@@ -4764,13 +4752,27 @@ function setViewRange(days) {
 // ==================== ROOM COUNT / ASSIGNMENT ====================
 
 function onRoomCountChange() {
-    const count = parseInt(document.getElementById('roomCount').value) || 1;
-    const type = document.getElementById('roomType').value;
-    const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
-    const baseGuests = type === 'individual' ? 1 : 2;
-    document.getElementById('guestCount').value = count * (baseGuests + extraBeds);
     renderRoomAssignments();
+    updateGuestCount();
     calculatePrice();
+}
+
+function updateGuestCount() {
+    const count = parseInt(document.getElementById('roomCount').value) || 1;
+    let total = 0;
+    for (let i = 0; i < count; i++) {
+        const occ = document.getElementById('roomOcc_' + i);
+        const ext = document.getElementById('roomExt_' + i);
+        const base = occ ? (occ.value === 'individual' ? 1 : 2) : 2;
+        const extra = ext ? parseInt(ext.value) || 0 : 0;
+        total += base + extra;
+    }
+    document.getElementById('guestCount').value = total;
+    // Sync hidden fields with first room
+    const occ0 = document.getElementById('roomOcc_0');
+    const ext0 = document.getElementById('roomExt_0');
+    if (occ0) document.getElementById('roomType').value = occ0.value;
+    if (ext0) document.getElementById('extraBeds').value = ext0.value;
 }
 
 function renderRoomAssignments() {
@@ -4789,27 +4791,38 @@ function renderRoomAssignments() {
 
     let html = '';
     for (let i = 0; i < count; i++) {
-        const label = count === 1 ? 'Habitación' : `Habitación ${i + 1}`;
+        const label = count === 1 ? 'Habitación' : `Hab. ${i + 1}`;
         const roomOptions = availableRooms.map(r =>
             `<option value="${r.number}">${r.label}</option>`
         ).join('');
-        html += `<div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-            <span style="font-size:0.75rem; color:#717171; min-width:70px; font-weight:500;">${label}</span>
-            <select id="roomAssign_${i}" style="flex:1; padding:8px 10px; border:1px solid #b0b0b0; border-radius:8px; font-size:0.8rem; font-family:inherit;"
-                onchange="updateMainRoom()">
-                ${roomOptions}
-            </select>
+        html += `<div style="padding:8px 0; ${i > 0 ? 'border-top:1px solid #ebebeb;' : ''}">
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <span style="font-size:0.75rem; color:#717171; min-width:44px; font-weight:600;">${label}</span>
+                <select id="roomAssign_${i}" style="flex:1; min-width:100px; padding:8px; border:1px solid #b0b0b0; border-radius:8px; font-size:0.78rem; font-family:inherit;"
+                    onchange="updateMainRoom()">
+                    ${roomOptions}
+                </select>
+                <select id="roomOcc_${i}" style="width:90px; padding:8px; border:1px solid #b0b0b0; border-radius:8px; font-size:0.72rem; font-family:inherit;"
+                    onchange="updateGuestCount();calculatePrice()">
+                    <option value="individual">1 pers.</option>
+                    <option value="doble" selected>2 pers.</option>
+                </select>
+                <select id="roomExt_${i}" style="width:110px; padding:8px; border:1px solid #b0b0b0; border-radius:8px; font-size:0.72rem; font-family:inherit;"
+                    onchange="updateGuestCount();calculatePrice()">
+                    <option value="0">Sin suplet.</option>
+                    <option value="1">+1 suplet.</option>
+                    <option value="2">+2 suplet.</option>
+                </select>
+            </div>
         </div>`;
     }
     container.innerHTML = html;
 
     // Auto-assign different rooms
-    const selects = [];
-    for (let i = 0; i < count; i++) {
-        selects.push(document.getElementById('roomAssign_' + i));
-    }
     const usedRooms = new Set();
-    selects.forEach((sel, idx) => {
+    for (let i = 0; i < count; i++) {
+        const sel = document.getElementById('roomAssign_' + i);
+        if (!sel) continue;
         for (let j = 0; j < sel.options.length; j++) {
             if (!usedRooms.has(sel.options[j].value)) {
                 sel.selectedIndex = j;
@@ -4817,8 +4830,9 @@ function renderRoomAssignments() {
                 break;
             }
         }
-    });
+    }
     updateMainRoom();
+    updateGuestCount();
 }
 
 function updateMainRoom() {
@@ -4836,6 +4850,24 @@ function getAssignedRooms() {
         if (sel && sel.value) {
             const val = sel.value;
             rooms.push(isNaN(val) ? val : parseInt(val));
+        }
+    }
+    return rooms;
+}
+
+function getAssignedRoomsDetail() {
+    const count = parseInt(document.getElementById('roomCount').value) || 1;
+    const rooms = [];
+    for (let i = 0; i < count; i++) {
+        const sel = document.getElementById('roomAssign_' + i);
+        const occ = document.getElementById('roomOcc_' + i);
+        const ext = document.getElementById('roomExt_' + i);
+        if (sel && sel.value) {
+            rooms.push({
+                room: isNaN(sel.value) ? sel.value : parseInt(sel.value),
+                roomType: occ ? occ.value : 'doble',
+                extraBeds: ext ? parseInt(ext.value) || 0 : 0
+            });
         }
     }
     return rooms;
