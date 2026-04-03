@@ -92,6 +92,13 @@
         }
         .room-header .room-number { font-size: 0.72rem; color: #222; font-weight: 600; }
         .room-header .room-type { font-size: 0.58rem; color: #717171; display: block; font-weight: 400; }
+        .room-header.room-dirty { border-left: 4px solid #C13515; background: #FFF5F5; }
+        .room-header.room-clean { border-left: 4px solid #008A05; background: #F5FFF5; }
+        .room-header.room-attention { border-left: 4px solid #1A73E8; background: #F0F6FF; }
+        .room-header .room-status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 3px; vertical-align: middle; }
+        .room-header .room-status-dot.dirty { background: #C13515; }
+        .room-header .room-status-dot.clean { background: #008A05; }
+        .room-header .room-status-dot.needs-attention { background: #1A73E8; }
 
         .floor-separator td, .floor-separator th {
             background: #f7f7f7 !important; color: #222; font-weight: 600;
@@ -856,182 +863,131 @@
 
         /* Tablet portrait — sidebar becomes overlay */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-            }
+            .sidebar { width: 220px; transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+            .sidebar:hover { width: 220px; }
             .sidebar.open { transform: translateX(0); }
             .sidebar-close { display: block; }
-            .main-content { margin-left: 0; }
+            .main-content { margin-left: 0 !important; }
             .hamburger-btn { display: block; }
 
-            header { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
-            header h1 { font-size: 1.2rem; }
-            header .subtitle { font-size: 0.75rem; }
+            header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+            header h1 { font-size: 1rem; }
+            .header-search { min-width: 150px !important; max-width: none !important; }
+            .view-toggle button { padding: 6px 12px; font-size: 0.72rem; }
 
-            .toolbar {
-                padding: 8px 10px; gap: 8px;
-            }
+            .toolbar { padding: 6px 10px; gap: 6px; }
             .toolbar label { display: none; }
-            .toolbar button { padding: 6px 10px; font-size: 0.78rem; }
-            .toolbar input[type="date"] { font-size: 0.78rem; padding: 5px 6px; max-width: 130px; }
-            .toolbar select { font-size: 0.78rem; padding: 5px 4px; }
-            .nav-arrows button { padding: 6px 8px; font-size: 0.9rem; }
-            .legend { display: none; }
-            .view-toggle button { padding: 5px 10px; font-size: 0.72rem; }
+            .toolbar button { padding: 8px 14px; font-size: 0.75rem; }
+            .toolbar input[type="date"] { font-size: 0.75rem; padding: 6px; max-width: 120px; }
+            .toolbar select { font-size: 0.75rem; padding: 6px; }
+            .nav-arrows button { padding: 6px 8px; }
 
-            .grid-container { padding: 8px; }
-            .calendar-container { padding: 10px; }
-            .calendar-nav h3 { font-size: 0.95rem; min-width: 140px; }
-            .calendar-grid .cal-day { min-height: 60px; padding: 2px; }
-            .calendar-grid .cal-day .day-num { font-size: 0.7rem; }
-            .calendar-grid .cal-day .cal-booking { font-size: 0.55rem; }
-            .calendar-grid .cal-header { padding: 5px; font-size: 0.7rem; }
+            .year-month-selector { padding: 8px 10px; }
+            .year-selector { gap: 4px; flex-wrap: wrap; }
+            .year-tab { padding: 4px 10px; font-size: 0.7rem; }
+            .month-tabs { gap: 0; }
+            .month-tab { font-size: 0.62rem; padding: 5px 0; }
 
-            .modal { padding: 20px 15px; width: 98vw; max-height: 95vh; border-radius: 10px; }
-            .modal h2 { font-size: 1.05rem; margin-bottom: 14px; }
+            .grid-container { padding: 4px; }
+            table.booking-grid thead th { padding: 4px 2px; min-width: 32px; font-size: 0.6rem; }
+            table.booking-grid thead th.corner { min-width: 44px; max-width: 50px; }
+            td.day-cell { height: 32px; min-width: 32px; }
+            .room-header { min-width: 44px; max-width: 50px; padding: 2px 4px; }
+            .room-header .room-number { font-size: 0.65rem; }
+            .room-header .room-type { font-size: 0.5rem; }
+            .booking-block { font-size: 0.55rem; }
+            .floor-separator td, .floor-separator th { font-size: 0.62rem; padding: 3px 6px; }
+
+            .modal { padding: 16px 12px; width: 98vw; max-height: 95vh; border-radius: 12px; }
+            .modal h2 { font-size: 1rem; margin-bottom: 12px; }
             .form-row { flex-direction: column; gap: 0; }
             .form-row .form-group { flex: none; }
             .form-group { margin-bottom: 10px; }
-            .form-group label { font-size: 0.8rem; }
-            .form-group input, .form-group select, .form-group textarea { font-size: 0.85rem; padding: 8px 10px; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.85rem; padding: 10px; }
             .form-actions { flex-wrap: wrap; gap: 8px; }
-            .form-actions button { flex: 1; min-width: 100px; }
+            .form-actions button { flex: 1; min-width: 80px; }
 
             .add-payment-row { flex-wrap: wrap; }
-            .add-payment-row .form-group { flex: 1 1 45% !important; min-width: 100px; }
+            .add-payment-row .form-group { flex: 1 1 45% !important; min-width: 90px; }
             .btn-add-payment { width: 100%; margin-top: 4px; }
-
             .payment-section { padding: 10px; }
-            .payment-status-badges { gap: 4px; }
-            .payment-badge { padding: 4px 8px; font-size: 0.7rem; }
-
-            .confirm-actions { gap: 6px; }
-            .confirm-actions button { flex: 1; min-width: 80px; font-size: 0.72rem; padding: 6px 8px; }
+            .payment-badge { padding: 6px 10px; font-size: 0.7rem; }
 
             .doc-section { padding: 10px; }
             .doc-section .form-row { flex-direction: column; gap: 0; }
-
-            .rural-section { padding: 10px; }
             .rural-section .form-row { flex-direction: column; gap: 0; }
 
-            .search-form { flex-direction: column; }
-            .search-form .form-group { width: 100% !important; min-width: 0 !important; }
-            .search-result-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .wiz-choice { padding: 10px 16px; font-size: 0.82rem; }
 
-            .client-card { flex-direction: column; align-items: flex-start; gap: 4px; }
-            .stay-item { flex-direction: column; align-items: flex-start; gap: 2px; }
-
-            .income-totals { gap: 8px; }
-            .income-total-card { min-width: 120px; padding: 8px; }
-            .income-total-card .label { font-size: 0.68rem; }
-            .income-total-card .value { font-size: 0.9rem; }
-
-            .chart-label { width: 40px; font-size: 0.7rem; }
-            .chart-value { width: 50px; font-size: 0.68rem; }
-            .chart-bar-fill { font-size: 0.62rem; }
-            .ic-values { width: 90px; font-size: 0.62rem; }
-
-            .stats-bar { padding: 8px 10px; gap: 10px; flex-wrap: wrap; font-size: 0.72rem; }
-
+            .stats-bar { padding: 6px 10px; gap: 8px; flex-wrap: wrap; font-size: 0.68rem; }
             .wizard-modal { width: 98vw; }
-            .wizard-steps { gap: 0; }
-            .wizard-step { font-size: 0.65rem; padding: 6px 2px; }
-            .wizard-room-card { flex-direction: column; align-items: flex-start; gap: 4px; }
-
-            .login-box { width: 92vw; padding: 25px 20px; }
-
-            .invoice-preview { padding: 15px; font-size: 0.75rem; }
-            .invoice-preview .inv-header { flex-direction: column; gap: 10px; }
-            .invoice-preview .inv-number { text-align: left; }
-            .invoice-preview th, .invoice-preview td { padding: 5px 4px; font-size: 0.72rem; }
-
+            .login-box { width: 94vw; padding: 24px 16px; }
             .user-indicator { display: none; }
-
-            .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 15px; right: 15px; }
+            .fab-btn { width: 48px; height: 48px; font-size: 1.5rem; bottom: 12px; right: 12px; }
+            .income-totals { gap: 6px; }
+            .income-total-card { min-width: 100px; padding: 8px; }
         }
 
         /* Mobile small */
         @media (max-width: 480px) {
-            header { padding: 8px 10px; }
-            header h1 { font-size: 1rem; }
-            header .subtitle { display: none; }
+            header { padding: 6px 8px; gap: 4px; }
+            header h1 { font-size: 0.9rem; }
+            .header-search { height: 32px; min-width: 100px !important; }
+            .header-search input { font-size: 0.72rem; }
 
-            .toolbar { padding: 6px 8px; gap: 6px; }
-            .toolbar button { padding: 5px 7px; font-size: 0.7rem; }
-            .toolbar input[type="date"] { max-width: 110px; font-size: 0.72rem; }
+            .toolbar { padding: 4px 6px; gap: 4px; }
+            .toolbar button { padding: 6px 10px; font-size: 0.68rem; }
+            .toolbar input[type="date"] { max-width: 100px; font-size: 0.68rem; padding: 5px; }
             .nav-arrows { gap: 2px; }
-            .nav-arrows button { padding: 5px 6px; font-size: 0.8rem; }
+            .nav-arrows button { padding: 4px 6px; font-size: 0.75rem; }
 
-            .grid-container { padding: 4px; }
-            table.booking-grid th, table.booking-grid td { font-size: 0.65rem; }
-            table.booking-grid thead th { padding: 5px 2px; min-width: 30px; }
-            td.day-cell { height: 30px; min-width: 30px; }
-            .room-header { padding: 4px 6px; min-width: 80px; }
-            .room-header .room-number { font-size: 0.72rem; }
-            .room-header .room-type { font-size: 0.6rem; }
-            .booking-block { font-size: 0.6rem; }
-            .floor-separator td, .floor-separator th { font-size: 0.7rem; padding: 3px 6px; }
+            .year-tab { padding: 3px 8px; font-size: 0.62rem; }
+            .month-tab { font-size: 0.55rem; padding: 4px 0; }
 
-            .calendar-container { padding: 4px; }
-            .calendar-nav { gap: 6px; margin-bottom: 8px; }
-            .calendar-nav h3 { font-size: 0.85rem; min-width: 110px; }
-            .calendar-grid .cal-day { min-height: 45px; }
-            .calendar-grid .cal-day .cal-booking { font-size: 0.5rem; padding: 0 2px; }
-            .calendar-grid .cal-header { font-size: 0.6rem; padding: 4px 2px; }
+            .grid-container { padding: 2px; }
+            table.booking-grid thead th { padding: 3px 1px; min-width: 28px; font-size: 0.55rem; }
+            table.booking-grid thead th.corner { min-width: 38px; max-width: 42px; }
+            td.day-cell { height: 28px; min-width: 28px; }
+            .room-header { min-width: 38px; max-width: 42px; padding: 2px 3px; }
+            .room-header .room-number { font-size: 0.6rem; }
+            .room-header .room-type { display: none; }
+            .booking-block { font-size: 0.5rem; }
 
-            .modal { padding: 15px 10px; border-radius: 8px; }
-            .modal h2 { font-size: 0.95rem; margin-bottom: 10px; }
-            .form-group input, .form-group select, .form-group textarea { font-size: 0.82rem; padding: 7px 8px; }
-
-            .stats-bar { gap: 6px; font-size: 0.65rem; padding: 6px 8px; }
-            .stat { gap: 3px; }
-
-            .report-tabs, .income-tabs, .checklist-tabs { flex-wrap: wrap; }
-            .report-tab, .income-tab, .checklist-tab { font-size: 0.72rem; padding: 5px 10px; }
-
-            .rank-table { font-size: 0.68rem; }
-            .rank-table th, .rank-table td { padding: 4px 3px; }
-            .rank-bar-cell { display: none; }
-
-            .payment-item { font-size: 0.7rem; flex-wrap: wrap; }
-            .payment-summary { flex-direction: column; gap: 2px; font-size: 0.75rem; }
-
-            .checklist-item { gap: 6px; font-size: 0.75rem; }
-            .checklist-item .item-note { width: 90px; font-size: 0.68rem; }
-            .checklist-item .item-qty { width: 35px; font-size: 0.68rem; }
-
-            .audit-info { font-size: 0.65rem; padding: 6px 8px; }
-
-            .login-box { padding: 20px 15px; }
-            .login-box h1 { font-size: 1.3rem; }
-            .user-card { padding: 10px 12px; }
-            .user-card .user-avatar { width: 34px; height: 34px; font-size: 0.85rem; }
-            .pin-input { width: 140px; font-size: 1.1rem; }
+            .modal { padding: 12px 8px; }
+            .modal h2 { font-size: 0.9rem; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.8rem; padding: 8px; }
+            .stats-bar { gap: 4px; font-size: 0.6rem; padding: 4px 6px; }
+            .wiz-choice { padding: 8px 12px; font-size: 0.75rem; min-width: 44px; }
+            .login-box { padding: 16px 12px; }
+            .login-box h1 { font-size: 1.1rem; }
+            .user-card .user-avatar { width: 32px; height: 32px; font-size: 0.8rem; }
+            .pin-input { width: 130px; font-size: 1rem; }
+            .fab-btn { width: 44px; height: 44px; font-size: 1.3rem; bottom: 10px; right: 10px; }
         }
 
         /* Very small mobile */
         @media (max-width: 360px) {
-            header h1 { font-size: 0.9rem; }
-            .toolbar button { font-size: 0.65rem; padding: 4px 5px; }
-            .modal { padding: 12px 8px; }
-            .form-group label { font-size: 0.72rem; }
-            .calendar-grid .cal-day { min-height: 36px; }
-            .calendar-grid .cal-day .day-num { font-size: 0.6rem; }
-            .calendar-grid .cal-day .cal-booking { display: none; }
-            .fab-btn { width: 44px; height: 44px; font-size: 1.3rem; bottom: 10px; right: 10px; }
+            header h1 { font-size: 0.8rem; }
+            .header-search { display: none; }
+            .view-toggle { display: none; }
+            .toolbar button { font-size: 0.6rem; padding: 4px 6px; }
+            .year-selector { display: none; }
+            .month-tab { font-size: 0.5rem; }
+            .modal { padding: 10px 6px; }
+            table.booking-grid thead th { min-width: 24px; }
+            td.day-cell { min-width: 24px; height: 24px; }
         }
 
         /* Touch device improvements */
         @media (hover: none) and (pointer: coarse) {
-            .toolbar button { min-height: 40px; }
-            td.day-cell { min-height: 38px; }
-            .form-group input, .form-group select { min-height: 42px; }
-            .payment-badge { min-height: 36px; display: flex; align-items: center; }
-            .wizard-room-card { padding: 14px 12px; }
+            .toolbar button { min-height: 38px; }
+            td.day-cell { min-height: 36px; }
+            .form-group input, .form-group select { min-height: 44px; font-size: 16px !important; }
+            .wiz-choice { min-height: 44px; }
             .client-card { padding: 14px; }
             .user-card { padding: 14px 16px; }
             .btn-login { min-height: 44px; }
+            .sidebar-item { padding: 12px 16px; }
         }
 
         /* Safe area for devices with notch */
@@ -1071,7 +1027,7 @@
         <div class="login-subtitle">Selecciona tu usuario e introduce el PIN</div>
         <div class="user-cards" id="userCards"></div>
         <div class="pin-input-group" id="pinGroup">
-            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="····" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()">
+            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="····" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
             <div class="login-error" id="loginError"></div>
             <button class="btn-login" onclick="doLogin()">Entrar</button>
         </div>
@@ -1361,12 +1317,18 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Personas por habitación</label>
+                <label>Ocupación</label>
                 <select id="roomType" onchange="onRoomCountChange()">
-                    <option value="individual">1 persona</option>
-                    <option value="doble" selected>2 personas</option>
-                    <option value="triple">3 personas</option>
-                    <option value="cuadruple">4 personas</option>
+                    <option value="individual">Individual (1 persona)</option>
+                    <option value="doble" selected>Doble (2 personas)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Supletorios</label>
+                <select id="extraBeds" onchange="onRoomCountChange()">
+                    <option value="0" selected>Sin supletorio</option>
+                    <option value="1">1 supletorio (+15€)</option>
+                    <option value="2">2 supletorios (+30€)</option>
                 </select>
             </div>
         </div>
@@ -1398,7 +1360,7 @@
             </div>
             <div class="form-group">
                 <label>Precio/noche (€)</label>
-                <input type="number" id="pricePerNight" value="55" min="0" step="0.5" onchange="calculatePrice()">
+                <input type="number" id="pricePerNight" value="48" min="0" step="0.5" onchange="calculatePrice()">
             </div>
         </div>
         <div class="form-group">
@@ -1699,9 +1661,11 @@ const BUSINESS_DATA = {
     tradeName: 'Hostal Jijones'
 };
 const USERS = [
-    { id: 'admin', name: 'Administrador', pin: '1101', role: 'admin', color: '#6A85A3' },
-    { id: 'carmen', name: 'Carmen', pin: '1001', role: 'recepción', color: '#AECFE0' },
-    { id: 'lucia', name: 'Lucía', pin: '1002', role: 'recepción', color: '#C0AD94' }
+    { id: 'ricardo', name: 'Ricardo', pin: '2601', role: 'admin', color: '#FF385C' },
+    { id: 'rosa', name: 'Rosa', pin: '1609', role: 'recepción', color: '#6B4FA0' },
+    { id: 'alba', name: 'Alba', pin: '100A', role: 'recepción', color: '#008A05' },
+    { id: 'laura', name: 'Laura', pin: '100L', role: 'recepción', color: '#F5A623' },
+    { id: 'carmen', name: 'Carmen', pin: '100C', role: 'recepción', color: '#1a73e8' }
 ];
 let currentUser = null;
 
@@ -1881,8 +1845,75 @@ function getBlocksForRoomAndDate(roomNumber, date) {
     );
 }
 
-function isRoomAvailable(roomNumber, checkin, checkout) {
-    return !hasConflict(roomNumber, checkin, checkout, null);
+function isRoomAvailable(roomNumber, checkin, checkout, excludeId) {
+    return !hasConflict(roomNumber, checkin, checkout, excludeId || null);
+}
+
+// ==================== ROOM CLEANING STATUS ====================
+
+let roomStatusData = {};
+
+function loadRoomStatus() {
+    try {
+        roomStatusData = JSON.parse(localStorage.getItem('hostal_jijones_room_status') || '{}');
+    } catch { roomStatusData = {}; }
+}
+
+function saveRoomStatus() {
+    localStorage.setItem('hostal_jijones_room_status', JSON.stringify(roomStatusData));
+}
+
+function toggleRoomStatus(roomNumber) {
+    const today = todayStr();
+    const current = roomStatusData[roomNumber];
+    const currentStatus = (current && current.date === today) ? current.status : null;
+    const cycle = [null, 'dirty', 'clean', 'needs-attention'];
+    const idx = cycle.indexOf(currentStatus);
+    const next = cycle[(idx + 1) % cycle.length];
+    if (next) {
+        roomStatusData[roomNumber] = { status: next, date: today };
+    } else {
+        delete roomStatusData[roomNumber];
+    }
+    saveRoomStatus();
+    renderGrid();
+}
+
+function getRoomStatusClass(roomNumber) {
+    const today = todayStr();
+    const entry = roomStatusData[roomNumber];
+    if (!entry || entry.date !== today) return '';
+    if (entry.status === 'dirty') return 'room-dirty';
+    if (entry.status === 'clean') return 'room-clean';
+    if (entry.status === 'needs-attention') return 'room-attention';
+    return '';
+}
+
+function getRoomStatusDot(roomNumber) {
+    const today = todayStr();
+    const entry = roomStatusData[roomNumber];
+    if (!entry || entry.date !== today) return '';
+    return `<span class="room-status-dot ${entry.status}"></span>`;
+}
+
+// ==================== PRICING HELPERS ====================
+
+function getBasePrice(checkin, checkout, roomType) {
+    if (!checkin || !checkout || checkout <= checkin) return 0;
+    let total = 0;
+    let d = parseDate(checkin);
+    const end = parseDate(checkout);
+    while (d < end) {
+        const dow = d.getDay(); // 0=Sun,1=Mon,...,6=Sat
+        const isWeekendNight = (dow === 5 || dow === 6); // Fri/Sat nights
+        if (roomType === 'individual') {
+            total += isWeekendNight ? 49 : 38.50;
+        } else {
+            total += isWeekendNight ? 58 : 48;
+        }
+        d = addDays(d, 1);
+    }
+    return total;
 }
 
 // ==================== GRID RENDERING ====================
@@ -1933,7 +1964,9 @@ function renderGrid() {
 
         const bedLabel = room.bedType === 'rural' ? 'Rural' : ({double:'Matrim.', twin:'2 camas', triple:'Triple', quadruple:'Cuádr.'}[room.bedType] || 'Matrim.');
         const roomDisplay = room.bedType === 'rural' ? 'CR1' : `${room.number}`;
-        html += `<tr><td class="room-header"><span class="room-number">${roomDisplay}</span><span class="room-type">${bedLabel}</span></td>`;
+        const statusClass = getRoomStatusClass(room.number);
+        const statusDot = getRoomStatusDot(room.number);
+        html += `<tr><td class="room-header ${statusClass}" onclick="toggleRoomStatus(${typeof room.number === 'string' ? "'" + room.number + "'" : room.number})" style="cursor:pointer;" title="Clic para cambiar estado de limpieza"><span class="room-number">${roomDisplay}${statusDot}</span><span class="room-type">${bedLabel}</span></td>`;
 
         dates.forEach(ds => {
             const matches = getBookingsForRoomAndDate(room.number, ds);
@@ -2115,6 +2148,14 @@ function quickCheckOut(bookingId) {
     b.updatedBy = currentUser ? currentUser.name : 'Sistema';
     if (!b.history) b.history = [];
     b.history.push({ action: 'check-out rápido', user: b.updatedBy, date: b.updatedAt });
+    // Set room to dirty after checkout
+    roomStatusData[b.room] = { status: 'dirty', date: todayStr() };
+    if (b.extraRooms) {
+        b.extraRooms.forEach(er => {
+            roomStatusData[er.room] = { status: 'dirty', date: todayStr() };
+        });
+    }
+    saveRoomStatus();
     saveBookings();
     closeQuickActions();
     renderGrid();
@@ -2179,7 +2220,7 @@ function updateRuralSection(room) {
         document.getElementById('guestCount').value = '16';
         // Only change price if it's the default hostel price
         const priceEl = document.getElementById('pricePerNight');
-        if (parseFloat(priceEl.value) === 55) {
+        if (parseFloat(priceEl.value) === 48) {
             priceEl.value = RURAL_DEFAULT_PRICE;
         }
     }
@@ -2204,7 +2245,7 @@ function openNewBooking(room, date) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -2236,6 +2277,7 @@ function openNewBooking(room, date) {
     currentExtraRooms = [];
     document.getElementById('roomCount').value = '1';
     document.getElementById('roomType').value = 'doble';
+    document.getElementById('extraBeds').value = '0';
     renderRoomAssignments();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
@@ -2284,8 +2326,9 @@ function editBooking(id) {
     const selectedRoom = ROOMS.find(r => String(r.number) === String(b.room));
     updateRuralSection(selectedRoom);
 
-    // Room type and extra rooms
+    // Room type, extra beds and extra rooms
     document.getElementById('roomType').value = b.roomType || 'doble';
+    document.getElementById('extraBeds').value = b.extraBeds || '0';
     const extraCount = (b.extraRooms && b.extraRooms.length > 0) ? b.extraRooms.length + 1 : 1;
     document.getElementById('roomCount').value = extraCount;
     currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
@@ -2317,15 +2360,31 @@ function closeModal() {
 function calculatePrice() {
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
+    const priceOverride = parseFloat(document.getElementById('pricePerNight').value) || 0;
 
     if (checkin && checkout && checkout > checkin) {
         const nights = nightsBetween(checkin, checkout);
-        const total = (nights * price).toFixed(2);
         const rural = isCurrentRoomRural();
+        const roomType = document.getElementById('roomType').value;
+        const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
+        const roomCount = parseInt(document.getElementById('roomCount').value) || 1;
+
+        let total;
+        if (rural) {
+            total = nights * priceOverride;
+        } else {
+            const baseTotal = getBasePrice(checkin, checkout, roomType);
+            const extraBedCost = extraBeds * 15 * nights;
+            total = (baseTotal + extraBedCost) * roomCount;
+            // Update the per-night display price to average
+            const avgPerNight = total / nights / roomCount;
+            document.getElementById('pricePerNight').value = avgPerNight.toFixed(2);
+        }
+
         const label = rural ? 'casa completa' : 'noche';
         const depositInfo = rural ? ` + Fianza: ${document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT} €` : '';
-        document.getElementById('priceTotal').textContent = `Total: ${total} € (${nights} ${label}${nights > 1 ? 's' : ''})${depositInfo}`;
+        const extraInfo = (!rural && extraBeds > 0) ? ` (incl. ${extraBeds} supletorio${extraBeds > 1 ? 's' : ''})` : '';
+        document.getElementById('priceTotal').textContent = `Total: ${total.toFixed(2)} € (${nights} ${label}${nights > 1 ? 's' : ''})${extraInfo}${depositInfo}`;
     } else {
         document.getElementById('priceTotal').textContent = '';
     }
@@ -2382,12 +2441,13 @@ function saveBooking() {
     }
 
     const roomType = document.getElementById('roomType').value;
+    const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
 
     const booking = {
         id: id || generateId(),
         guestName: name,
         phone, email, docType, docNumber, nationality,
-        room, roomType,
+        room, roomType, extraBeds,
         extraRooms: getAssignedRooms().slice(1).map(r => ({ room: r, roomType: document.getElementById('roomType').value })),
         checkin, checkout, status, pricePerNight: price,
         guests: parseInt(document.getElementById('guestCount').value),
@@ -2896,13 +2956,13 @@ function searchAvailability() {
 
         // Check availability
         if (isRoomAvailable(room.number, from, checkout)) {
-            const nightPrice = room.bedType === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+            const totalPrice = room.bedType === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(from, checkout, 'doble');
             results.push({
                 room,
                 checkin: from,
                 checkout,
                 nights,
-                totalPrice: nights * nightPrice
+                totalPrice
             });
         }
     });
@@ -2942,7 +3002,7 @@ function bookFromSearch(room, checkin, checkout) {
     document.getElementById('guestNationality').value = '';
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     document.getElementById('bookingNotes').value = '';
     document.getElementById('deleteBtn').style.display = 'none';
     document.getElementById('confirmActions').style.display = 'none';
@@ -3940,8 +4000,15 @@ function wizardSearchRooms() {
 
     // Auto-select first N available rooms
     wizSelectedRooms = available.slice(0, wizRoomCount);
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
-    const totalPerRoom = nights * nightPrice;
+    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : (() => {
+        const d = parseDate(checkin);
+        const dow = d.getDay();
+        const isWeekendNight = (dow === 5 || dow === 6);
+        if (wizRoomType === 'individual') return isWeekendNight ? 49 : 38.50;
+        return isWeekendNight ? 58 : 48;
+    })();
+    const totalPerRoom = currentProperty === 'rural' ? nights * nightPrice : getBasePrice(checkin, checkout, wizRoomType);
     const totalAll = totalPerRoom * wizRoomCount;
     const persLabel = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuádruple' };
 
@@ -3977,7 +4044,8 @@ function wizardBook() {
     const checkin = document.getElementById('wizCheckin').value;
     const checkout = document.getElementById('wizCheckout').value;
     const mainRoom = wizSelectedRooms[0];
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 55;
+    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     const persMap = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuadruple' };
     closeWizard();
 
@@ -3992,6 +4060,7 @@ function wizardBook() {
     document.getElementById('guestNationality').value = '';
     document.getElementById('roomCount').value = wizRoomCount;
     document.getElementById('roomType').value = persMap[wizPersons] || 'doble';
+    document.getElementById('extraBeds').value = '0';
     document.getElementById('guestCount').value = wizRoomCount * wizPersons;
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = nightPrice;
@@ -4478,16 +4547,46 @@ function closeInvoicesListModal() {
     document.getElementById('invoicesListModal').classList.remove('active');
 }
 
-function renderInvoicesList() {
+function getFilteredInvoices() {
     const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
-    const container = document.getElementById('invoicesListContent');
+    const from = document.getElementById('invoiceFilterFrom')?.value || '';
+    const to = document.getElementById('invoiceFilterTo')?.value || '';
+    return invoices.filter(inv => {
+        if (from && inv.date < from) return false;
+        if (to && inv.date > to) return false;
+        return true;
+    }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+}
 
-    if (invoices.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#80868b; padding:30px; font-size:0.9rem;">No hay facturas emitidas.<br>Las facturas se generan automáticamente al pagar con tarjeta.</div>';
+function exportInvoices() {
+    const filtered = getFilteredInvoices();
+    if (filtered.length === 0) return alert('No hay facturas para exportar con ese filtro.');
+    const headers = ['N.º Factura', 'Fecha', 'Cliente', 'Documento', 'Habitación', 'Check-in', 'Check-out', 'Importe', 'Método'];
+    const rows = filtered.map(inv => [
+        inv.invoiceNum, inv.date, inv.guestName, (inv.guestDocType || '').toUpperCase() + ' ' + (inv.guestDoc || ''),
+        inv.roomLabel || '', inv.checkin || '', inv.checkout || '',
+        inv.amount.toFixed(2), inv.method || 'card'
+    ]);
+    const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const from = document.getElementById('invoiceFilterFrom')?.value || 'todas';
+    const to = document.getElementById('invoiceFilterTo')?.value || 'hoy';
+    a.href = url;
+    a.download = `facturas_${from}_a_${to}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function renderInvoicesList() {
+    const container = document.getElementById('invoicesListContent');
+    const sorted = getFilteredInvoices();
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#717171; padding:24px; font-size:0.85rem;">No hay facturas para el rango seleccionado.</div>';
         return;
     }
-
-    const sorted = [...invoices].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     container.innerHTML = `<table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
         <thead><tr style="background:#f1f3f4;">
             <th style="padding:8px 10px; text-align:left; font-weight:500; border-bottom:2px solid #dadce0;">N.º Factura</th>
@@ -4667,17 +4766,25 @@ function setViewRange(days) {
 function onRoomCountChange() {
     const count = parseInt(document.getElementById('roomCount').value) || 1;
     const type = document.getElementById('roomType').value;
-    const guestMap = { individual: 1, doble: 2, triple: 3, cuadruple: 4 };
-    document.getElementById('guestCount').value = count * (guestMap[type] || 2);
+    const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
+    const baseGuests = type === 'individual' ? 1 : 2;
+    document.getElementById('guestCount').value = count * (baseGuests + extraBeds);
     renderRoomAssignments();
+    calculatePrice();
 }
 
 function renderRoomAssignments() {
     const count = parseInt(document.getElementById('roomCount').value) || 1;
     const container = document.getElementById('roomAssignmentsList');
+    const checkin = document.getElementById('bookingCheckin').value;
+    const checkout = document.getElementById('bookingCheckout').value;
+    const editId = document.getElementById('bookingId').value;
     const availableRooms = ROOMS.filter(r => {
         if (currentProperty === 'rural') return r.floor === 'rural';
         return r.floor !== 'rural';
+    }).filter(r => {
+        if (checkin && checkout) return isRoomAvailable(r.number, checkin, checkout, editId);
+        return true;
     });
 
     let html = '';
@@ -4822,8 +4929,8 @@ function getPriceForDate(ds, roomType) {
     const key = ds + '_' + roomType;
     if (pricing[key]) return pricing[key];
     // Default prices
-    const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
-    return defaults[roomType] || 55;
+    const defaults = { individual: 38.50, doble: 48, triple: 70, cuadruple: 85, rural: RURAL_DEFAULT_PRICE };
+    return defaults[roomType] || 48;
 }
 
 function getSuggestedPrice(ds, roomType) {
@@ -4875,8 +4982,8 @@ function renderPricingCalendar() {
         roomTypes.forEach(rt => {
             const key = ds + '_' + rt;
             const baseVal = pricing[key] || '';
-            const defaults = { individual: 45, doble: 55, triple: 70, cuadruple: 85 };
-            const placeholder = defaults[rt] || 55;
+            const defaults = { individual: 38.50, doble: 48, triple: 70, cuadruple: 85 };
+            const placeholder = defaults[rt] || 48;
             const surgePrice = surge ? Math.round((parseFloat(baseVal) || placeholder) * 1.10) : null;
             html += `<td style="padding:2px 4px; border-bottom:1px solid #e8eaed; text-align:center;">
                 <input type="number" value="${baseVal}" placeholder="${placeholder}" min="0" step="1"
@@ -5001,6 +5108,7 @@ function setRoomBedType(roomNumber, bedType) {
 
 function init() {
     loadBookings();
+    loadRoomStatus();
     ROOMS = buildRooms(); // Rebuild with saved config
     populateRoomSelect();
     populateBlockRoomSelect();
@@ -5127,7 +5235,18 @@ renderLoginScreen();
 <div class="modal-overlay" id="invoicesListModal">
     <div class="modal" style="width:750px;">
         <h2>Facturas Emitidas</h2>
-        <div id="invoicesListContent" style="max-height:500px; overflow-y:auto;"></div>
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:flex-end;">
+            <div class="form-group" style="margin:0; flex:1; min-width:120px;">
+                <label style="font-size:0.72rem;">Desde</label>
+                <input type="date" id="invoiceFilterFrom" onchange="renderInvoicesList()" style="padding:6px 8px; font-size:0.78rem;">
+            </div>
+            <div class="form-group" style="margin:0; flex:1; min-width:120px;">
+                <label style="font-size:0.72rem;">Hasta</label>
+                <input type="date" id="invoiceFilterTo" onchange="renderInvoicesList()" style="padding:6px 8px; font-size:0.78rem;">
+            </div>
+            <button class="btn-primary" onclick="exportInvoices()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">Exportar CSV</button>
+        </div>
+        <div id="invoicesListContent" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
             <button class="btn-secondary" onclick="closeInvoicesListModal()">Cerrar</button>
         </div>
@@ -5199,7 +5318,7 @@ renderLoginScreen();
                 </div>
                 <div class="form-group" style="margin:0; width:80px;">
                     <label style="font-size:0.72rem;">Nuevo precio €</label>
-                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="55" style="padding:6px 8px; font-size:0.78rem;">
+                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
                 <div class="form-group" style="margin:0; flex:1; min-width:100px;">
                     <label style="font-size:0.72rem;">Aplicar a</label>
