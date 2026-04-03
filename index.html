@@ -1089,6 +1089,10 @@
         </div>
 
         <div class="sidebar-section">Datos</div>
+        <div class="sidebar-item" onclick="sidebarNav('booking-sync')" data-section="booking-sync">
+            <span class="si-icon" style="font-size:0.8rem; font-weight:700; color:#003580;">B</span>
+            <span class="si-label">Booking.com</span>
+        </div>
         <div class="sidebar-item" onclick="sidebarNav('export')" data-section="export">
             <span class="si-icon">📤</span>
             <span class="si-label">Exportar</span>
@@ -1963,7 +1967,8 @@ function renderGrid() {
 
                 const extraBadge = (b.extraRooms && b.extraRooms.length > 0 && isStart) ? `<span style="font-size:0.55rem;opacity:0.8;">+${b.extraRooms.length}</span>` : '';
                 const paidSymbol = b.paymentStatus === 'paid' ? ' €' : '';
-                const label = isStart ? b.guestName.split(' ')[0] + paidSymbol + extraBadge : '';
+                const bookingBadge = (b.source === 'booking' && isStart) ? '<span style="background:#003580;color:#fff;font-size:0.45rem;padding:0 2px;border-radius:2px;margin-left:1px;font-weight:700;">B</span>' : '';
+                const label = isStart ? b.guestName.split(' ')[0] + paidSymbol + bookingBadge + extraBadge : '';
                 const pDotClass = b.paymentStatus === 'paid' ? 'paid' : (b.paymentStatus === 'deposit_paid' ? 'deposit' : 'unpaid');
                 const payDot = isEnd || isSingle ? `<span class="payment-dot ${pDotClass}"></span>` : '';
                 const clickAction = ds === today ? `showQuickActions(event,'${b.id}')` : `editBooking('${b.id}')`;
@@ -4313,7 +4318,7 @@ function formatAuditDate(isoStr) {
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); }
+    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); closeBookingSyncModal(); }
 });
 
 // ==================== INIT ====================
@@ -4358,6 +4363,7 @@ function sidebarNav(section) {
         case 'pricing': openPricingModal(); break;
         case 'clients': openClientsModal(); break;
         case 'roomConfig': openRoomConfigModal(); break;
+        case 'booking-sync': openBookingSyncModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
     }
@@ -4912,6 +4918,238 @@ function getAssignedRoomsDetail() {
     return rooms;
 }
 
+// ==================== BOOKING.COM iCAL SYNC ====================
+
+function openBookingSyncModal() {
+    // Populate room select
+    const sel = document.getElementById('bookingIcalRoom');
+    sel.innerHTML = ROOMS.filter(r => r.floor !== 'rural').map(r =>
+        `<option value="${r.number}">${r.label}</option>`
+    ).join('');
+    document.getElementById('bookingIcalUrl').value = '';
+    document.getElementById('bookingSyncResult').style.display = 'none';
+    renderSavedIcalLinks();
+    document.getElementById('bookingSyncModal').classList.add('active');
+}
+
+function closeBookingSyncModal() {
+    document.getElementById('bookingSyncModal').classList.remove('active');
+}
+
+function loadIcalLinks() {
+    try { return JSON.parse(localStorage.getItem('hostal_jijones_ical_links') || '[]'); }
+    catch { return []; }
+}
+
+function saveIcalLinks(links) {
+    localStorage.setItem('hostal_jijones_ical_links', JSON.stringify(links));
+}
+
+function renderSavedIcalLinks() {
+    const links = loadIcalLinks();
+    const container = document.getElementById('savedIcalLinks');
+    if (links.length === 0) {
+        container.innerHTML = '<div style="font-size:0.75rem; color:#717171;">No hay enlaces guardados</div>';
+        return;
+    }
+    container.innerHTML = links.map((l, idx) => {
+        const room = ROOMS.find(r => String(r.number) === String(l.room));
+        const roomLabel = room ? room.label : 'Hab. ' + l.room;
+        return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f7f7f7; font-size:0.75rem;">
+            <div>
+                <strong>${roomLabel}</strong>
+                <div style="color:#717171; font-size:0.68rem; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${l.url}</div>
+                ${l.lastSync ? '<div style="color:#008A05; font-size:0.65rem;">Última sync: ' + formatDateDMY(l.lastSync) + '</div>' : ''}
+            </div>
+            <div style="display:flex; gap:4px;">
+                <button class="btn-outline" onclick="resyncIcalLink(${idx})" style="font-size:0.65rem; padding:3px 8px;">Sync</button>
+                <button onclick="removeIcalLink(${idx})" style="background:none; border:none; color:#C13515; cursor:pointer; font-size:0.9rem;">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function removeIcalLink(idx) {
+    const links = loadIcalLinks();
+    links.splice(idx, 1);
+    saveIcalLinks(links);
+    renderSavedIcalLinks();
+}
+
+function resyncIcalLink(idx) {
+    const links = loadIcalLinks();
+    const link = links[idx];
+    if (!link) return;
+    document.getElementById('bookingIcalUrl').value = link.url;
+    document.getElementById('bookingIcalRoom').value = link.room;
+    syncBookingICal();
+}
+
+async function syncBookingICal() {
+    const url = document.getElementById('bookingIcalUrl').value.trim();
+    const roomVal = document.getElementById('bookingIcalRoom').value;
+    const room = isNaN(roomVal) ? roomVal : parseInt(roomVal);
+    const resultDiv = document.getElementById('bookingSyncResult');
+
+    if (!url) return alert('Pega el enlace iCal de Booking.com');
+
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center; padding:12px; color:#717171;">Importando reservas...</div>';
+
+    try {
+        // Use a CORS proxy since Booking iCal URLs don't allow direct browser access
+        // Try direct first, then fallback
+        let icalText = '';
+        try {
+            const resp = await fetch(url);
+            icalText = await resp.text();
+        } catch {
+            // Try with allorigins proxy
+            try {
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+                const resp = await fetch(proxyUrl);
+                icalText = await resp.text();
+            } catch {
+                resultDiv.innerHTML = `<div style="padding:12px; color:#C13515; background:#FFF0F0; border-radius:8px; font-size:0.82rem;">
+                    <strong>Error de conexión.</strong> No se pudo acceder al enlace iCal.<br>
+                    <span style="font-size:0.75rem; color:#717171;">Puedes copiar el contenido del archivo .ics y pegarlo manualmente abajo:</span><br>
+                    <textarea id="manualIcalPaste" style="width:100%; height:80px; margin-top:6px; font-size:0.72rem; border:1px solid #b0b0b0; border-radius:6px; padding:6px;" placeholder="Pega aquí el contenido del archivo .ics"></textarea>
+                    <button class="btn-primary" onclick="parseManualIcal()" style="margin-top:6px; font-size:0.75rem; padding:6px 14px;">Importar texto</button>
+                </div>`;
+                return;
+            }
+        }
+
+        const imported = parseICalAndImport(icalText, room);
+        // Save link
+        const links = loadIcalLinks();
+        const existingIdx = links.findIndex(l => l.room === room);
+        if (existingIdx >= 0) {
+            links[existingIdx] = { url, room, lastSync: todayStr() };
+        } else {
+            links.push({ url, room, lastSync: todayStr() });
+        }
+        saveIcalLinks(links);
+        renderSavedIcalLinks();
+
+        resultDiv.innerHTML = `<div style="padding:12px; background:#E8F5E9; border-radius:8px; font-size:0.82rem; color:#008A05;">
+            <strong>${imported.created} reservas importadas</strong>, ${imported.skipped} ya existían.
+        </div>`;
+        renderGrid();
+
+    } catch (err) {
+        resultDiv.innerHTML = `<div style="padding:12px; color:#C13515; background:#FFF0F0; border-radius:8px; font-size:0.82rem;">
+            Error: ${err.message || 'No se pudo procesar el archivo iCal'}
+        </div>`;
+    }
+}
+
+function parseManualIcal() {
+    const text = document.getElementById('manualIcalPaste').value;
+    const roomVal = document.getElementById('bookingIcalRoom').value;
+    const room = isNaN(roomVal) ? roomVal : parseInt(roomVal);
+    if (!text.trim()) return alert('Pega el contenido del archivo .ics');
+    const resultDiv = document.getElementById('bookingSyncResult');
+    try {
+        const imported = parseICalAndImport(text, room);
+        resultDiv.innerHTML = `<div style="padding:12px; background:#E8F5E9; border-radius:8px; font-size:0.82rem; color:#008A05;">
+            <strong>${imported.created} reservas importadas</strong>, ${imported.skipped} ya existían.
+        </div>`;
+        renderGrid();
+    } catch (err) {
+        resultDiv.innerHTML = `<div style="padding:12px; color:#C13515;">Error: ${err.message}</div>`;
+    }
+}
+
+function parseICalAndImport(icalText, room) {
+    const events = [];
+    const lines = icalText.replace(/\r\n /g, '').replace(/\r/g, '').split('\n');
+    let current = null;
+
+    for (const line of lines) {
+        if (line === 'BEGIN:VEVENT') {
+            current = {};
+        } else if (line === 'END:VEVENT' && current) {
+            events.push(current);
+            current = null;
+        } else if (current) {
+            if (line.startsWith('DTSTART')) {
+                const val = line.split(':').pop().trim();
+                current.checkin = parseICalDate(val);
+            } else if (line.startsWith('DTEND')) {
+                const val = line.split(':').pop().trim();
+                current.checkout = parseICalDate(val);
+            } else if (line.startsWith('SUMMARY')) {
+                current.summary = line.substring(line.indexOf(':') + 1).trim();
+            } else if (line.startsWith('UID')) {
+                current.uid = line.substring(line.indexOf(':') + 1).trim();
+            } else if (line.startsWith('DESCRIPTION')) {
+                current.description = line.substring(line.indexOf(':') + 1).trim();
+            }
+        }
+    }
+
+    let created = 0, skipped = 0;
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    const now = new Date().toISOString();
+
+    events.forEach(evt => {
+        if (!evt.checkin || !evt.checkout || !evt.summary) { skipped++; return; }
+        // Skip if "Not available" or "Closed"
+        const sumLower = evt.summary.toLowerCase();
+        if (sumLower.includes('not available') || sumLower.includes('closed') || sumLower.includes('no disponible')) { skipped++; return; }
+
+        // Check if already imported (by UID or matching guest+dates+room)
+        const alreadyExists = bookings.some(b =>
+            (b.icalUid && b.icalUid === evt.uid) ||
+            (b.source === 'booking' && b.room === room && b.checkin === evt.checkin && b.checkout === evt.checkout)
+        );
+        if (alreadyExists) { skipped++; return; }
+
+        // Check conflicts
+        if (hasConflict(room, evt.checkin, evt.checkout, null)) { skipped++; return; }
+
+        // Extract guest name from summary (Booking format: "Guest Name" or "CLOSED - ...")
+        const guestName = evt.summary.replace(/^(Booking\.com|CLOSED)\s*[-:]\s*/i, '').trim() || evt.summary;
+
+        bookings.push({
+            id: generateId(),
+            guestName,
+            phone: '', email: '', docType: 'dni', docNumber: '', nationality: '',
+            room,
+            roomType: 'doble',
+            extraRooms: [],
+            extraBeds: 0,
+            checkin: evt.checkin,
+            checkout: evt.checkout,
+            status: 'confirmed',
+            pricePerNight: 48,
+            guests: 2,
+            notes: evt.description || 'Reserva importada de Booking.com',
+            paymentStatus: 'pending_payment',
+            payments: [],
+            source: 'booking',
+            icalUid: evt.uid || '',
+            createdAt: now,
+            createdBy: userName,
+            updatedAt: now,
+            updatedBy: userName,
+            history: [{ action: 'importada desde Booking.com', user: userName, date: now }]
+        });
+        created++;
+    });
+
+    saveBookings();
+    return { created, skipped };
+}
+
+function parseICalDate(val) {
+    // Format: 20260403 or 20260403T140000 or 20260403T140000Z
+    const clean = val.replace(/[TZ]/g, '').substring(0, 8);
+    if (clean.length < 8) return null;
+    return clean.substring(0, 4) + '-' + clean.substring(4, 6) + '-' + clean.substring(6, 8);
+}
+
 // ==================== GLOBAL SEARCH ====================
 
 function onGlobalSearch(query) {
@@ -5412,6 +5650,56 @@ renderLoginScreen();
         <div class="form-actions" style="margin-top:15px;">
             <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar</button>
             <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Booking.com Sync -->
+<div class="modal-overlay" id="bookingSyncModal">
+    <div class="modal" style="width:550px;">
+        <h2 style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#003580; color:#fff; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:700;">Booking.com</span>
+            Sincronización
+        </h2>
+        <p style="font-size:0.82rem; color:#717171; margin-bottom:16px; line-height:1.5;">
+            Pega el enlace iCal de tu propiedad en Booking.com para importar reservas automáticamente.
+            Las reservas aparecerán marcadas con <span style="background:#003580;color:#fff;font-size:0.65rem;padding:1px 4px;border-radius:2px;font-weight:700;">B</span> en la cuadrícula.
+        </p>
+
+        <div style="background:#f0f4ff; border:1px solid #b3c6ff; border-radius:10px; padding:14px; margin-bottom:16px;">
+            <div style="font-size:0.78rem; color:#003580; font-weight:600; margin-bottom:6px;">¿Cómo obtener el enlace iCal?</div>
+            <ol style="font-size:0.75rem; color:#555; line-height:1.6; padding-left:18px;">
+                <li>Entra en tu <strong>Extranet de Booking.com</strong></li>
+                <li>Ve a <strong>Tarifas y disponibilidad</strong> → <strong>Sincronización de calendarios</strong></li>
+                <li>Copia el <strong>enlace iCal de exportación</strong> de cada habitación</li>
+                <li>Pégalo aquí abajo</li>
+            </ol>
+        </div>
+
+        <div class="form-group">
+            <label>Enlace iCal de Booking.com</label>
+            <input type="url" id="bookingIcalUrl" placeholder="https://admin.booking.com/hotel/hoteladmin/ical.html?t=..." style="font-size:0.78rem;">
+        </div>
+
+        <div class="form-group">
+            <label>Asignar a habitación</label>
+            <select id="bookingIcalRoom" style="font-size:0.82rem;"></select>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary" onclick="syncBookingICal()" style="flex:1;">Importar reservas</button>
+        </div>
+
+        <div id="bookingSyncResult" style="margin-top:12px; display:none;"></div>
+
+        <!-- Saved iCal links -->
+        <div style="margin-top:20px; border-top:1px solid #ebebeb; padding-top:14px;">
+            <div style="font-weight:600; font-size:0.82rem; color:#222; margin-bottom:8px;">Enlaces guardados</div>
+            <div id="savedIcalLinks"></div>
+        </div>
+
+        <div class="form-actions" style="margin-top:16px;">
+            <button class="btn-secondary" onclick="closeBookingSyncModal()">Cerrar</button>
         </div>
     </div>
 </div>
