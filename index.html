@@ -1938,13 +1938,8 @@ function getBasePrice(checkin, checkout, roomType) {
     let d = parseDate(checkin);
     const end = parseDate(checkout);
     while (d < end) {
-        const dow = d.getDay(); // 0=Sun,1=Mon,...,6=Sat
-        const isWeekendNight = (dow === 5 || dow === 6); // Fri/Sat nights
-        if (roomType === 'individual') {
-            total += isWeekendNight ? 49 : 38.50;
-        } else {
-            total += isWeekendNight ? 58 : 48;
-        }
+        const ds = dateStr(d);
+        total += getSuggestedPrice(ds, roomType || 'doble');
         d = addDays(d, 1);
     }
     return total;
@@ -5709,11 +5704,47 @@ function savePricingData(data) {
     localStorage.setItem('hostal_jijones_pricing', JSON.stringify(data));
 }
 
+let selectedPricingMonths = new Set();
+
 function openPricingModal() {
     pricingMonth = new Date().getMonth();
     pricingYear = new Date().getFullYear();
+    selectedPricingMonths = new Set();
+    renderMonthPriceTabs();
     renderPricingCalendar();
+    document.getElementById('intervalPriceFrom').value = todayStr();
+    document.getElementById('intervalPriceTo').value = dateStr(addDays(new Date(), 7));
     document.getElementById('pricingModal').classList.add('active');
+}
+
+function renderMonthPriceTabs() {
+    const container = document.getElementById('monthPriceTabs');
+    const currentYear = new Date().getFullYear();
+    let html = '';
+    for (let y = currentYear; y <= currentYear + 1; y++) {
+        for (let m = 0; m < 12; m++) {
+            if (y === currentYear && m < new Date().getMonth()) continue;
+            if (y > currentYear && m > 5) break;
+            const key = y + '-' + String(m).padStart(2, '0');
+            const active = selectedPricingMonths.has(key);
+            const label = MONTH_NAMES[m] + (y !== currentYear ? ' ' + y : '');
+            html += `<button onclick="togglePricingMonth('${key}')" style="
+                padding:5px 12px; border:1px solid ${active ? '#FF385C' : '#ccc'};
+                background:${active ? '#FFF0F3' : '#fff'}; color:${active ? '#FF385C' : '#222'};
+                border-radius:20px; font-size:0.72rem; font-family:inherit; cursor:pointer;
+                font-weight:${active ? '600' : '400'};">${label}</button>`;
+        }
+    }
+    container.innerHTML = html;
+}
+
+function togglePricingMonth(key) {
+    if (selectedPricingMonths.has(key)) {
+        selectedPricingMonths.delete(key);
+    } else {
+        selectedPricingMonths.add(key);
+    }
+    renderMonthPriceTabs();
 }
 
 function closePricingModal() {
@@ -5820,37 +5851,67 @@ function updatePricingCell(key, value) {
     savePricingData(pricing);
 }
 
-function applyBulkPrice() {
-    const type = document.getElementById('bulkPriceType').value;
-    const price = parseFloat(document.getElementById('bulkPriceValue').value);
-    const range = document.getElementById('bulkPriceRange').value;
+function applyMonthPrice() {
+    const type = document.getElementById('monthPriceType').value;
+    const daysMode = document.getElementById('monthPriceDays').value;
+    const price = parseFloat(document.getElementById('monthPriceValue').value);
+
     if (!price || price <= 0) return alert('Introduce un precio válido.');
+    if (selectedPricingMonths.size === 0) return alert('Selecciona al menos un mes.');
 
     const pricing = loadPricing();
-    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+
+    selectedPricingMonths.forEach(key => {
+        const [y, m] = key.split('-').map(Number);
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const date = new Date(y, m, d);
+            const ds = dateStr(date);
+            const dow = date.getDay();
+            // weekdays = Dom(0)-Jue(4), weekends = Vie(5)-Sáb(6)
+            const isWeekend = dow === 5 || dow === 6;
+
+            if (daysMode === 'weekdays' && isWeekend) continue;
+            if (daysMode === 'weekends' && !isWeekend) continue;
+
+            pricing[ds + '_' + type] = price;
+        }
+    });
+
+    savePricingData(pricing);
+    renderPricingCalendar();
+    alert(`Precio de ${price}€ aplicado a ${selectedPricingMonths.size} mes(es).`);
+}
+
+function applyIntervalPrice() {
+    const type = document.getElementById('intervalPriceType').value;
+    const from = document.getElementById('intervalPriceFrom').value;
+    const to = document.getElementById('intervalPriceTo').value;
+    const price = parseFloat(document.getElementById('intervalPriceValue').value);
+
+    if (!price || price <= 0) return alert('Introduce un precio válido.');
+    if (!from || !to) return alert('Selecciona las fechas.');
+    if (to < from) return alert('La fecha "hasta" debe ser igual o posterior a "desde".');
+
+    const pricing = loadPricing();
     const types = type === 'all' ? ['individual', 'doble', 'triple', 'cuadruple'] : [type];
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(pricingYear, pricingMonth, d);
-        const ds = dateStr(date);
-        const dow = date.getDay();
-        const isWeekend = dow === 0 || dow === 5 || dow === 6;
-
-        if (range === 'weekdays' && isWeekend) continue;
-        if (range === 'weekends' && !isWeekend) continue;
-
+    let d = parseDate(from);
+    const end = parseDate(to);
+    let count = 0;
+    while (d <= end) {
+        const ds = dateStr(d);
         types.forEach(rt => {
             pricing[ds + '_' + rt] = price;
         });
+        d = addDays(d, 1);
+        count++;
     }
 
     savePricingData(pricing);
     renderPricingCalendar();
-}
-
-function savePricing() {
-    alert('Precios guardados correctamente.');
-    closePricingModal();
+    alert(`Precio de ${price}€ aplicado a ${count} día(s).`);
 }
 
 // ==================== ROOM CONFIG (BED TYPE TOGGLE) ====================
@@ -6105,44 +6166,77 @@ renderLoginScreen();
         <h2>Gestión de Precios</h2>
         <p style="font-size:0.78rem; color:#717171; margin-bottom:16px;">Los fines de semana con +80% de ocupación se incrementan automáticamente un 10%.</p>
 
-        <!-- Bulk edit section -->
-        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
-            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Cambio masivo de precios</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
-                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
-                    <label style="font-size:0.72rem;">Tipo</label>
-                    <select id="bulkPriceType" style="padding:6px 8px; font-size:0.78rem;">
-                        <option value="all">Todos</option>
-                        <option value="individual">Individual</option>
-                        <option value="doble">Doble</option>
-                        <option value="triple">Triple</option>
-                        <option value="cuadruple">Cuádruple</option>
+        <!-- Pricing by month -->
+        <div style="background:#f8f9fa; border:1px solid #e0e0e0; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#222; margin-bottom:12px;">Precios por mes</div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px;">
+                <div class="form-group" style="margin:0; min-width:120px;">
+                    <label style="font-size:0.72rem;">Tipo de habitación</label>
+                    <select id="monthPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="individual">1 persona</option>
+                        <option value="doble" selected>2 personas</option>
+                        <option value="triple">3 personas</option>
+                        <option value="cuadruple">4 personas</option>
                     </select>
+                </div>
+                <div class="form-group" style="margin:0; min-width:140px;">
+                    <label style="font-size:0.72rem;">Días de la semana</label>
+                    <select id="monthPriceDays" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="weekdays">Domingo a Jueves</option>
+                        <option value="weekends">Viernes y Sábado</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; width:90px;">
+                    <label style="font-size:0.72rem;">Precio €/noche</label>
+                    <input type="number" id="monthPriceValue" min="0" step="0.5" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+            </div>
+
+            <!-- Month tabs -->
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:12px;" id="monthPriceTabs"></div>
+
+            <button class="btn-primary" onclick="applyMonthPrice()" style="padding:8px 20px; font-size:0.78rem;">Aplicar a meses seleccionados</button>
+        </div>
+
+        <!-- Pricing by date interval -->
+        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Precio por intervalo de fechas</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group" style="margin:0; min-width:100px;">
+                    <label style="font-size:0.72rem;">Tipo</label>
+                    <select id="intervalPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="all">Todos</option>
+                        <option value="individual">1 persona</option>
+                        <option value="doble">2 personas</option>
+                        <option value="triple">3 personas</option>
+                        <option value="cuadruple">4 personas</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; min-width:110px;">
+                    <label style="font-size:0.72rem;">Desde</label>
+                    <input type="date" id="intervalPriceFrom" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+                <div class="form-group" style="margin:0; min-width:110px;">
+                    <label style="font-size:0.72rem;">Hasta</label>
+                    <input type="date" id="intervalPriceTo" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
                 <div class="form-group" style="margin:0; width:80px;">
-                    <label style="font-size:0.72rem;">Nuevo precio €</label>
-                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
+                    <label style="font-size:0.72rem;">Precio €</label>
+                    <input type="number" id="intervalPriceValue" min="0" step="0.5" placeholder="58" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
-                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
-                    <label style="font-size:0.72rem;">Aplicar a</label>
-                    <select id="bulkPriceRange" style="padding:6px 8px; font-size:0.78rem;">
-                        <option value="month">Este mes</option>
-                        <option value="weekdays">Solo L-V este mes</option>
-                        <option value="weekends">Solo V-D este mes</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="applyBulkPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap;">Aplicar</button>
+                <button class="btn-primary" onclick="applyIntervalPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap; background:#FF385C;">Aplicar</button>
             </div>
         </div>
 
+        <!-- Calendar view -->
         <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
             <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
             <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:600; color:#222;"></h4>
             <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
         </div>
-        <div id="pricingCalendar" style="max-height:400px; overflow-y:auto;"></div>
+        <div id="pricingCalendar" style="max-height:350px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
-            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar</button>
             <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
         </div>
     </div>
