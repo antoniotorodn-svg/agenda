@@ -640,6 +640,19 @@
         .pm-badge.cash { background: #fef7e0; color: #e37400; }
         .pm-badge.card { background: #e8f0fe; color: #1a73e8; }
 
+        /* INE */
+        .ine-tab { padding:8px 16px; border:none; background:none; cursor:pointer; font-size:0.78rem; font-family:inherit; color:#717171; border-bottom:2px solid transparent; font-weight:500; }
+        .ine-tab:hover { color:#222; }
+        .ine-tab.active { color:#222; border-bottom-color:#FF385C; font-weight:600; }
+        .ine-table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+        .ine-table th { background:#f7f7f7; padding:8px 10px; text-align:left; font-weight:600; border-bottom:2px solid #ebebeb; font-size:0.72rem; }
+        .ine-table td { padding:6px 10px; border-bottom:1px solid #f0f0f0; }
+        .ine-table tr:hover td { background:#f8f9fa; }
+        .ine-table .ine-total { font-weight:700; background:#f0f0f0; }
+        .ine-table .ine-subtotal { font-weight:600; color:#555; }
+        .ine-table td.num { text-align:center; font-weight:500; }
+        .ine-valid { color:#1e8e3e; } .ine-invalid { color:#c0392b; font-weight:600; }
+
         /* Login screen */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -1099,6 +1112,10 @@
         </div>
 
         <div class="sidebar-section">Datos</div>
+        <div class="sidebar-item" onclick="sidebarNav('ine')" data-section="ine">
+            <span class="si-icon">📊</span>
+            <span class="si-label">INE</span>
+        </div>
         <div class="sidebar-item" onclick="sidebarNav('booking-sync')" data-section="booking-sync">
             <span class="si-icon" style="font-size:0.8rem; font-weight:700; color:#003580;">B</span>
             <span class="si-label">Booking.com</span>
@@ -1477,7 +1494,6 @@
         <div class="confirm-actions" id="confirmActions" style="display:none;">
             <button class="btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
             <button class="btn-email" onclick="sendEmail()">Email</button>
-            <button class="btn-copy-confirm" onclick="copyConfirmation()">Copiar texto</button>
             <button class="btn-primary" onclick="generateInvoice()" style="font-size:0.8rem;">Factura</button>
         </div>
 
@@ -1939,13 +1955,8 @@ function getBasePrice(checkin, checkout, roomType) {
     let d = parseDate(checkin);
     const end = parseDate(checkout);
     while (d < end) {
-        const dow = d.getDay(); // 0=Sun,1=Mon,...,6=Sat
-        const isWeekendNight = (dow === 5 || dow === 6); // Fri/Sat nights
-        if (roomType === 'individual') {
-            total += isWeekendNight ? 49 : 38.50;
-        } else {
-            total += isWeekendNight ? 58 : 48;
-        }
+        const ds = dateStr(d);
+        total += getSuggestedPrice(ds, roomType || 'doble');
         d = addDays(d, 1);
     }
     return total;
@@ -2523,12 +2534,18 @@ function saveBooking() {
 
     // Validate extra rooms for conflicts
     const validExtraRooms = currentExtraRooms.filter(er => er.room);
+    const existingExtraRooms = id ? (bookings.find(b => b.id === id)?.extraRooms || []).map(er => String(er.room)) : [];
+    const existingMainRoom = id ? String(bookings.find(b => b.id === id)?.room) : '';
+    const existingCheckin = id ? bookings.find(b => b.id === id)?.checkin : '';
+    const existingCheckout = id ? bookings.find(b => b.id === id)?.checkout : '';
     for (const er of validExtraRooms) {
         const erRoom = isNaN(er.room) ? er.room : parseInt(er.room);
         if (erRoom === room) {
             return alert(`La habitación ${erRoom} no puede ser habitación principal y adicional a la vez.`);
         }
-        if (hasConflict(erRoom, checkin, checkout, id)) {
+        // Skip conflict check if room, dates haven't changed (already validated when first added)
+        const roomUnchanged = existingExtraRooms.includes(String(erRoom)) && checkin === existingCheckin && checkout === existingCheckout;
+        if (!roomUnchanged && hasConflict(erRoom, checkin, checkout, id)) {
             return alert(`La habitación adicional ${erRoom} ya está ocupada en esas fechas.`);
         }
     }
@@ -2624,8 +2641,8 @@ function saveBooking() {
     // Auto-generate invoice for card payments
     const cardPayments = currentPayments.filter(p => p.method === 'card');
     if (cardPayments.length > 0) {
-        const cardTotal = cardPayments.reduce((s, p) => s + p.amount, 0);
-        saveInvoiceRecord(booking, cardTotal);
+        const invoiceTotal = getBookingTotal();
+        saveInvoiceRecord(booking, invoiceTotal > 0 ? invoiceTotal : cardPayments.reduce((s,p) => s + p.amount, 0), 'card');
     }
 
     saveBookings();
@@ -2953,7 +2970,7 @@ function addPayment() {
         if (bookingId) {
             const b = bookings.find(x => x.id === bookingId);
             if (b) {
-                saveInvoiceRecord(b, amount);
+                saveInvoiceRecord(b, amount, 'card');
             }
         }
     }
@@ -3707,45 +3724,25 @@ function closeClientDetail() {
 
 function buildConfirmationText() {
     const name = document.getElementById('guestName').value.trim();
-    const roomVal = document.getElementById('bookingRoom').value;
-    const room = ROOMS.find(r => String(r.number) === roomVal);
-    const roomLabel = room ? room.label : roomVal;
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
-    const guests = document.getElementById('guestCount').value;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
     const nights = (checkin && checkout && checkout > checkin) ? nightsBetween(checkin, checkout) : 0;
-    const total = (nights * price).toFixed(2);
-
+    const total = getBookingTotal();
+    const roomVal = document.getElementById('bookingRoom').value;
+    const room = ROOMS.find(r => String(r.number) === roomVal);
     const isRural = room && room.bedType === 'rural';
-    let ruralInfo = '';
-    if (isRural) {
-        const deposit = document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT;
-        ruralInfo = `
-Fianza/Depósito: ${deposit} € (se devolverá tras verificar el estado de la casa)
+    const place = isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones';
 
-NORMAS: Se le entregarán las normas de la casa a su llegada. Por favor, léalas con atención.
-`;
-    }
+    return `Hola ${name}, le confirmamos su reserva en ${place}:
 
-    return `Confirmación de Reserva - ${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}
+📅 Entrada: ${formatDateDMY(checkin)}
+📅 Salida: ${formatDateDMY(checkout)}
+🌙 ${nights} noche${nights > 1 ? 's' : ''}
+💰 Total: ${total.toFixed(2)} €
 
-Estimado/a ${name},
+Recuerde traer su DNI/NIE/Pasaporte.
 
-Le confirmamos su reserva con los siguientes detalles:
-
-${isRural ? 'Alojamiento' : 'Habitación'}: ${roomLabel}
-Check-in: ${checkin}
-Check-out: ${checkout}
-Noches: ${nights}
-Huéspedes: ${guests}
-Precio/noche${isRural ? ' (casa completa)' : ''}: ${price.toFixed(2)} €
-Total: ${total} €
-${ruralInfo}
-IMPORTANTE: Recuerde traer su documento de identidad (DNI/NIE/Pasaporte) para el registro obligatorio.
-
-¡Le esperamos!
-${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}`;
+¡Le esperamos! ${place}`;
 }
 
 function sendWhatsApp() {
@@ -4262,6 +4259,7 @@ function renderRoomsReport(container) {
 
 let wizRoomCount = 1;
 let wizPersons = 2;
+let wizPersonsPerRoom = [2]; // array for per-room persons
 let wizSelectedRooms = [];
 
 function openWizard() {
@@ -4269,12 +4267,12 @@ function openWizard() {
     document.getElementById('wizCheckout').value = dateStr(addDays(new Date(), 1));
     wizRoomCount = 1;
     wizPersons = 2;
+    wizPersonsPerRoom = [2];
     wizSelectedRooms = [];
     wizardGoTo(1);
     // Reset choices
     document.querySelectorAll('.wiz-choice').forEach(b => b.classList.remove('active'));
     document.getElementById('wizRooms1').classList.add('active');
-    document.getElementById('wizPers2').classList.add('active');
     document.getElementById('wizardModal').classList.add('active');
 }
 
@@ -4299,8 +4297,38 @@ function wizardNext(from) {
         if (co <= ci) return alert('La salida debe ser posterior a la entrada.');
         wizardGoTo(2);
     } else if (from === 2) {
+        wizPersonsPerRoom = Array(wizRoomCount).fill(2);
+        renderWizPersonsStep();
         wizardGoTo(3);
     }
+}
+
+function renderWizPersonsStep() {
+    const container = document.getElementById('wizPersonsContainer');
+    if (wizRoomCount === 1) {
+        container.innerHTML = `
+            <label>¿Cuántas personas por habitación?</label>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                ${[1,2,3,4].map(n => `<button class="wiz-choice ${wizPersonsPerRoom[0]===n?'active':''}" onclick="wizSetPersonsForRoom(0,${n})">${n} pers.</button>`).join('')}
+            </div>`;
+    } else {
+        let html = '<label>¿Cuántas personas por habitación?</label>';
+        for (let i = 0; i < wizRoomCount; i++) {
+            html += `<div style="display:flex; align-items:center; gap:10px; margin-top:10px; padding:8px 12px; background:#f7f7f7; border-radius:8px;">
+                <span style="font-weight:600; min-width:55px;">Hab. ${i+1}</span>
+                <div style="display:flex; gap:6px;">
+                    ${[1,2,3,4].map(n => `<button class="wiz-choice ${wizPersonsPerRoom[i]===n?'active':''}" onclick="wizSetPersonsForRoom(${i},${n})" style="padding:8px 12px;font-size:0.8rem;">${n} pers.</button>`).join('')}
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+}
+
+function wizSetPersonsForRoom(roomIdx, n) {
+    wizPersonsPerRoom[roomIdx] = n;
+    wizPersons = wizPersonsPerRoom[0]; // main room persons
+    renderWizPersonsStep();
 }
 
 function wizardBack(to) {
@@ -4314,12 +4342,6 @@ function wizSetRooms(n) {
     }
 }
 
-function wizSetPersons(n) {
-    wizPersons = n;
-    for (let i = 1; i <= 4; i++) {
-        document.getElementById('wizPers' + i).classList.toggle('active', i === n);
-    }
-}
 
 function wizardSearchRooms() {
     const checkin = document.getElementById('wizCheckin').value;
@@ -4346,23 +4368,25 @@ function wizardSearchRooms() {
 
     // Auto-select first N available rooms
     wizSelectedRooms = available.slice(0, wizRoomCount);
-    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : (() => {
-        const d = parseDate(checkin);
-        const dow = d.getDay();
-        const isWeekendNight = (dow === 5 || dow === 6);
-        if (wizRoomType === 'individual') return isWeekendNight ? 49 : 38.50;
-        return isWeekendNight ? 58 : 48;
-    })();
-    const totalPerRoom = currentProperty === 'rural' ? nights * nightPrice : getBasePrice(checkin, checkout, wizRoomType);
-    const totalAll = totalPerRoom * wizRoomCount;
     const persLabel = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuádruple' };
 
+    let totalAll = 0;
+    const roomTotals = [];
+    for (let i = 0; i < wizRoomCount; i++) {
+        const pers = wizPersonsPerRoom[i] || 2;
+        const rType = pers === 1 ? 'individual' : 'doble';
+        const extraBeds = pers > 2 ? pers - 2 : 0;
+        const roomTotal = currentProperty === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(checkin, checkout, rType) + (extraBeds * 15 * nights);
+        roomTotals.push(roomTotal);
+        totalAll += roomTotal;
+    }
+
     let html = `<div style="text-align:center; margin-bottom:12px; font-size:0.82rem; color:#717171;">
-        ${wizRoomCount} hab. × ${wizPersons} pers. × ${nights} noche(s) = <strong style="color:#222;">${totalAll.toFixed(2)} €</strong>
+        ${wizRoomCount} hab. × ${nights} noche(s) = <strong style="color:#222;">${totalAll.toFixed(2)} €</strong>
     </div>`;
 
     html += wizSelectedRooms.map((room, idx) => {
+        const pers = wizPersonsPerRoom[idx] || 2;
         const options = available.map(r =>
             `<option value="${r.number}" ${r.number === room.number ? 'selected' : ''}>${r.label}</option>`
         ).join('');
@@ -4371,7 +4395,7 @@ function wizardSearchRooms() {
             <select onchange="wizChangeRoom(${idx}, this.value)" style="flex:1; padding:8px; border:1px solid #b0b0b0; border-radius:8px; font-family:inherit; font-size:0.8rem;">
                 ${options}
             </select>
-            <span style="font-size:0.75rem; color:#717171;">${persLabel[wizPersons] || 'doble'} · ${totalPerRoom.toFixed(0)}€</span>
+            <span style="font-size:0.75rem; color:#717171;">${persLabel[pers] || 'doble'} · ${pers} pers. · ${roomTotals[idx].toFixed(0)}€</span>
         </div>`;
     }).join('');
 
@@ -4390,9 +4414,11 @@ function wizardBook() {
     const checkin = document.getElementById('wizCheckin').value;
     const checkout = document.getElementById('wizCheckout').value;
     const mainRoom = wizSelectedRooms[0];
-    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
+    const mainPers = wizPersonsPerRoom[0] || 2;
     const persMap = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuadruple' };
+    const mainRoomType = persMap[mainPers] || 'doble';
+    const mainExtraBeds = mainPers > 2 ? mainPers - 2 : 0;
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     closeWizard();
 
     // Open the full booking form pre-filled
@@ -4411,10 +4437,11 @@ function wizardBook() {
     currentCompanions = [];
     renderCompanions();
     document.getElementById('roomCount').value = wizRoomCount;
-    document.getElementById('roomType').value = persMap[wizPersons] || 'doble';
-    document.getElementById('extraBeds').value = '0';
+    document.getElementById('roomType').value = mainRoomType;
+    document.getElementById('extraBeds').value = String(mainExtraBeds);
     document.getElementById('lateCheckout').value = '0';
-    document.getElementById('guestCount').value = wizRoomCount * wizPersons;
+    const totalPersons = wizPersonsPerRoom.slice(0, wizRoomCount).reduce((s, p) => s + p, 0);
+    document.getElementById('guestCount').value = totalPersons;
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = nightPrice;
     document.getElementById('bookingNotes').value = '';
@@ -4436,12 +4463,20 @@ function wizardBook() {
     updateRuralSection(selectedRoom);
 
     currentPayments = [];
-    currentExtraRooms = wizSelectedRooms.slice(1).map(r => ({ room: r.number, roomType: persMap[wizPersons] || 'doble' }));
+    currentExtraRooms = wizSelectedRooms.slice(1).map((r, idx) => {
+        const pers = wizPersonsPerRoom[idx + 1] || 2;
+        return { room: r.number, roomType: persMap[pers] || 'doble', extraBeds: pers > 2 ? pers - 2 : 0 };
+    });
     renderRoomAssignments();
-    // Set the assigned rooms
+    // Set the assigned rooms with per-room occupancy
     wizSelectedRooms.forEach((r, idx) => {
         const sel = document.getElementById('roomAssign_' + idx);
         if (sel) sel.value = r.number;
+        const pers = wizPersonsPerRoom[idx] || 2;
+        const occ = document.getElementById('roomOcc_' + idx);
+        if (occ) occ.value = persMap[pers] || 'doble';
+        const ext = document.getElementById('roomExt_' + idx);
+        if (ext) ext.value = pers > 2 ? String(pers - 2) : '0';
     });
     updateMainRoom();
     document.getElementById('paymentStatus').value = 'pending_payment';
@@ -4462,9 +4497,27 @@ function generateInvoice() {
     if (!b) return alert('Guarda la reserva primero para generar la factura.');
 
     const nights = nightsBetween(b.checkin, b.checkout);
-    const total = nights * b.pricePerNight;
     const room = ROOMS.find(r => r.number === b.room);
     const roomLabel = room ? room.label : b.room;
+    // Calculate real total using getBookingTotal logic but from saved booking data
+    let total = 0;
+    const isRuralBooking = room && room.bedType === 'rural';
+    if (isRuralBooking) {
+        total = nights * b.pricePerNight;
+    } else {
+        const mainRoomType = b.roomType || 'doble';
+        const mainExtraBeds = parseInt(b.extraBeds) || 0;
+        total = getBasePrice(b.checkin, b.checkout, mainRoomType) + (mainExtraBeds * 15 * nights);
+        if (b.extraRooms && b.extraRooms.length > 0) {
+            b.extraRooms.forEach(er => {
+                const erType = er.roomType || 'doble';
+                const erExtraBeds = parseInt(er.extraBeds) || 0;
+                total += getBasePrice(b.checkin, b.checkout, erType) + (erExtraBeds * 15 * nights);
+            });
+        }
+        const lateHours = parseInt(b.lateCheckout) || 0;
+        total += lateHours * 5;
+    }
     const isRural = room && room.bedType === 'rural';
     const invoiceNum = 'F-' + b.checkin.replace(/-/g, '') + '-' + String(b.room).replace(/[^a-zA-Z0-9]/g, '');
     const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
@@ -4552,6 +4605,10 @@ function generateInvoice() {
                 ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
             </div>
         </div>`;
+
+    // Save invoice record when manually generating
+    const mainMethod = cardTotal >= cashTotal ? 'card' : 'cash';
+    saveInvoiceRecord(b, total, mainMethod);
 
     document.getElementById('invoiceModal').classList.add('active');
 }
@@ -4725,6 +4782,7 @@ function sidebarNav(section) {
         case 'clients': openClientsModal(); break;
         case 'roomConfig': openRoomConfigModal(); break;
         case 'booking-sync': openBookingSyncModal(); break;
+        case 'ine': openIneModal(); break;
         case 'export': exportData(); break;
         case 'import': importData(); break;
     }
@@ -4973,6 +5031,83 @@ function exportInvoicesPDF() {
     setTimeout(() => win.print(), 300);
 }
 
+function exportInvoicesZipPDF() {
+    const filtered = getFilteredInvoices();
+    if (filtered.length === 0) return alert('No hay facturas para exportar.');
+
+    let pages = '';
+    filtered.forEach((inv, idx) => {
+        const b = bookings.find(x => x.id === inv.bookingId);
+        if (!b) return;
+        const nights = nightsBetween(b.checkin, b.checkout);
+        const room = ROOMS.find(r => r.number === b.room);
+        const roomLabel = room ? room.label : b.room;
+        const isRural = room && room.bedType === 'rural';
+        let total = 0;
+        if (isRural) {
+            total = nights * b.pricePerNight;
+        } else {
+            const mainRoomType = b.roomType || 'doble';
+            total = getBasePrice(b.checkin, b.checkout, mainRoomType) + ((parseInt(b.extraBeds)||0) * 15 * nights);
+            if (b.extraRooms) b.extraRooms.forEach(er => {
+                total += getBasePrice(b.checkin, b.checkout, er.roomType||'doble') + ((parseInt(er.extraBeds)||0) * 15 * nights);
+            });
+            total += (parseInt(b.lateCheckout)||0) * 5;
+        }
+        const totalPaid = (b.payments||[]).reduce((s,p) => s + p.amount, 0);
+        const cashTotal = (b.payments||[]).filter(p => p.method !== 'card').reduce((s,p) => s + p.amount, 0);
+        const cardTotal = (b.payments||[]).filter(p => p.method === 'card').reduce((s,p) => s + p.amount, 0);
+
+        let paymentsRows = '';
+        (b.payments||[]).forEach(p => {
+            paymentsRows += `<tr><td>${p.date}</td><td>${p.method === 'card' ? 'Tarjeta' : 'Efectivo'}</td><td style="text-align:right;">${p.amount.toFixed(2)} €</td></tr>`;
+        });
+
+        pages += `<div class="invoice-page" ${idx > 0 ? 'style="page-break-before:always;"' : ''}>
+            <div style="display:flex;justify-content:space-between;padding-bottom:15px;margin-bottom:15px;border-bottom:3px solid #FF385C;">
+                <div>
+                    <div style="font-size:1.2rem;font-weight:700;color:#FF385C;">${BUSINESS_DATA.tradeName}</div>
+                    <div style="font-size:0.8rem;color:#717171;margin-top:4px;">${BUSINESS_DATA.name}<br>NIF: ${BUSINESS_DATA.nif}<br>${BUSINESS_DATA.address}<br>${BUSINESS_DATA.city}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.2rem;font-weight:700;">FACTURA</div>
+                    <div style="font-size:0.8rem;color:#717171;">N.º: <strong>${inv.invoiceNum}</strong><br>Fecha: ${inv.date}</div>
+                </div>
+            </div>
+            <div style="background:#f8f9fa;padding:10px 14px;border-radius:6px;margin-bottom:15px;">
+                <div style="font-size:0.7rem;color:#717171;text-transform:uppercase;">Cliente</div>
+                <div style="font-weight:600;">${b.guestName}</div>
+                <div style="font-size:0.8rem;color:#555;">${b.docNumber ? (b.docType||'DNI').toUpperCase()+': '+b.docNumber : ''} ${b.phone ? '· Tel: '+b.phone : ''}</div>
+            </div>
+            <table><thead><tr style="background:#f7f7f7;"><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Importe</th></tr></thead>
+            <tbody><tr>
+                <td>${isRural ? 'Alquiler Casa Rural' : 'Alojamiento '+roomLabel}<br><span style="font-size:0.75rem;color:#717171;">${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)}</span></td>
+                <td style="text-align:center;">${nights} noche${nights>1?'s':''}</td>
+                <td style="text-align:right;font-weight:600;">${total.toFixed(2)} €</td>
+            </tr></tbody></table>
+            <div style="text-align:right;font-weight:700;font-size:1.1rem;margin-top:10px;padding:10px 14px;background:#f8f9fa;border-radius:6px;">TOTAL: ${total.toFixed(2)} €</div>
+            ${paymentsRows ? '<h4 style="margin-top:12px;font-size:0.8rem;">Pagos</h4><table><thead><tr><th>Fecha</th><th>Método</th><th style="text-align:right;">Importe</th></tr></thead><tbody>'+paymentsRows+'</tbody></table>' : ''}
+            <div style="margin-top:20px;font-size:0.7rem;color:#999;border-top:1px solid #ebebeb;padding-top:8px;text-align:center;">
+                ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
+            </div>
+        </div>`;
+    });
+
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>Facturas</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px 30px; color: #222; font-size: 13px; line-height: 1.5; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            th { padding: 8px 10px; text-align: left; font-size: 0.8rem; border-bottom: 1px solid #ddd; }
+            td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 0.82rem; }
+            h4 { margin-bottom: 6px; }
+            @media print { body { padding: 10px; } .invoice-page { page-break-inside: avoid; } }
+        </style></head><body>${pages}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 400);
+}
+
 function renderInvoicesList() {
     const container = document.getElementById('invoicesListContent');
     const sorted = getFilteredInvoices();
@@ -4997,7 +5132,7 @@ function renderInvoicesList() {
         <td style="padding:8px 10px;">${inv.guestName}</td>
         <td style="padding:8px 10px;">${inv.roomLabel || ''}</td>
         <td style="padding:8px 10px; text-align:right; font-weight:500; color:#1a73e8;">${inv.amount.toFixed(2)} €</td>
-        <td style="padding:8px 10px; text-align:center;"><span class="pm-badge card">Tarjeta</span></td>
+        <td style="padding:8px 10px; text-align:center;"><span class="pm-badge ${inv.method || 'card'}">${inv.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</span></td>
         <td style="padding:8px 10px; text-align:center;"><button class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="viewSavedInvoice('${inv.bookingId}')">Ver</button></td>
     </tr>`).join('') + '</tbody></table>';
 }
@@ -5011,14 +5146,20 @@ function viewSavedInvoice(bookingId) {
     }
 }
 
-function saveInvoiceRecord(booking, amount) {
+function saveInvoiceRecord(booking, amount, method) {
     const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
     const room = ROOMS.find(r => r.number === booking.room);
     const roomLabel = room ? room.label : String(booking.room);
     const invoiceNum = 'F-' + booking.checkin.replace(/-/g, '') + '-' + String(booking.room).replace(/[^a-zA-Z0-9]/g, '');
 
-    // Don't duplicate
-    if (invoices.some(inv => inv.invoiceNum === invoiceNum)) return;
+    // Don't duplicate - update if exists
+    const existingIdx = invoices.findIndex(inv => inv.invoiceNum === invoiceNum);
+    if (existingIdx >= 0) {
+        invoices[existingIdx].amount = amount;
+        invoices[existingIdx].method = method || invoices[existingIdx].method;
+        localStorage.setItem('hostal_jijones_invoices', JSON.stringify(invoices));
+        return;
+    }
 
     invoices.push({
         invoiceNum,
@@ -5034,7 +5175,7 @@ function saveInvoiceRecord(booking, amount) {
         checkin: booking.checkin,
         checkout: booking.checkout,
         amount,
-        method: 'card',
+        method: method || 'card',
         businessName: BUSINESS_DATA.name,
         businessNif: BUSINESS_DATA.nif,
         businessAddress: BUSINESS_DATA.address,
@@ -5581,11 +5722,47 @@ function savePricingData(data) {
     localStorage.setItem('hostal_jijones_pricing', JSON.stringify(data));
 }
 
+let selectedPricingMonths = new Set();
+
 function openPricingModal() {
     pricingMonth = new Date().getMonth();
     pricingYear = new Date().getFullYear();
+    selectedPricingMonths = new Set();
+    renderMonthPriceTabs();
     renderPricingCalendar();
+    document.getElementById('intervalPriceFrom').value = todayStr();
+    document.getElementById('intervalPriceTo').value = dateStr(addDays(new Date(), 7));
     document.getElementById('pricingModal').classList.add('active');
+}
+
+function renderMonthPriceTabs() {
+    const container = document.getElementById('monthPriceTabs');
+    const currentYear = new Date().getFullYear();
+    let html = '';
+    for (let y = currentYear; y <= currentYear + 1; y++) {
+        for (let m = 0; m < 12; m++) {
+            if (y === currentYear && m < new Date().getMonth()) continue;
+            if (y > currentYear && m > 5) break;
+            const key = y + '-' + String(m).padStart(2, '0');
+            const active = selectedPricingMonths.has(key);
+            const label = MONTH_NAMES[m] + (y !== currentYear ? ' ' + y : '');
+            html += `<button onclick="togglePricingMonth('${key}')" style="
+                padding:5px 12px; border:1px solid ${active ? '#FF385C' : '#ccc'};
+                background:${active ? '#FFF0F3' : '#fff'}; color:${active ? '#FF385C' : '#222'};
+                border-radius:20px; font-size:0.72rem; font-family:inherit; cursor:pointer;
+                font-weight:${active ? '600' : '400'};">${label}</button>`;
+        }
+    }
+    container.innerHTML = html;
+}
+
+function togglePricingMonth(key) {
+    if (selectedPricingMonths.has(key)) {
+        selectedPricingMonths.delete(key);
+    } else {
+        selectedPricingMonths.add(key);
+    }
+    renderMonthPriceTabs();
 }
 
 function closePricingModal() {
@@ -5692,37 +5869,575 @@ function updatePricingCell(key, value) {
     savePricingData(pricing);
 }
 
-function applyBulkPrice() {
-    const type = document.getElementById('bulkPriceType').value;
-    const price = parseFloat(document.getElementById('bulkPriceValue').value);
-    const range = document.getElementById('bulkPriceRange').value;
+function applyMonthPrice() {
+    const type = document.getElementById('monthPriceType').value;
+    const daysMode = document.getElementById('monthPriceDays').value;
+    const price = parseFloat(document.getElementById('monthPriceValue').value);
+
     if (!price || price <= 0) return alert('Introduce un precio válido.');
+    if (selectedPricingMonths.size === 0) return alert('Selecciona al menos un mes.');
 
     const pricing = loadPricing();
-    const daysInMonth = new Date(pricingYear, pricingMonth + 1, 0).getDate();
+
+    selectedPricingMonths.forEach(key => {
+        const [y, m] = key.split('-').map(Number);
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const date = new Date(y, m, d);
+            const ds = dateStr(date);
+            const dow = date.getDay();
+            // weekdays = Dom(0)-Jue(4), weekends = Vie(5)-Sáb(6)
+            const isWeekend = dow === 5 || dow === 6;
+
+            if (daysMode === 'weekdays' && isWeekend) continue;
+            if (daysMode === 'weekends' && !isWeekend) continue;
+
+            pricing[ds + '_' + type] = price;
+        }
+    });
+
+    savePricingData(pricing);
+    renderPricingCalendar();
+    alert(`Precio de ${price}€ aplicado a ${selectedPricingMonths.size} mes(es).`);
+}
+
+function applyIntervalPrice() {
+    const type = document.getElementById('intervalPriceType').value;
+    const from = document.getElementById('intervalPriceFrom').value;
+    const to = document.getElementById('intervalPriceTo').value;
+    const price = parseFloat(document.getElementById('intervalPriceValue').value);
+
+    if (!price || price <= 0) return alert('Introduce un precio válido.');
+    if (!from || !to) return alert('Selecciona las fechas.');
+    if (to < from) return alert('La fecha "hasta" debe ser igual o posterior a "desde".');
+
+    const pricing = loadPricing();
     const types = type === 'all' ? ['individual', 'doble', 'triple', 'cuadruple'] : [type];
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(pricingYear, pricingMonth, d);
-        const ds = dateStr(date);
-        const dow = date.getDay();
-        const isWeekend = dow === 0 || dow === 5 || dow === 6;
-
-        if (range === 'weekdays' && isWeekend) continue;
-        if (range === 'weekends' && !isWeekend) continue;
-
+    let d = parseDate(from);
+    const end = parseDate(to);
+    let count = 0;
+    while (d <= end) {
+        const ds = dateStr(d);
         types.forEach(rt => {
             pricing[ds + '_' + rt] = price;
         });
+        d = addDays(d, 1);
+        count++;
     }
 
     savePricingData(pricing);
     renderPricingCalendar();
+    alert(`Precio de ${price}€ aplicado a ${count} día(s).`);
 }
 
-function savePricing() {
-    alert('Precios guardados correctamente.');
-    closePricingModal();
+// ==================== INE SURVEY ====================
+
+const INE_COUNTRY_NAMES = {
+    'ES':'España','AT':'Austria','BE':'Bélgica','BG':'Bulgaria','CH':'Suiza','CZ':'Rep. Checa',
+    'DE':'Alemania','DK':'Dinamarca','EE':'Estonia','FI':'Finlandia','FR':'Francia','GB':'Reino Unido',
+    'HU':'Hungría','IE':'Irlanda','IT':'Italia','NL':'Países Bajos','PL':'Polonia','PT':'Portugal',
+    'RO':'Rumanía','SE':'Suecia','US':'EE.UU.','JP':'Japón','CN':'China','KR':'Corea del Sur',
+    'RU':'Rusia','BR':'Brasil','AR':'Argentina','MX':'México','MA':'Marruecos','NO':'Noruega',
+    'HR':'Croacia','SK':'Eslovaquia','LT':'Lituania','LV':'Letonia','SI':'Eslovenia','GR':'Grecia'
+};
+
+let ineCurrentTab = 'cabecera';
+let ineReportData = null;
+
+function loadIneConfig() {
+    try { return JSON.parse(localStorage.getItem('hostal_jijones_ine_config') || '{}'); }
+    catch { return {}; }
+}
+
+function saveIneConfig() {
+    const config = {
+        razonSocial: document.getElementById('ineRazonSocial').value.trim(),
+        nombreEstab: document.getElementById('ineNombreEstab').value.trim(),
+        nif: document.getElementById('ineNif').value.trim(),
+        numRegistro: document.getElementById('ineNumRegistro').value.trim(),
+        direccion: document.getElementById('ineDireccion').value.trim(),
+        cp: document.getElementById('ineCp').value.trim(),
+        localidad: document.getElementById('ineLocalidad').value.trim(),
+        municipio: document.getElementById('ineMunicipio').value.trim(),
+        provincia: document.getElementById('ineProvincia').value.trim(),
+        tel1: document.getElementById('ineTel1').value.trim(),
+        tel2: document.getElementById('ineTel2').value.trim(),
+        url: document.getElementById('ineUrl').value.trim(),
+        categoria: document.getElementById('ineCategoria').value,
+        numHab: parseInt(document.getElementById('ineNumHab').value) || 0,
+        numPlazas: parseInt(document.getElementById('ineNumPlazas').value) || 0,
+        personalNR: parseInt(document.getElementById('inePersonalNR').value) || 0,
+        personalFijo: parseInt(document.getElementById('inePersonalFijo').value) || 0,
+        personalEventual: parseInt(document.getElementById('inePersonalEventual').value) || 0
+    };
+    localStorage.setItem('hostal_jijones_ine_config', JSON.stringify(config));
+    document.getElementById('ineConfigModal').classList.remove('active');
+    if (ineReportData) renderIneTab();
+    alert('Configuración INE guardada.');
+}
+
+function openIneConfigModal() {
+    const c = loadIneConfig();
+    document.getElementById('ineRazonSocial').value = c.razonSocial || BUSINESS_DATA.name;
+    document.getElementById('ineNombreEstab').value = c.nombreEstab || BUSINESS_DATA.tradeName;
+    document.getElementById('ineNif').value = c.nif || BUSINESS_DATA.nif;
+    document.getElementById('ineNumRegistro').value = c.numRegistro || '';
+    document.getElementById('ineDireccion').value = c.direccion || BUSINESS_DATA.address;
+    document.getElementById('ineCp').value = c.cp || '';
+    document.getElementById('ineLocalidad').value = c.localidad || '';
+    document.getElementById('ineMunicipio').value = c.municipio || '';
+    document.getElementById('ineProvincia').value = c.provincia || '';
+    document.getElementById('ineTel1').value = c.tel1 || '';
+    document.getElementById('ineTel2').value = c.tel2 || '';
+    document.getElementById('ineUrl').value = c.url || '';
+    document.getElementById('ineCategoria').value = c.categoria || 'HS1';
+    document.getElementById('ineNumHab').value = c.numHab || ROOMS.filter(r => r.floor !== 'rural').length;
+    document.getElementById('ineNumPlazas').value = c.numPlazas || ROOMS.filter(r => r.floor !== 'rural').length * 2;
+    document.getElementById('inePersonalNR').value = c.personalNR || 0;
+    document.getElementById('inePersonalFijo').value = c.personalFijo || 0;
+    document.getElementById('inePersonalEventual').value = c.personalEventual || 0;
+    document.getElementById('ineConfigModal').classList.add('active');
+}
+
+function openIneModal() {
+    const now = new Date();
+    document.getElementById('ineMes').value = now.getMonth();
+    const yearSel = document.getElementById('ineAnio');
+    yearSel.innerHTML = '';
+    for (let y = now.getFullYear() - 1; y <= now.getFullYear() + 1; y++) {
+        yearSel.innerHTML += `<option value="${y}" ${y === now.getFullYear() ? 'selected' : ''}>${y}</option>`;
+    }
+    document.getElementById('ineReport').style.display = 'none';
+    document.getElementById('inePeriodSelector').style.display = 'block';
+    document.getElementById('ineValidation').style.display = 'none';
+    ineMonthChanged();
+    document.getElementById('ineModal').classList.add('active');
+}
+
+function closeIneModal() {
+    document.getElementById('ineModal').classList.remove('active');
+}
+
+function ineMonthChanged() {
+    const m = parseInt(document.getElementById('ineMes').value);
+    const y = parseInt(document.getElementById('ineAnio').value);
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    document.getElementById('ineDiasAbierto').value = daysInMonth;
+}
+
+function getNationalityCode(nat) {
+    if (!nat) return 'UNKNOWN';
+    const n = nat.trim().toLowerCase();
+    const map = {
+        'españa':'ES','spain':'ES','espana':'ES','spanish':'ES','española':'ES','español':'ES',
+        'francia':'FR','france':'FR','french':'FR','francés':'FR','francesa':'FR',
+        'alemania':'DE','germany':'DE','german':'DE','alemán':'DE','alemana':'DE',
+        'italia':'IT','italy':'IT','italian':'IT','italiano':'IT','italiana':'IT',
+        'portugal':'PT','portuguese':'PT','portugués':'PT','portuguesa':'PT',
+        'reino unido':'GB','uk':'GB','united kingdom':'GB','british':'GB','inglés':'GB','inglesa':'GB','england':'GB',
+        'estados unidos':'US','usa':'US','united states':'US','american':'US','eeuu':'US',
+        'países bajos':'NL','holanda':'NL','netherlands':'NL','dutch':'NL','holland':'NL',
+        'bélgica':'BE','belgica':'BE','belgium':'BE','belgian':'BE',
+        'suiza':'CH','switzerland':'CH','swiss':'CH',
+        'austria':'AT','austrian':'AT',
+        'polonia':'PL','poland':'PL','polish':'PL','polaco':'PL','polaca':'PL',
+        'rumanía':'RO','rumania':'RO','romania':'RO','romanian':'RO',
+        'suecia':'SE','sweden':'SE','swedish':'SE',
+        'noruega':'NO','norway':'NO','norwegian':'NO',
+        'dinamarca':'DK','denmark':'DK','danish':'DK',
+        'irlanda':'IE','ireland':'IE','irish':'IE',
+        'brasil':'BR','brazil':'BR','brazilian':'BR','brasileño':'BR',
+        'argentina':'AR','argentine':'AR','argentino':'AR','argentina':'AR',
+        'méxico':'MX','mexico':'MX','mexican':'MX','mexicano':'MX',
+        'marruecos':'MA','morocco':'MA','moroccan':'MA','marroquí':'MA',
+        'china':'CN','chinese':'CN','chino':'CN',
+        'japón':'JP','japon':'JP','japan':'JP','japanese':'JP',
+        'rusia':'RU','russia':'RU','russian':'RU','ruso':'RU',
+        'rep. checa':'CZ','república checa':'CZ','republica checa':'CZ','czech':'CZ',
+        'hungría':'HU','hungria':'HU','hungary':'HU','hungarian':'HU',
+        'finlandia':'FI','finland':'FI','finnish':'FI',
+        'bulgaria':'BG','bulgarian':'BG',
+        'croacia':'HR','croatia':'HR',
+        'eslovaquia':'SK','slovakia':'SK',
+        'corea del sur':'KR','south korea':'KR','corea':'KR',
+        'grecia':'GR','greece':'GR',
+        'estonia':'EE','lituania':'LT','letonia':'LV','eslovenia':'SI'
+    };
+    if (map[n]) return map[n];
+    // Try 2-letter code directly
+    const upper = nat.trim().toUpperCase();
+    if (upper.length === 2 && /^[A-Z]{2}$/.test(upper)) return upper;
+    return 'OTHER';
+}
+
+function getGuestsFromBooking(b) {
+    // Returns array of {nationality} for main guest + companions
+    const guests = [];
+    const numGuests = parseInt(b.guests) || 1;
+    guests.push({ nationality: b.nationality || '' });
+    if (b.companions && b.companions.length > 0) {
+        b.companions.forEach(c => {
+            if (c.name) guests.push({ nationality: b.nationality || '' });
+        });
+    }
+    // Fill up to numGuests if companions don't cover it
+    while (guests.length < numGuests) {
+        guests.push({ nationality: b.nationality || '' });
+    }
+    return guests;
+}
+
+function generateIneReport() {
+    const m = parseInt(document.getElementById('ineMes').value);
+    const y = parseInt(document.getElementById('ineAnio').value);
+    const dias = [
+        parseInt(document.getElementById('ineDia1').value),
+        parseInt(document.getElementById('ineDia2').value),
+        parseInt(document.getElementById('ineDia3').value),
+        parseInt(document.getElementById('ineDia4').value)
+    ];
+
+    if (dias.some(d => !d || d < 1 || d > 31)) return alert('Introduce 4 días válidos (1-31).');
+    dias.sort((a, b) => a - b);
+
+    const diasAbierto = parseInt(document.getElementById('ineDiasAbierto').value) || 30;
+    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural');
+
+    // Calculate data for each day
+    const entradas = [], salidas = [], pernoctaciones = [], habitacionesData = [];
+
+    dias.forEach(dia => {
+        const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+
+        // Entries: check-ins on this day
+        const entryByCountry = {};
+        bookings.filter(b => b.checkin === ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+            getGuestsFromBooking(b).forEach(g => {
+                const code = getNationalityCode(g.nationality);
+                entryByCountry[code] = (entryByCountry[code] || 0) + 1;
+            });
+        });
+        entradas.push(entryByCountry);
+
+        // Exits: check-outs on this day
+        const exitByCountry = {};
+        bookings.filter(b => b.checkout === ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+            getGuestsFromBooking(b).forEach(g => {
+                const code = getNationalityCode(g.nationality);
+                exitByCountry[code] = (exitByCountry[code] || 0) + 1;
+            });
+        });
+        salidas.push(exitByCountry);
+
+        // Overnight stays: active bookings (checkin <= day && checkout > day)
+        const overnightByCountry = {};
+        bookings.filter(b => b.checkin <= ds && b.checkout > ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+            getGuestsFromBooking(b).forEach(g => {
+                const code = getNationalityCode(g.nationality);
+                overnightByCountry[code] = (overnightByCountry[code] || 0) + 1;
+            });
+        });
+        pernoctaciones.push(overnightByCountry);
+
+        // Room occupancy
+        let supletorias = 0, dobleDoble = 0, dobleIndiv = 0, otras = 0;
+        hostalRooms.forEach(room => {
+            const active = bookings.filter(b => b.checkin <= ds && b.checkout > ds && String(b.room) === String(room.number) && b.status !== 'cancelled');
+            if (active.length === 0) return;
+            const b = active[0];
+            const numGuests = parseInt(b.guests) || 1;
+            const roomType = b.roomType || 'doble';
+            const extraBeds = parseInt(b.extraBeds) || 0;
+            supletorias += extraBeds;
+            if (room.bedType === 'double' || room.bedType === 'twin') {
+                if (numGuests >= 2 || roomType === 'doble') dobleDoble++;
+                else dobleIndiv++;
+            } else {
+                otras++;
+            }
+        });
+        habitacionesData.push({ supletorias, dobleDoble, dobleIndiv, otras });
+    });
+
+    // ADR & REVPAR
+    const monthStart = `${y}-${String(m + 1).padStart(2, '0')}-01`;
+    const monthEnd = `${y}-${String(m + 2 > 12 ? 1 : m + 2).padStart(2, '0')}-01`;
+    const monthBookings = bookings.filter(b => b.checkin < monthEnd && b.checkout > monthStart && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room)));
+    let totalRevenue = 0, totalRoomNights = 0;
+    monthBookings.forEach(b => {
+        const ci = b.checkin < monthStart ? monthStart : b.checkin;
+        const co = b.checkout > monthEnd ? monthEnd : b.checkout;
+        const nights = nightsBetween(ci, co);
+        totalRevenue += nights * (b.pricePerNight || 0);
+        totalRoomNights += nights;
+    });
+    const totalAvailableRoomNights = hostalRooms.length * diasAbierto;
+    const adr = totalRoomNights > 0 ? totalRevenue / totalRoomNights : 0;
+    const revpar = totalAvailableRoomNights > 0 ? totalRevenue / totalAvailableRoomNights : 0;
+
+    ineReportData = { m, y, dias, diasAbierto, entradas, salidas, pernoctaciones, habitacionesData, adr, revpar, totalRevenue, totalRoomNights };
+
+    document.getElementById('inePeriodSelector').style.display = 'none';
+    document.getElementById('ineReport').style.display = 'block';
+    ineCurrentTab = 'cabecera';
+    renderIneTab();
+    renderIneValidation();
+}
+
+function switchIneTab(tab) {
+    ineCurrentTab = tab;
+    document.querySelectorAll('.ine-tab').forEach(el => el.classList.toggle('active', el.textContent.toLowerCase().includes(tab.substring(0, 4))));
+    renderIneTab();
+}
+
+function renderIneTab() {
+    const d = ineReportData;
+    const container = document.getElementById('ineTabContent');
+
+    if (ineCurrentTab === 'cabecera') {
+        const c = loadIneConfig();
+        container.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-weight:600;">Datos del establecimiento</span>
+                <button class="btn-outline" onclick="openIneConfigModal()" style="font-size:0.72rem; padding:4px 12px;">Editar configuración</button>
+            </div>
+            <table class="ine-table">
+                <tr><td style="width:40%; font-weight:500;">Mes/Año</td><td>${MONTH_NAMES_FULL[d.m]} ${d.y}</td></tr>
+                <tr><td style="font-weight:500;">Días abierto</td><td>${d.diasAbierto}</td></tr>
+                <tr><td style="font-weight:500;">Razón Social</td><td>${c.razonSocial || BUSINESS_DATA.name}</td></tr>
+                <tr><td style="font-weight:500;">Nombre</td><td>${c.nombreEstab || BUSINESS_DATA.tradeName}</td></tr>
+                <tr><td style="font-weight:500;">NIF</td><td>${c.nif || BUSINESS_DATA.nif}</td></tr>
+                <tr><td style="font-weight:500;">N.º Registro</td><td>${c.numRegistro || '-'}</td></tr>
+                <tr><td style="font-weight:500;">Dirección</td><td>${c.direccion || BUSINESS_DATA.address}, ${c.cp || ''} ${c.localidad || ''}</td></tr>
+                <tr><td style="font-weight:500;">Municipio / Provincia</td><td>${c.municipio || ''} / ${c.provincia || ''}</td></tr>
+                <tr><td style="font-weight:500;">Categoría</td><td>${c.categoria || 'HS1'}</td></tr>
+                <tr><td style="font-weight:500;">N.º habitaciones</td><td>${c.numHab || ROOMS.filter(r=>r.floor!=='rural').length}</td></tr>
+                <tr><td style="font-weight:500;">Plazas sin supletorias</td><td>${c.numPlazas || '-'}</td></tr>
+                <tr><td style="font-weight:500;">Días muestrales</td><td>${d.dias.join(', ')}</td></tr>
+            </table>`;
+        return;
+    }
+
+    if (ineCurrentTab === 'entradas' || ineCurrentTab === 'salidas' || ineCurrentTab === 'pernoctaciones') {
+        const dataset = ineCurrentTab === 'entradas' ? d.entradas : ineCurrentTab === 'salidas' ? d.salidas : d.pernoctaciones;
+        const title = ineCurrentTab === 'entradas' ? 'ENTRADA DE VIAJEROS' : ineCurrentTab === 'salidas' ? 'SALIDA DE VIAJEROS' : 'PERNOCTACIONES';
+
+        // Collect all country codes across all 4 days
+        const allCodes = new Set();
+        dataset.forEach(dayData => Object.keys(dayData).forEach(c => allCodes.add(c)));
+
+        const esCodes = [...allCodes].filter(c => c === 'ES').sort();
+        const foreignCodes = [...allCodes].filter(c => c !== 'ES' && c !== 'UNKNOWN' && c !== 'OTHER').sort();
+        const otherCodes = [...allCodes].filter(c => c === 'UNKNOWN' || c === 'OTHER');
+
+        let html = `<div style="font-weight:600; margin-bottom:8px;">${title}</div>
+            <table class="ine-table"><thead><tr><th style="min-width:150px;">Procedencia</th>`;
+        d.dias.forEach(dia => { html += `<th style="text-align:center; min-width:60px;">Día ${dia}</th>`; });
+        html += '</tr></thead><tbody>';
+
+        // Spain total
+        if (esCodes.length > 0) {
+            html += '<tr class="ine-total"><td>ESPAÑA</td>';
+            d.dias.forEach((_, i) => { html += `<td class="num">${dataset[i]['ES'] || 0}</td>`; });
+            html += '</tr>';
+        }
+
+        // Foreign countries
+        if (foreignCodes.length > 0 || otherCodes.length > 0) {
+            const foreignTotal = d.dias.map((_, i) => {
+                return [...foreignCodes, ...otherCodes].reduce((s, c) => s + (dataset[i][c] || 0), 0);
+            });
+            html += '<tr class="ine-total"><td>RESTO DE PAÍSES</td>';
+            foreignTotal.forEach(t => { html += `<td class="num">${t}</td>`; });
+            html += '</tr>';
+            foreignCodes.forEach(code => {
+                html += `<tr><td style="padding-left:20px;">${INE_COUNTRY_NAMES[code] || code}</td>`;
+                d.dias.forEach((_, i) => { html += `<td class="num">${dataset[i][code] || 0}</td>`; });
+                html += '</tr>';
+            });
+            if (otherCodes.length > 0) {
+                html += '<tr><td style="padding-left:20px;">Otros / Sin especificar</td>';
+                d.dias.forEach((_, i) => {
+                    const val = otherCodes.reduce((s, c) => s + (dataset[i][c] || 0), 0);
+                    html += `<td class="num">${val}</td>`;
+                });
+                html += '</tr>';
+            }
+        }
+
+        // Grand total
+        html += '<tr style="border-top:2px solid #222;"><td style="font-weight:700;">TOTAL</td>';
+        d.dias.forEach((_, i) => {
+            const total = Object.values(dataset[i]).reduce((s, v) => s + v, 0);
+            html += `<td class="num" style="font-weight:700;">${total}</td>`;
+        });
+        html += '</tr>';
+
+        if (ineCurrentTab === 'pernoctaciones') {
+            // Validation row
+            html += '<tr style="background:#f0f8ff;"><td style="font-size:0.72rem; color:#555;">Validación (P = P_ant + E - S)</td>';
+            d.dias.forEach((_, i) => {
+                if (i === 0) { html += '<td class="num" style="font-size:0.72rem;">—</td>'; return; }
+                const pPrev = Object.values(d.pernoctaciones[i-1]).reduce((s,v) => s+v, 0);
+                const eDay = Object.values(d.entradas[i]).reduce((s,v) => s+v, 0);
+                const sDay = Object.values(d.salidas[i]).reduce((s,v) => s+v, 0);
+                const expected = pPrev + eDay - sDay;
+                const actual = Object.values(d.pernoctaciones[i]).reduce((s,v) => s+v, 0);
+                const ok = actual === expected;
+                html += `<td class="num ${ok ? 'ine-valid' : 'ine-invalid'}" style="font-size:0.72rem;">${ok ? '✓' : expected + '≠' + actual}</td>`;
+            });
+            html += '</tr>';
+        }
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+        return;
+    }
+
+    if (ineCurrentTab === 'habitaciones') {
+        let html = `<div style="font-weight:600; margin-bottom:8px;">HABITACIONES OCUPADAS Y PLAZAS SUPLETORIAS</div>
+            <table class="ine-table"><thead><tr><th>Concepto</th>`;
+        d.dias.forEach(dia => { html += `<th style="text-align:center;">Día ${dia}</th>`; });
+        html += '</tr></thead><tbody>';
+
+        const rows = [
+            { label: 'Plazas supletorias', key: 'supletorias' },
+            { label: 'Hab. dobles uso doble', key: 'dobleDoble' },
+            { label: 'Hab. dobles uso individual', key: 'dobleIndiv' },
+            { label: 'Otras habitaciones', key: 'otras' }
+        ];
+        rows.forEach(row => {
+            html += `<tr><td>${row.label}</td>`;
+            d.dias.forEach((_, i) => { html += `<td class="num">${d.habitacionesData[i][row.key]}</td>`; });
+            html += '</tr>';
+        });
+        html += '<tr class="ine-total"><td>Total hab. ocupadas</td>';
+        d.dias.forEach((_, i) => {
+            const h = d.habitacionesData[i];
+            html += `<td class="num">${h.dobleDoble + h.dobleIndiv + h.otras}</td>`;
+        });
+        html += '</tr></tbody></table>';
+        container.innerHTML = html;
+        return;
+    }
+
+    if (ineCurrentTab === 'personal') {
+        const c = loadIneConfig();
+        container.innerHTML = `
+            <div style="font-weight:600; margin-bottom:8px;">PERSONAL OCUPADO</div>
+            <table class="ine-table">
+                <tr><td>Personal no remunerado</td><td class="num">${c.personalNR || 0}</td></tr>
+                <tr><td>Personal remunerado fijo</td><td class="num">${c.personalFijo || 0}</td></tr>
+                <tr><td>Personal remunerado eventual</td><td class="num">${c.personalEventual || 0}</td></tr>
+            </table>
+            <div style="font-weight:600; margin:16px 0 8px;">REVPAR Y ADR MENSUAL</div>
+            <table class="ine-table">
+                <tr><td>Ingresos por habitaciones (mes)</td><td class="num">${d.totalRevenue.toFixed(2)} €</td></tr>
+                <tr><td>Habitaciones-noche vendidas</td><td class="num">${d.totalRoomNights}</td></tr>
+                <tr><td>ADR (tarifa media diaria)</td><td class="num" style="font-weight:700;">${d.adr.toFixed(2)} €</td></tr>
+                <tr><td>REVPAR (ingreso por hab. disponible)</td><td class="num" style="font-weight:700;">${d.revpar.toFixed(2)} €</td></tr>
+            </table>
+            <div style="margin-top:12px;"><button class="btn-outline" onclick="openIneConfigModal()" style="font-size:0.72rem; padding:4px 12px;">Editar personal</button></div>`;
+        return;
+    }
+}
+
+function renderIneValidation() {
+    const d = ineReportData;
+    const c = loadIneConfig();
+    const numHab = c.numHab || ROOMS.filter(r => r.floor !== 'rural').length;
+    let html = '<div style="font-weight:600; margin-bottom:8px;">Validaciones INE</div>';
+    const checks = [];
+
+    d.dias.forEach((dia, i) => {
+        const totalPernoct = Object.values(d.pernoctaciones[i]).reduce((s,v) => s+v, 0);
+        const totalEntradas = Object.values(d.entradas[i]).reduce((s,v) => s+v, 0);
+        const h = d.habitacionesData[i];
+        const totalHabOcup = h.dobleDoble + h.dobleIndiv + h.otras;
+
+        // XML_7: First day pernoctaciones >= entradas
+        if (i === 0) {
+            checks.push({ ok: totalPernoct >= totalEntradas, msg: `Día ${dia}: Pernoctaciones (${totalPernoct}) ≥ Entradas (${totalEntradas})`, code: 'XML_7' });
+        }
+
+        // XML_8: P[n] = P[n-1] + E[n] - S[n]
+        if (i > 0) {
+            const prevPernoct = Object.values(d.pernoctaciones[i-1]).reduce((s,v) => s+v, 0);
+            const totalSalidas = Object.values(d.salidas[i]).reduce((s,v) => s+v, 0);
+            const expected = prevPernoct + totalEntradas - totalSalidas;
+            checks.push({ ok: totalPernoct === expected, msg: `Día ${dia}: P=${totalPernoct}, esperado P_ant(${prevPernoct})+E(${totalEntradas})-S(${totalSalidas})=${expected}`, code: 'XML_8' });
+        }
+
+        // XML_9: si hab ocupadas → pernoctaciones y viceversa
+        const habSinPernoct = totalHabOcup > 0 && totalPernoct === 0;
+        const pernoctSinHab = totalPernoct > 0 && totalHabOcup === 0;
+        checks.push({ ok: !habSinPernoct && !pernoctSinHab, msg: `Día ${dia}: Coherencia hab.(${totalHabOcup}) ↔ pernoct.(${totalPernoct})`, code: 'XML_9' });
+
+        // XML_13: hab ocupadas ≤ total hab
+        checks.push({ ok: totalHabOcup <= numHab, msg: `Día ${dia}: Hab. ocupadas (${totalHabOcup}) ≤ Total hab. (${numHab})`, code: 'XML_13' });
+    });
+
+    html += checks.map(c => `<div style="margin-bottom:4px;">${c.ok ? '<span class="ine-valid">✓</span>' : '<span class="ine-invalid">✗</span>'} <span style="font-size:0.72rem; color:#888;">[${c.code}]</span> ${c.msg}</div>`).join('');
+
+    document.getElementById('ineValidation').innerHTML = html;
+    document.getElementById('ineValidation').style.display = 'block';
+}
+
+function exportInePDF() {
+    const d = ineReportData;
+    const c = loadIneConfig();
+
+    // Build all tables as HTML
+    let content = `<h1 style="font-size:1.2rem;margin-bottom:4px;">Encuesta INE — Ocupación Hotelera</h1>
+        <div style="color:#717171;font-size:0.85rem;margin-bottom:16px;">${c.nombreEstab || BUSINESS_DATA.tradeName} · ${MONTH_NAMES_FULL[d.m]} ${d.y} · Días: ${d.dias.join(', ')}</div>`;
+
+    // Render each tab's content
+    const tabs = ['entradas', 'salidas', 'pernoctaciones', 'habitaciones'];
+    const savedTab = ineCurrentTab;
+    tabs.forEach(tab => {
+        ineCurrentTab = tab;
+        renderIneTab();
+        content += document.getElementById('ineTabContent').innerHTML + '<div style="margin-top:16px;"></div>';
+    });
+    ineCurrentTab = savedTab;
+    renderIneTab();
+
+    content += `<div style="margin-top:16px;font-weight:600;">ADR: ${d.adr.toFixed(2)} € · REVPAR: ${d.revpar.toFixed(2)} €</div>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>INE ${MONTH_NAMES_FULL[d.m]} ${d.y}</title>
+        <style>body{font-family:'Segoe UI',system-ui,sans-serif;padding:20px 30px;color:#222;font-size:13px;}
+        table{width:100%;border-collapse:collapse;margin-bottom:12px;}th{background:#f7f7f7;padding:6px 8px;text-align:left;font-size:0.75rem;border-bottom:2px solid #ddd;}
+        td{padding:5px 8px;border-bottom:1px solid #eee;font-size:0.78rem;}.num{text-align:center;font-weight:500;}
+        .ine-total td{font-weight:700;background:#f0f0f0;}@media print{body{padding:10px;}}</style></head><body>${content}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 300);
+}
+
+function exportIneCSV() {
+    const d = ineReportData;
+    const allCodes = new Set();
+    [...d.entradas, ...d.salidas, ...d.pernoctaciones].forEach(dd => Object.keys(dd).forEach(c => allCodes.add(c)));
+    const codes = [...allCodes].sort();
+
+    let csv = 'Tipo;Procedencia;' + d.dias.map(dia => 'Día ' + dia).join(';') + '\n';
+    ['Entradas', 'Salidas', 'Pernoctaciones'].forEach((label, ti) => {
+        const dataset = [d.entradas, d.salidas, d.pernoctaciones][ti];
+        codes.forEach(code => {
+            const name = code === 'ES' ? 'España' : (INE_COUNTRY_NAMES[code] || code);
+            csv += label + ';' + name + ';' + d.dias.map((_, i) => dataset[i][code] || 0).join(';') + '\n';
+        });
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `INE_${MONTH_NAMES_FULL[d.m]}_${d.y}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // ==================== ROOM CONFIG (BED TYPE TOGGLE) ====================
@@ -5859,14 +6574,7 @@ renderLoginScreen();
         </div>
 
         <div class="wizard-panel" id="wp3">
-            <div class="form-group" style="margin-top:16px;">
-                <label>¿Cuántas personas por habitación?</label>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                    <button class="wiz-choice active" id="wizPers1" onclick="wizSetPersons(1)">1 pers.</button>
-                    <button class="wiz-choice" id="wizPers2" onclick="wizSetPersons(2)">2 pers.</button>
-                    <button class="wiz-choice" id="wizPers3" onclick="wizSetPersons(3)">3 pers.</button>
-                    <button class="wiz-choice" id="wizPers4" onclick="wizSetPersons(4)">4 pers.</button>
-                </div>
+            <div class="form-group" style="margin-top:16px;" id="wizPersonsContainer">
             </div>
             <div class="wizard-nav" style="margin-top:24px;">
                 <button class="btn-secondary" onclick="wizardBack(3)">Atrás</button>
@@ -5925,7 +6633,8 @@ renderLoginScreen();
                 <input type="date" id="invoiceFilterTo" onchange="renderInvoicesList()" style="padding:6px 8px; font-size:0.78rem;">
             </div>
             <button class="btn-primary" onclick="exportInvoicesCSV()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">CSV</button>
-            <button class="btn-primary" onclick="exportInvoicesPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">PDF</button>
+            <button class="btn-primary" onclick="exportInvoicesPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">PDF listado</button>
+            <button class="btn-primary" onclick="exportInvoicesZipPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">ZIP PDFs</button>
         </div>
         <div id="invoicesListContent" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
@@ -5983,45 +6692,201 @@ renderLoginScreen();
         <h2>Gestión de Precios</h2>
         <p style="font-size:0.78rem; color:#717171; margin-bottom:16px;">Los fines de semana con +80% de ocupación se incrementan automáticamente un 10%.</p>
 
-        <!-- Bulk edit section -->
-        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
-            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Cambio masivo de precios</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
-                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
-                    <label style="font-size:0.72rem;">Tipo</label>
-                    <select id="bulkPriceType" style="padding:6px 8px; font-size:0.78rem;">
-                        <option value="all">Todos</option>
-                        <option value="individual">Individual</option>
-                        <option value="doble">Doble</option>
-                        <option value="triple">Triple</option>
-                        <option value="cuadruple">Cuádruple</option>
+        <!-- Pricing by month -->
+        <div style="background:#f8f9fa; border:1px solid #e0e0e0; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#222; margin-bottom:12px;">Precios por mes</div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px;">
+                <div class="form-group" style="margin:0; min-width:120px;">
+                    <label style="font-size:0.72rem;">Tipo de habitación</label>
+                    <select id="monthPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="individual">1 persona</option>
+                        <option value="doble" selected>2 personas</option>
+                        <option value="triple">3 personas</option>
+                        <option value="cuadruple">4 personas</option>
                     </select>
+                </div>
+                <div class="form-group" style="margin:0; min-width:140px;">
+                    <label style="font-size:0.72rem;">Días de la semana</label>
+                    <select id="monthPriceDays" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="weekdays">Domingo a Jueves</option>
+                        <option value="weekends">Viernes y Sábado</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; width:90px;">
+                    <label style="font-size:0.72rem;">Precio €/noche</label>
+                    <input type="number" id="monthPriceValue" min="0" step="0.5" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+            </div>
+
+            <!-- Month tabs -->
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:12px;" id="monthPriceTabs"></div>
+
+            <button class="btn-primary" onclick="applyMonthPrice()" style="padding:8px 20px; font-size:0.78rem;">Aplicar a meses seleccionados</button>
+        </div>
+
+        <!-- Pricing by date interval -->
+        <div style="background:#FFF0F3; border:1px solid #FFD6DE; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:600; font-size:0.85rem; color:#FF385C; margin-bottom:10px;">Precio por intervalo de fechas</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                <div class="form-group" style="margin:0; min-width:100px;">
+                    <label style="font-size:0.72rem;">Tipo</label>
+                    <select id="intervalPriceType" style="padding:6px 8px; font-size:0.78rem;">
+                        <option value="all">Todos</option>
+                        <option value="individual">1 persona</option>
+                        <option value="doble">2 personas</option>
+                        <option value="triple">3 personas</option>
+                        <option value="cuadruple">4 personas</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0; min-width:110px;">
+                    <label style="font-size:0.72rem;">Desde</label>
+                    <input type="date" id="intervalPriceFrom" style="padding:6px 8px; font-size:0.78rem;">
+                </div>
+                <div class="form-group" style="margin:0; min-width:110px;">
+                    <label style="font-size:0.72rem;">Hasta</label>
+                    <input type="date" id="intervalPriceTo" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
                 <div class="form-group" style="margin:0; width:80px;">
-                    <label style="font-size:0.72rem;">Nuevo precio €</label>
-                    <input type="number" id="bulkPriceValue" min="0" step="1" placeholder="48" style="padding:6px 8px; font-size:0.78rem;">
+                    <label style="font-size:0.72rem;">Precio €</label>
+                    <input type="number" id="intervalPriceValue" min="0" step="0.5" placeholder="58" style="padding:6px 8px; font-size:0.78rem;">
                 </div>
-                <div class="form-group" style="margin:0; flex:1; min-width:100px;">
-                    <label style="font-size:0.72rem;">Aplicar a</label>
-                    <select id="bulkPriceRange" style="padding:6px 8px; font-size:0.78rem;">
-                        <option value="month">Este mes</option>
-                        <option value="weekdays">Solo L-V este mes</option>
-                        <option value="weekends">Solo V-D este mes</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="applyBulkPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap;">Aplicar</button>
+                <button class="btn-primary" onclick="applyIntervalPrice()" style="padding:6px 16px; font-size:0.78rem; white-space:nowrap; background:#FF385C;">Aplicar</button>
             </div>
         </div>
 
+        <!-- Calendar view -->
         <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
             <button class="btn-outline" onclick="changePricingMonth(-1)" style="padding:4px 10px;">‹</button>
             <h4 id="pricingMonthLabel" style="min-width:160px; text-align:center; font-weight:600; color:#222;"></h4>
             <button class="btn-outline" onclick="changePricingMonth(1)" style="padding:4px 10px;">›</button>
         </div>
-        <div id="pricingCalendar" style="max-height:400px; overflow-y:auto;"></div>
+        <div id="pricingCalendar" style="max-height:350px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
-            <button class="btn-primary" onclick="savePricing()" style="margin-right:auto;">Guardar</button>
             <button class="btn-secondary" onclick="closePricingModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal INE -->
+<div class="modal-overlay" id="ineModal">
+    <div class="modal" style="width:950px; max-height:90vh; overflow-y:auto;">
+        <h2 style="display:flex;align-items:center;gap:8px;">📊 Encuesta INE — Ocupación Hotelera</h2>
+
+        <!-- Period selector -->
+        <div id="inePeriodSelector">
+            <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:16px;">
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.72rem;">Mes</label>
+                    <select id="ineMes" style="padding:6px 10px; font-size:0.82rem;" onchange="ineMonthChanged()">
+                        <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                        <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+                        <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+                        <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.72rem;">Año</label>
+                    <select id="ineAnio" style="padding:6px 10px; font-size:0.82rem;"></select>
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label style="font-size:0.72rem;">Días abierto</label>
+                    <input type="number" id="ineDiasAbierto" value="30" min="1" max="31" style="width:60px; padding:6px; font-size:0.82rem;">
+                </div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:0.78rem; font-weight:500; color:#555;">Días solicitados por el INE:</label>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <input type="number" id="ineDia1" min="1" max="31" placeholder="Día 1" style="width:70px; padding:8px; font-size:0.9rem; text-align:center; border:2px solid #e0e0e0; border-radius:8px; font-weight:600;">
+                    <input type="number" id="ineDia2" min="1" max="31" placeholder="Día 2" style="width:70px; padding:8px; font-size:0.9rem; text-align:center; border:2px solid #e0e0e0; border-radius:8px; font-weight:600;">
+                    <input type="number" id="ineDia3" min="1" max="31" placeholder="Día 3" style="width:70px; padding:8px; font-size:0.9rem; text-align:center; border:2px solid #e0e0e0; border-radius:8px; font-weight:600;">
+                    <input type="number" id="ineDia4" min="1" max="31" placeholder="Día 4" style="width:70px; padding:8px; font-size:0.9rem; text-align:center; border:2px solid #e0e0e0; border-radius:8px; font-weight:600;">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="generateIneReport()" style="padding:10px 24px;">Generar informe</button>
+        </div>
+
+        <!-- Report tabs -->
+        <div id="ineReport" style="display:none; margin-top:16px;">
+            <div style="display:flex; gap:0; margin-bottom:16px; border-bottom:2px solid #ebebeb; flex-wrap:wrap;">
+                <button class="ine-tab active" onclick="switchIneTab('cabecera')">Cabecera</button>
+                <button class="ine-tab" onclick="switchIneTab('entradas')">Entradas</button>
+                <button class="ine-tab" onclick="switchIneTab('salidas')">Salidas</button>
+                <button class="ine-tab" onclick="switchIneTab('pernoctaciones')">Pernoctaciones</button>
+                <button class="ine-tab" onclick="switchIneTab('habitaciones')">Habitaciones</button>
+                <button class="ine-tab" onclick="switchIneTab('personal')">Personal/Precios</button>
+            </div>
+            <div id="ineTabContent" style="max-height:55vh; overflow-y:auto;"></div>
+            <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;">
+                <button class="btn-primary" onclick="exportInePDF()" style="padding:8px 16px; font-size:0.78rem;">Exportar PDF</button>
+                <button class="btn-primary" onclick="exportIneCSV()" style="padding:8px 16px; font-size:0.78rem;">Exportar CSV</button>
+                <button class="btn-secondary" onclick="document.getElementById('ineReport').style.display='none';document.getElementById('inePeriodSelector').style.display='block';">Cambiar período</button>
+            </div>
+        </div>
+
+        <!-- Validation panel -->
+        <div id="ineValidation" style="display:none; margin-top:12px; padding:12px; background:#f8f9fa; border-radius:8px; font-size:0.78rem;"></div>
+
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-secondary" onclick="closeIneModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal INE Config -->
+<div class="modal-overlay" id="ineConfigModal">
+    <div class="modal" style="width:600px; max-height:85vh; overflow-y:auto;">
+        <h2>Configuración INE — Establecimiento</h2>
+        <div class="form-row">
+            <div class="form-group"><label>Razón Social</label><input type="text" id="ineRazonSocial"></div>
+            <div class="form-group"><label>Nombre establecimiento</label><input type="text" id="ineNombreEstab"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>NIF</label><input type="text" id="ineNif"></div>
+            <div class="form-group"><label>N.º Registro turístico</label><input type="text" id="ineNumRegistro" placeholder="H-XX/XXX"></div>
+        </div>
+        <div class="form-group"><label>Dirección</label><input type="text" id="ineDireccion"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Código Postal</label><input type="text" id="ineCp"></div>
+            <div class="form-group"><label>Localidad</label><input type="text" id="ineLocalidad"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Municipio</label><input type="text" id="ineMunicipio"></div>
+            <div class="form-group"><label>Provincia</label><input type="text" id="ineProvincia"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Teléfono 1</label><input type="text" id="ineTel1"></div>
+            <div class="form-group"><label>Teléfono 2</label><input type="text" id="ineTel2"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>URL</label><input type="text" id="ineUrl"></div>
+            <div class="form-group"><label>Categoría</label>
+                <select id="ineCategoria" style="padding:8px;">
+                    <option value="HS1">HS1 - Hostal 1 estrella</option>
+                    <option value="HS2">HS2 - Hostal 2 estrellas</option>
+                    <option value="HS3">HS3 - Hostal 3 estrellas</option>
+                    <option value="H1">H1 - Hotel 1 estrella</option>
+                    <option value="H2">H2 - Hotel 2 estrella</option>
+                    <option value="P1">P1 - Pensión 1</option>
+                    <option value="P2">P2 - Pensión 2</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>N.º habitaciones</label><input type="number" id="ineNumHab" min="1"></div>
+            <div class="form-group"><label>Plazas sin supletorias</label><input type="number" id="ineNumPlazas" min="1"></div>
+        </div>
+        <div style="border-top:1px solid #eee; padding-top:12px; margin-top:8px;">
+            <div style="font-weight:600; font-size:0.85rem; margin-bottom:8px;">Personal</div>
+            <div class="form-row">
+                <div class="form-group"><label>No remunerado</label><input type="number" id="inePersonalNR" min="0" value="0"></div>
+                <div class="form-group"><label>Fijo</label><input type="number" id="inePersonalFijo" min="0" value="0"></div>
+                <div class="form-group"><label>Eventual</label><input type="number" id="inePersonalEventual" min="0" value="0"></div>
+            </div>
+        </div>
+        <div class="form-actions" style="margin-top:15px;">
+            <button class="btn-primary" onclick="saveIneConfig()">Guardar</button>
+            <button class="btn-secondary" onclick="document.getElementById('ineConfigModal').classList.remove('active')">Cancelar</button>
         </div>
     </div>
 </div>
