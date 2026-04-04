@@ -1477,7 +1477,6 @@
         <div class="confirm-actions" id="confirmActions" style="display:none;">
             <button class="btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
             <button class="btn-email" onclick="sendEmail()">Email</button>
-            <button class="btn-copy-confirm" onclick="copyConfirmation()">Copiar texto</button>
             <button class="btn-primary" onclick="generateInvoice()" style="font-size:0.8rem;">Factura</button>
         </div>
 
@@ -2523,12 +2522,18 @@ function saveBooking() {
 
     // Validate extra rooms for conflicts
     const validExtraRooms = currentExtraRooms.filter(er => er.room);
+    const existingExtraRooms = id ? (bookings.find(b => b.id === id)?.extraRooms || []).map(er => String(er.room)) : [];
+    const existingMainRoom = id ? String(bookings.find(b => b.id === id)?.room) : '';
+    const existingCheckin = id ? bookings.find(b => b.id === id)?.checkin : '';
+    const existingCheckout = id ? bookings.find(b => b.id === id)?.checkout : '';
     for (const er of validExtraRooms) {
         const erRoom = isNaN(er.room) ? er.room : parseInt(er.room);
         if (erRoom === room) {
             return alert(`La habitación ${erRoom} no puede ser habitación principal y adicional a la vez.`);
         }
-        if (hasConflict(erRoom, checkin, checkout, id)) {
+        // Skip conflict check if room, dates haven't changed (already validated when first added)
+        const roomUnchanged = existingExtraRooms.includes(String(erRoom)) && checkin === existingCheckin && checkout === existingCheckout;
+        if (!roomUnchanged && hasConflict(erRoom, checkin, checkout, id)) {
             return alert(`La habitación adicional ${erRoom} ya está ocupada en esas fechas.`);
         }
     }
@@ -2624,8 +2629,8 @@ function saveBooking() {
     // Auto-generate invoice for card payments
     const cardPayments = currentPayments.filter(p => p.method === 'card');
     if (cardPayments.length > 0) {
-        const cardTotal = cardPayments.reduce((s, p) => s + p.amount, 0);
-        saveInvoiceRecord(booking, cardTotal);
+        const invoiceTotal = getBookingTotal();
+        saveInvoiceRecord(booking, invoiceTotal > 0 ? invoiceTotal : cardPayments.reduce((s,p) => s + p.amount, 0), 'card');
     }
 
     saveBookings();
@@ -2953,7 +2958,7 @@ function addPayment() {
         if (bookingId) {
             const b = bookings.find(x => x.id === bookingId);
             if (b) {
-                saveInvoiceRecord(b, amount);
+                saveInvoiceRecord(b, amount, 'card');
             }
         }
     }
@@ -3707,45 +3712,25 @@ function closeClientDetail() {
 
 function buildConfirmationText() {
     const name = document.getElementById('guestName').value.trim();
-    const roomVal = document.getElementById('bookingRoom').value;
-    const room = ROOMS.find(r => String(r.number) === roomVal);
-    const roomLabel = room ? room.label : roomVal;
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
-    const guests = document.getElementById('guestCount').value;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
     const nights = (checkin && checkout && checkout > checkin) ? nightsBetween(checkin, checkout) : 0;
-    const total = (nights * price).toFixed(2);
-
+    const total = getBookingTotal();
+    const roomVal = document.getElementById('bookingRoom').value;
+    const room = ROOMS.find(r => String(r.number) === roomVal);
     const isRural = room && room.bedType === 'rural';
-    let ruralInfo = '';
-    if (isRural) {
-        const deposit = document.getElementById('depositAmount').value || RURAL_DEFAULT_DEPOSIT;
-        ruralInfo = `
-Fianza/Depósito: ${deposit} € (se devolverá tras verificar el estado de la casa)
+    const place = isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones';
 
-NORMAS: Se le entregarán las normas de la casa a su llegada. Por favor, léalas con atención.
-`;
-    }
+    return `Hola ${name}, le confirmamos su reserva en ${place}:
 
-    return `Confirmación de Reserva - ${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}
+📅 Entrada: ${formatDateDMY(checkin)}
+📅 Salida: ${formatDateDMY(checkout)}
+🌙 ${nights} noche${nights > 1 ? 's' : ''}
+💰 Total: ${total.toFixed(2)} €
 
-Estimado/a ${name},
+Recuerde traer su DNI/NIE/Pasaporte.
 
-Le confirmamos su reserva con los siguientes detalles:
-
-${isRural ? 'Alojamiento' : 'Habitación'}: ${roomLabel}
-Check-in: ${checkin}
-Check-out: ${checkout}
-Noches: ${nights}
-Huéspedes: ${guests}
-Precio/noche${isRural ? ' (casa completa)' : ''}: ${price.toFixed(2)} €
-Total: ${total} €
-${ruralInfo}
-IMPORTANTE: Recuerde traer su documento de identidad (DNI/NIE/Pasaporte) para el registro obligatorio.
-
-¡Le esperamos!
-${isRural ? 'Casa Rural Villarrubia' : 'Hostal Jijones'}`;
+¡Le esperamos! ${place}`;
 }
 
 function sendWhatsApp() {
@@ -4500,9 +4485,27 @@ function generateInvoice() {
     if (!b) return alert('Guarda la reserva primero para generar la factura.');
 
     const nights = nightsBetween(b.checkin, b.checkout);
-    const total = nights * b.pricePerNight;
     const room = ROOMS.find(r => r.number === b.room);
     const roomLabel = room ? room.label : b.room;
+    // Calculate real total using getBookingTotal logic but from saved booking data
+    let total = 0;
+    const isRuralBooking = room && room.bedType === 'rural';
+    if (isRuralBooking) {
+        total = nights * b.pricePerNight;
+    } else {
+        const mainRoomType = b.roomType || 'doble';
+        const mainExtraBeds = parseInt(b.extraBeds) || 0;
+        total = getBasePrice(b.checkin, b.checkout, mainRoomType) + (mainExtraBeds * 15 * nights);
+        if (b.extraRooms && b.extraRooms.length > 0) {
+            b.extraRooms.forEach(er => {
+                const erType = er.roomType || 'doble';
+                const erExtraBeds = parseInt(er.extraBeds) || 0;
+                total += getBasePrice(b.checkin, b.checkout, erType) + (erExtraBeds * 15 * nights);
+            });
+        }
+        const lateHours = parseInt(b.lateCheckout) || 0;
+        total += lateHours * 5;
+    }
     const isRural = room && room.bedType === 'rural';
     const invoiceNum = 'F-' + b.checkin.replace(/-/g, '') + '-' + String(b.room).replace(/[^a-zA-Z0-9]/g, '');
     const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
@@ -4590,6 +4593,10 @@ function generateInvoice() {
                 ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
             </div>
         </div>`;
+
+    // Save invoice record when manually generating
+    const mainMethod = cardTotal >= cashTotal ? 'card' : 'cash';
+    saveInvoiceRecord(b, total, mainMethod);
 
     document.getElementById('invoiceModal').classList.add('active');
 }
@@ -5011,6 +5018,83 @@ function exportInvoicesPDF() {
     setTimeout(() => win.print(), 300);
 }
 
+function exportInvoicesZipPDF() {
+    const filtered = getFilteredInvoices();
+    if (filtered.length === 0) return alert('No hay facturas para exportar.');
+
+    let pages = '';
+    filtered.forEach((inv, idx) => {
+        const b = bookings.find(x => x.id === inv.bookingId);
+        if (!b) return;
+        const nights = nightsBetween(b.checkin, b.checkout);
+        const room = ROOMS.find(r => r.number === b.room);
+        const roomLabel = room ? room.label : b.room;
+        const isRural = room && room.bedType === 'rural';
+        let total = 0;
+        if (isRural) {
+            total = nights * b.pricePerNight;
+        } else {
+            const mainRoomType = b.roomType || 'doble';
+            total = getBasePrice(b.checkin, b.checkout, mainRoomType) + ((parseInt(b.extraBeds)||0) * 15 * nights);
+            if (b.extraRooms) b.extraRooms.forEach(er => {
+                total += getBasePrice(b.checkin, b.checkout, er.roomType||'doble') + ((parseInt(er.extraBeds)||0) * 15 * nights);
+            });
+            total += (parseInt(b.lateCheckout)||0) * 5;
+        }
+        const totalPaid = (b.payments||[]).reduce((s,p) => s + p.amount, 0);
+        const cashTotal = (b.payments||[]).filter(p => p.method !== 'card').reduce((s,p) => s + p.amount, 0);
+        const cardTotal = (b.payments||[]).filter(p => p.method === 'card').reduce((s,p) => s + p.amount, 0);
+
+        let paymentsRows = '';
+        (b.payments||[]).forEach(p => {
+            paymentsRows += `<tr><td>${p.date}</td><td>${p.method === 'card' ? 'Tarjeta' : 'Efectivo'}</td><td style="text-align:right;">${p.amount.toFixed(2)} €</td></tr>`;
+        });
+
+        pages += `<div class="invoice-page" ${idx > 0 ? 'style="page-break-before:always;"' : ''}>
+            <div style="display:flex;justify-content:space-between;padding-bottom:15px;margin-bottom:15px;border-bottom:3px solid #FF385C;">
+                <div>
+                    <div style="font-size:1.2rem;font-weight:700;color:#FF385C;">${BUSINESS_DATA.tradeName}</div>
+                    <div style="font-size:0.8rem;color:#717171;margin-top:4px;">${BUSINESS_DATA.name}<br>NIF: ${BUSINESS_DATA.nif}<br>${BUSINESS_DATA.address}<br>${BUSINESS_DATA.city}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.2rem;font-weight:700;">FACTURA</div>
+                    <div style="font-size:0.8rem;color:#717171;">N.º: <strong>${inv.invoiceNum}</strong><br>Fecha: ${inv.date}</div>
+                </div>
+            </div>
+            <div style="background:#f8f9fa;padding:10px 14px;border-radius:6px;margin-bottom:15px;">
+                <div style="font-size:0.7rem;color:#717171;text-transform:uppercase;">Cliente</div>
+                <div style="font-weight:600;">${b.guestName}</div>
+                <div style="font-size:0.8rem;color:#555;">${b.docNumber ? (b.docType||'DNI').toUpperCase()+': '+b.docNumber : ''} ${b.phone ? '· Tel: '+b.phone : ''}</div>
+            </div>
+            <table><thead><tr style="background:#f7f7f7;"><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Importe</th></tr></thead>
+            <tbody><tr>
+                <td>${isRural ? 'Alquiler Casa Rural' : 'Alojamiento '+roomLabel}<br><span style="font-size:0.75rem;color:#717171;">${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)}</span></td>
+                <td style="text-align:center;">${nights} noche${nights>1?'s':''}</td>
+                <td style="text-align:right;font-weight:600;">${total.toFixed(2)} €</td>
+            </tr></tbody></table>
+            <div style="text-align:right;font-weight:700;font-size:1.1rem;margin-top:10px;padding:10px 14px;background:#f8f9fa;border-radius:6px;">TOTAL: ${total.toFixed(2)} €</div>
+            ${paymentsRows ? '<h4 style="margin-top:12px;font-size:0.8rem;">Pagos</h4><table><thead><tr><th>Fecha</th><th>Método</th><th style="text-align:right;">Importe</th></tr></thead><tbody>'+paymentsRows+'</tbody></table>' : ''}
+            <div style="margin-top:20px;font-size:0.7rem;color:#999;border-top:1px solid #ebebeb;padding-top:8px;text-align:center;">
+                ${BUSINESS_DATA.name} · NIF: ${BUSINESS_DATA.nif} · ${BUSINESS_DATA.address}, ${BUSINESS_DATA.city}
+            </div>
+        </div>`;
+    });
+
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>Facturas</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px 30px; color: #222; font-size: 13px; line-height: 1.5; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            th { padding: 8px 10px; text-align: left; font-size: 0.8rem; border-bottom: 1px solid #ddd; }
+            td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 0.82rem; }
+            h4 { margin-bottom: 6px; }
+            @media print { body { padding: 10px; } .invoice-page { page-break-inside: avoid; } }
+        </style></head><body>${pages}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 400);
+}
+
 function renderInvoicesList() {
     const container = document.getElementById('invoicesListContent');
     const sorted = getFilteredInvoices();
@@ -5035,7 +5119,7 @@ function renderInvoicesList() {
         <td style="padding:8px 10px;">${inv.guestName}</td>
         <td style="padding:8px 10px;">${inv.roomLabel || ''}</td>
         <td style="padding:8px 10px; text-align:right; font-weight:500; color:#1a73e8;">${inv.amount.toFixed(2)} €</td>
-        <td style="padding:8px 10px; text-align:center;"><span class="pm-badge card">Tarjeta</span></td>
+        <td style="padding:8px 10px; text-align:center;"><span class="pm-badge ${inv.method || 'card'}">${inv.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</span></td>
         <td style="padding:8px 10px; text-align:center;"><button class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="viewSavedInvoice('${inv.bookingId}')">Ver</button></td>
     </tr>`).join('') + '</tbody></table>';
 }
@@ -5049,14 +5133,20 @@ function viewSavedInvoice(bookingId) {
     }
 }
 
-function saveInvoiceRecord(booking, amount) {
+function saveInvoiceRecord(booking, amount, method) {
     const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
     const room = ROOMS.find(r => r.number === booking.room);
     const roomLabel = room ? room.label : String(booking.room);
     const invoiceNum = 'F-' + booking.checkin.replace(/-/g, '') + '-' + String(booking.room).replace(/[^a-zA-Z0-9]/g, '');
 
-    // Don't duplicate
-    if (invoices.some(inv => inv.invoiceNum === invoiceNum)) return;
+    // Don't duplicate - update if exists
+    const existingIdx = invoices.findIndex(inv => inv.invoiceNum === invoiceNum);
+    if (existingIdx >= 0) {
+        invoices[existingIdx].amount = amount;
+        invoices[existingIdx].method = method || invoices[existingIdx].method;
+        localStorage.setItem('hostal_jijones_invoices', JSON.stringify(invoices));
+        return;
+    }
 
     invoices.push({
         invoiceNum,
@@ -5072,7 +5162,7 @@ function saveInvoiceRecord(booking, amount) {
         checkin: booking.checkin,
         checkout: booking.checkout,
         amount,
-        method: 'card',
+        method: method || 'card',
         businessName: BUSINESS_DATA.name,
         businessNif: BUSINESS_DATA.nif,
         businessAddress: BUSINESS_DATA.address,
@@ -5956,7 +6046,8 @@ renderLoginScreen();
                 <input type="date" id="invoiceFilterTo" onchange="renderInvoicesList()" style="padding:6px 8px; font-size:0.78rem;">
             </div>
             <button class="btn-primary" onclick="exportInvoicesCSV()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">CSV</button>
-            <button class="btn-primary" onclick="exportInvoicesPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">PDF</button>
+            <button class="btn-primary" onclick="exportInvoicesPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">PDF listado</button>
+            <button class="btn-primary" onclick="exportInvoicesZipPDF()" style="padding:8px 16px; font-size:0.78rem; white-space:nowrap;">ZIP PDFs</button>
         </div>
         <div id="invoicesListContent" style="max-height:400px; overflow-y:auto;"></div>
         <div class="form-actions" style="margin-top:15px;">
