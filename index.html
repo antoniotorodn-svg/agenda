@@ -1971,8 +1971,7 @@ function renderGrid() {
         const we = isWeekend(d) ? ' weekend' : '';
         const tod = ds === today ? ' today-header' : '';
         const monthLabel = d.getDate() === 1 || i === 0 ? `<div style="font-size:0.6rem;opacity:0.7">${MONTH_NAMES[d.getMonth()]}</div>` : '';
-        const xmlBtn = `<div class="xml-download-btn" onclick="event.stopPropagation();exportGuestXML('${ds}')" title="Descargar XML huéspedes">⬇</div>`;
-        html += `<th class="${we}${tod}">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}${xmlBtn}</th>`;
+        html += `<th class="${we}${tod}" onclick="exportGuestXML('${ds}')" style="cursor:pointer;" title="Descargar XML huéspedes">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}</th>`;
     }
     html += '</tr></thead><tbody>';
 
