@@ -1288,7 +1288,10 @@
 <!-- Modal Nueva/Editar Reserva -->
 <div class="modal-overlay" id="bookingModal">
     <div class="modal">
-        <h2 id="modalTitle">Nueva Reserva</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 id="modalTitle" style="margin-bottom:0;">Nueva Reserva</h2>
+            <button id="swapRoomBtn" class="btn-outline" onclick="openSwapRoom()" style="display:none;font-size:0.75rem;padding:6px 12px;white-space:nowrap;">&#8646; Intercambiar hab.</button>
+        </div>
         <input type="hidden" id="bookingId">
         <div class="form-row">
             <div class="form-group autocomplete-wrapper">
@@ -1960,18 +1963,42 @@ function renderGrid() {
     const today = todayStr();
 
     const table = document.getElementById('bookingGrid');
-    let html = '<thead><tr><th class="corner">Hab.</th>';
 
-    // Date headers
+    // Build month row
+    let monthRow = '<thead><tr><th class="corner" rowspan="2">Hab.</th>';
     const dates = [];
+    const monthSpans = [];
+    let currentMonth = -1;
+    let currentMonthStart = 0;
+
     for (let i = 0; i < days; i++) {
         const d = addDays(startDate, i);
         const ds = dateStr(d);
         dates.push(ds);
+        const m = d.getMonth();
+        if (m !== currentMonth) {
+            if (currentMonth !== -1) {
+                monthSpans.push({ month: currentMonth, span: i - currentMonthStart });
+            }
+            currentMonth = m;
+            currentMonthStart = i;
+        }
+    }
+    monthSpans.push({ month: currentMonth, span: days - currentMonthStart });
+
+    monthSpans.forEach(ms => {
+        monthRow += `<th colspan="${ms.span}" style="font-size:0.78rem;font-weight:600;padding:4px 0;border-bottom:none;">${MONTH_NAMES[ms.month]}</th>`;
+    });
+    monthRow += '</tr><tr>';
+
+    // Day headers row
+    let html = monthRow;
+    for (let i = 0; i < days; i++) {
+        const d = addDays(startDate, i);
+        const ds = dates[i];
         const we = isWeekend(d) ? ' weekend' : '';
         const tod = ds === today ? ' today-header' : '';
-        const monthLabel = d.getDate() === 1 || i === 0 ? `<div style="font-size:0.6rem;opacity:0.7">${MONTH_NAMES[d.getMonth()]}</div>` : '';
-        html += `<th class="${we}${tod}" onclick="exportGuestXML('${ds}')" style="cursor:pointer;" title="Descargar XML huéspedes">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}</th>`;
+        html += `<th class="${we}${tod}" onclick="exportGuestXML('${ds}')" style="cursor:pointer;border-top:none;" title="Descargar XML huéspedes">${DAY_NAMES[d.getDay()]}<br>${d.getDate()}</th>`;
     }
     html += '</tr></thead><tbody>';
 
@@ -2274,6 +2301,7 @@ function isCurrentRoomRural() {
 
 function openNewBooking(room, date) {
     document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('swapRoomBtn').style.display = 'none';
     document.getElementById('bookingId').value = '';
     document.getElementById('guestName').value = '';
     document.getElementById('guestPhone').value = '';
@@ -2338,6 +2366,7 @@ function editBooking(id) {
     if (!b) return;
 
     document.getElementById('modalTitle').textContent = 'Editar Reserva';
+    document.getElementById('swapRoomBtn').style.display = 'inline-block';
     document.getElementById('bookingId').value = b.id;
     document.getElementById('guestName').value = b.guestName;
     document.getElementById('guestPhone').value = b.phone || '';
@@ -2606,6 +2635,68 @@ function deleteBooking() {
     saveBookings();
     closeModal();
     renderGrid();
+}
+
+// ==================== SWAP ROOMS ====================
+
+function openSwapRoom() {
+    const id = document.getElementById('bookingId').value;
+    if (!id) return;
+    const b = bookings.find(x => x.id === id);
+    if (!b) return;
+
+    const currentRoom = b.room;
+    const roomOptions = ROOMS
+        .filter(r => String(r.number) !== String(currentRoom))
+        .map(r => `<option value="${r.number}">${r.number} - ${r.bedType || r.type || ''}</option>`)
+        .join('');
+
+    const targetRoom = prompt(`Intercambiar habitación ${currentRoom}.\n\nEscribe el número de habitación destino:`);
+    if (!targetRoom) return;
+
+    const targetRoomVal = isNaN(targetRoom) ? targetRoom : parseInt(targetRoom);
+    const roomExists = ROOMS.find(r => String(r.number) === String(targetRoomVal));
+    if (!roomExists) return alert('Esa habitación no existe.');
+    if (String(targetRoomVal) === String(currentRoom)) return alert('Es la misma habitación.');
+
+    // Find bookings in the target room that overlap with current booking dates
+    const targetBookings = bookings.filter(tb =>
+        String(tb.room) === String(targetRoomVal) &&
+        tb.id !== id &&
+        tb.checkin < b.checkout &&
+        tb.checkout > b.checkin
+    );
+
+    let msg;
+    if (targetBookings.length > 0) {
+        const names = targetBookings.map(tb => tb.guestName).join(', ');
+        msg = `Intercambiar:\n• Hab. ${currentRoom} (${b.guestName}) → Hab. ${targetRoomVal}\n• Hab. ${targetRoomVal} (${names}) → Hab. ${currentRoom}\n\n¿Continuar?`;
+    } else {
+        msg = `Mover reserva de ${b.guestName} de Hab. ${currentRoom} a Hab. ${targetRoomVal} (libre).\n\n¿Continuar?`;
+    }
+
+    if (!confirm(msg)) return;
+
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    const now = new Date().toISOString();
+
+    // Swap: move current booking to target room
+    b.room = targetRoomVal;
+    if (!b.history) b.history = [];
+    b.history.push({ action: `intercambio hab. ${currentRoom} → ${targetRoomVal}`, user: userName, date: now });
+
+    // Move target bookings to current room
+    targetBookings.forEach(tb => {
+        const oldRoom = tb.room;
+        tb.room = currentRoom;
+        if (!tb.history) tb.history = [];
+        tb.history.push({ action: `intercambio hab. ${oldRoom} → ${currentRoom}`, user: userName, date: now });
+    });
+
+    saveBookings();
+    closeModal();
+    renderGrid();
+    alert('Intercambio realizado correctamente.');
 }
 
 // ==================== EXPORT / IMPORT ====================
@@ -3224,6 +3315,7 @@ function searchAvailability() {
 function bookFromSearch(room, checkin, checkout) {
     closeSearchModal();
     document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('swapRoomBtn').style.display = 'none';
     document.getElementById('bookingId').value = '';
     document.getElementById('guestName').value = '';
     document.getElementById('guestPhone').value = '';
@@ -4287,6 +4379,7 @@ function wizardBook() {
 
     // Open the full booking form pre-filled
     document.getElementById('modalTitle').textContent = 'Nueva Reserva';
+    document.getElementById('swapRoomBtn').style.display = 'none';
     document.getElementById('bookingId').value = '';
     document.getElementById('guestName').value = '';
     document.getElementById('guestPhone').value = '';
