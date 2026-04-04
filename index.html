@@ -4262,6 +4262,7 @@ function renderRoomsReport(container) {
 
 let wizRoomCount = 1;
 let wizPersons = 2;
+let wizPersonsPerRoom = [2]; // array for per-room persons
 let wizSelectedRooms = [];
 
 function openWizard() {
@@ -4269,12 +4270,12 @@ function openWizard() {
     document.getElementById('wizCheckout').value = dateStr(addDays(new Date(), 1));
     wizRoomCount = 1;
     wizPersons = 2;
+    wizPersonsPerRoom = [2];
     wizSelectedRooms = [];
     wizardGoTo(1);
     // Reset choices
     document.querySelectorAll('.wiz-choice').forEach(b => b.classList.remove('active'));
     document.getElementById('wizRooms1').classList.add('active');
-    document.getElementById('wizPers2').classList.add('active');
     document.getElementById('wizardModal').classList.add('active');
 }
 
@@ -4299,8 +4300,38 @@ function wizardNext(from) {
         if (co <= ci) return alert('La salida debe ser posterior a la entrada.');
         wizardGoTo(2);
     } else if (from === 2) {
+        wizPersonsPerRoom = Array(wizRoomCount).fill(2);
+        renderWizPersonsStep();
         wizardGoTo(3);
     }
+}
+
+function renderWizPersonsStep() {
+    const container = document.getElementById('wizPersonsContainer');
+    if (wizRoomCount === 1) {
+        container.innerHTML = `
+            <label>¿Cuántas personas por habitación?</label>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                ${[1,2,3,4].map(n => `<button class="wiz-choice ${wizPersonsPerRoom[0]===n?'active':''}" onclick="wizSetPersonsForRoom(0,${n})">${n} pers.</button>`).join('')}
+            </div>`;
+    } else {
+        let html = '<label>¿Cuántas personas por habitación?</label>';
+        for (let i = 0; i < wizRoomCount; i++) {
+            html += `<div style="display:flex; align-items:center; gap:10px; margin-top:10px; padding:8px 12px; background:#f7f7f7; border-radius:8px;">
+                <span style="font-weight:600; min-width:55px;">Hab. ${i+1}</span>
+                <div style="display:flex; gap:6px;">
+                    ${[1,2,3,4].map(n => `<button class="wiz-choice ${wizPersonsPerRoom[i]===n?'active':''}" onclick="wizSetPersonsForRoom(${i},${n})" style="padding:8px 12px;font-size:0.8rem;">${n} pers.</button>`).join('')}
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+}
+
+function wizSetPersonsForRoom(roomIdx, n) {
+    wizPersonsPerRoom[roomIdx] = n;
+    wizPersons = wizPersonsPerRoom[0]; // main room persons
+    renderWizPersonsStep();
 }
 
 function wizardBack(to) {
@@ -4314,12 +4345,6 @@ function wizSetRooms(n) {
     }
 }
 
-function wizSetPersons(n) {
-    wizPersons = n;
-    for (let i = 1; i <= 4; i++) {
-        document.getElementById('wizPers' + i).classList.toggle('active', i === n);
-    }
-}
 
 function wizardSearchRooms() {
     const checkin = document.getElementById('wizCheckin').value;
@@ -4346,23 +4371,25 @@ function wizardSearchRooms() {
 
     // Auto-select first N available rooms
     wizSelectedRooms = available.slice(0, wizRoomCount);
-    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : (() => {
-        const d = parseDate(checkin);
-        const dow = d.getDay();
-        const isWeekendNight = (dow === 5 || dow === 6);
-        if (wizRoomType === 'individual') return isWeekendNight ? 49 : 38.50;
-        return isWeekendNight ? 58 : 48;
-    })();
-    const totalPerRoom = currentProperty === 'rural' ? nights * nightPrice : getBasePrice(checkin, checkout, wizRoomType);
-    const totalAll = totalPerRoom * wizRoomCount;
     const persLabel = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuádruple' };
 
+    let totalAll = 0;
+    const roomTotals = [];
+    for (let i = 0; i < wizRoomCount; i++) {
+        const pers = wizPersonsPerRoom[i] || 2;
+        const rType = pers === 1 ? 'individual' : 'doble';
+        const extraBeds = pers > 2 ? pers - 2 : 0;
+        const roomTotal = currentProperty === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(checkin, checkout, rType) + (extraBeds * 15 * nights);
+        roomTotals.push(roomTotal);
+        totalAll += roomTotal;
+    }
+
     let html = `<div style="text-align:center; margin-bottom:12px; font-size:0.82rem; color:#717171;">
-        ${wizRoomCount} hab. × ${wizPersons} pers. × ${nights} noche(s) = <strong style="color:#222;">${totalAll.toFixed(2)} €</strong>
+        ${wizRoomCount} hab. × ${nights} noche(s) = <strong style="color:#222;">${totalAll.toFixed(2)} €</strong>
     </div>`;
 
     html += wizSelectedRooms.map((room, idx) => {
+        const pers = wizPersonsPerRoom[idx] || 2;
         const options = available.map(r =>
             `<option value="${r.number}" ${r.number === room.number ? 'selected' : ''}>${r.label}</option>`
         ).join('');
@@ -4371,7 +4398,7 @@ function wizardSearchRooms() {
             <select onchange="wizChangeRoom(${idx}, this.value)" style="flex:1; padding:8px; border:1px solid #b0b0b0; border-radius:8px; font-family:inherit; font-size:0.8rem;">
                 ${options}
             </select>
-            <span style="font-size:0.75rem; color:#717171;">${persLabel[wizPersons] || 'doble'} · ${totalPerRoom.toFixed(0)}€</span>
+            <span style="font-size:0.75rem; color:#717171;">${persLabel[pers] || 'doble'} · ${pers} pers. · ${roomTotals[idx].toFixed(0)}€</span>
         </div>`;
     }).join('');
 
@@ -4390,9 +4417,11 @@ function wizardBook() {
     const checkin = document.getElementById('wizCheckin').value;
     const checkout = document.getElementById('wizCheckout').value;
     const mainRoom = wizSelectedRooms[0];
-    const wizRoomType = wizPersons === 1 ? 'individual' : 'doble';
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
+    const mainPers = wizPersonsPerRoom[0] || 2;
     const persMap = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuadruple' };
+    const mainRoomType = persMap[mainPers] || 'doble';
+    const mainExtraBeds = mainPers > 2 ? mainPers - 2 : 0;
+    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     closeWizard();
 
     // Open the full booking form pre-filled
@@ -4411,10 +4440,11 @@ function wizardBook() {
     currentCompanions = [];
     renderCompanions();
     document.getElementById('roomCount').value = wizRoomCount;
-    document.getElementById('roomType').value = persMap[wizPersons] || 'doble';
-    document.getElementById('extraBeds').value = '0';
+    document.getElementById('roomType').value = mainRoomType;
+    document.getElementById('extraBeds').value = String(mainExtraBeds);
     document.getElementById('lateCheckout').value = '0';
-    document.getElementById('guestCount').value = wizRoomCount * wizPersons;
+    const totalPersons = wizPersonsPerRoom.slice(0, wizRoomCount).reduce((s, p) => s + p, 0);
+    document.getElementById('guestCount').value = totalPersons;
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = nightPrice;
     document.getElementById('bookingNotes').value = '';
@@ -4436,12 +4466,20 @@ function wizardBook() {
     updateRuralSection(selectedRoom);
 
     currentPayments = [];
-    currentExtraRooms = wizSelectedRooms.slice(1).map(r => ({ room: r.number, roomType: persMap[wizPersons] || 'doble' }));
+    currentExtraRooms = wizSelectedRooms.slice(1).map((r, idx) => {
+        const pers = wizPersonsPerRoom[idx + 1] || 2;
+        return { room: r.number, roomType: persMap[pers] || 'doble', extraBeds: pers > 2 ? pers - 2 : 0 };
+    });
     renderRoomAssignments();
-    // Set the assigned rooms
+    // Set the assigned rooms with per-room occupancy
     wizSelectedRooms.forEach((r, idx) => {
         const sel = document.getElementById('roomAssign_' + idx);
         if (sel) sel.value = r.number;
+        const pers = wizPersonsPerRoom[idx] || 2;
+        const occ = document.getElementById('roomOcc_' + idx);
+        if (occ) occ.value = persMap[pers] || 'doble';
+        const ext = document.getElementById('roomExt_' + idx);
+        if (ext) ext.value = pers > 2 ? String(pers - 2) : '0';
     });
     updateMainRoom();
     document.getElementById('paymentStatus').value = 'pending_payment';
@@ -5859,14 +5897,7 @@ renderLoginScreen();
         </div>
 
         <div class="wizard-panel" id="wp3">
-            <div class="form-group" style="margin-top:16px;">
-                <label>¿Cuántas personas por habitación?</label>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                    <button class="wiz-choice active" id="wizPers1" onclick="wizSetPersons(1)">1 pers.</button>
-                    <button class="wiz-choice" id="wizPers2" onclick="wizSetPersons(2)">2 pers.</button>
-                    <button class="wiz-choice" id="wizPers3" onclick="wizSetPersons(3)">3 pers.</button>
-                    <button class="wiz-choice" id="wizPers4" onclick="wizSetPersons(4)">4 pers.</button>
-                </div>
+            <div class="form-group" style="margin-top:16px;" id="wizPersonsContainer">
             </div>
             <div class="wizard-nav" style="margin-top:24px;">
                 <button class="btn-secondary" onclick="wizardBack(3)">Atrás</button>
