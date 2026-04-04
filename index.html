@@ -85,6 +85,16 @@
         table.booking-grid thead th.weekend { background: #FFF8F6; color: #FF385C; }
         table.booking-grid thead th.today-header { background: #222; color: #fff; }
 
+        .xml-download-btn {
+            font-size: 0.55rem;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.15s;
+            line-height: 1;
+            margin-top: 1px;
+        }
+        .xml-download-btn:hover { opacity: 1; }
+
         .room-header {
             position: sticky; left: 0; z-index: 5;
             background: #fff; font-weight: 500; padding: 3px 5px;
@@ -1169,6 +1179,7 @@
     <div class="view-toggle">
         <button class="active" id="viewWeek" onclick="setViewRange(7)">Semanal</button>
         <button id="viewMonth" onclick="setViewRange(30)">Mensual</button>
+        <button id="viewFromToday" onclick="setViewRange('fromToday')">Desde hoy</button>
     </div>
 
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
@@ -1295,10 +1306,10 @@
             <input type="email" id="guestEmail" placeholder="email@ejemplo.com">
         </div>
         <div class="doc-section">
-            <h4>Documento de identidad (obligatorio)</h4>
+            <h4>Datos del huésped principal (Guardia Civil)</h4>
             <div class="form-row">
                 <div class="form-group" style="flex:0.8;">
-                    <label>Tipo</label>
+                    <label>Tipo doc.</label>
                     <select id="docType">
                         <option value="dni">DNI</option>
                         <option value="nie">NIE</option>
@@ -1306,7 +1317,7 @@
                     </select>
                 </div>
                 <div class="form-group" style="flex:1.2;">
-                    <label>Numero *</label>
+                    <label>Nº documento *</label>
                     <input type="text" id="docNumber" placeholder="12345678A">
                 </div>
                 <div class="form-group" style="flex:1;">
@@ -1314,6 +1325,27 @@
                     <input type="text" id="guestNationality" placeholder="Española">
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" id="guestBirthDate">
+                </div>
+                <div class="form-group">
+                    <label>Nº soporte</label>
+                    <input type="text" id="guestSupportNumber" placeholder="Nº soporte del documento">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" id="guestAddress" placeholder="Calle, número, ciudad, CP">
+            </div>
+        </div>
+
+        <!-- Acompañantes -->
+        <div class="doc-section" id="companionsSection">
+            <h4>Acompañantes</h4>
+            <div id="companionsList"></div>
+            <button type="button" class="btn-outline" onclick="addCompanion()" style="font-size:0.78rem; margin-top:8px;">+ Añadir acompañante</button>
         </div>
         <div class="form-group">
             <label>¿Cuántas habitaciones? *</label>
@@ -1939,7 +1971,8 @@ function renderGrid() {
         const we = isWeekend(d) ? ' weekend' : '';
         const tod = ds === today ? ' today-header' : '';
         const monthLabel = d.getDate() === 1 || i === 0 ? `<div style="font-size:0.6rem;opacity:0.7">${MONTH_NAMES[d.getMonth()]}</div>` : '';
-        html += `<th class="${we}${tod}">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}</th>`;
+        const xmlBtn = `<div class="xml-download-btn" onclick="event.stopPropagation();exportGuestXML('${ds}')" title="Descargar XML huéspedes">⬇</div>`;
+        html += `<th class="${we}${tod}">${monthLabel}${DAY_NAMES[d.getDay()]}<br>${d.getDate()}${xmlBtn}</th>`;
     }
     html += '</tr></thead><tbody>';
 
@@ -2175,15 +2208,20 @@ function goToToday() {
     const now = new Date();
     calendarMonth = now.getMonth();
     calendarYear = now.getFullYear();
-    const days = parseInt(document.getElementById('daysToShow').value);
-    if (days <= 7) {
-        // Weekly: start from Monday of current week
-        const dow = (now.getDay() + 6) % 7; // Monday=0
-        const monday = addDays(now, -dow);
-        document.getElementById('startDate').value = dateStr(monday);
+    const isFromToday = document.getElementById('viewFromToday').classList.contains('active');
+    if (isFromToday) {
+        document.getElementById('startDate').value = todayStr();
     } else {
-        // Monthly: start from 1st of current month
-        document.getElementById('startDate').value = dateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+        const days = parseInt(document.getElementById('daysToShow').value);
+        if (days <= 7) {
+            // Weekly: start from Monday of current week
+            const dow = (now.getDay() + 6) % 7; // Monday=0
+            const monday = addDays(now, -dow);
+            document.getElementById('startDate').value = dateStr(monday);
+        } else {
+            // Monthly: start from 1st of current month
+            document.getElementById('startDate').value = dateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+        }
     }
     renderGrid();
 }
@@ -2244,6 +2282,11 @@ function openNewBooking(room, date) {
     document.getElementById('docType').value = 'dni';
     document.getElementById('docNumber').value = '';
     document.getElementById('guestNationality').value = '';
+    document.getElementById('guestBirthDate').value = '';
+    document.getElementById('guestSupportNumber').value = '';
+    document.getElementById('guestAddress').value = '';
+    currentCompanions = [];
+    renderCompanions();
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
@@ -2303,6 +2346,11 @@ function editBooking(id) {
     document.getElementById('docType').value = b.docType || 'dni';
     document.getElementById('docNumber').value = b.docNumber || '';
     document.getElementById('guestNationality').value = b.nationality || '';
+    document.getElementById('guestBirthDate').value = b.birthDate || '';
+    document.getElementById('guestSupportNumber').value = b.supportNumber || '';
+    document.getElementById('guestAddress').value = b.address || '';
+    currentCompanions = b.companions ? JSON.parse(JSON.stringify(b.companions)) : [];
+    renderCompanions();
     document.getElementById('bookingRoom').value = b.room;
     document.getElementById('guestCount').value = b.guests || 2;
     document.getElementById('bookingCheckin').value = b.checkin;
@@ -2440,6 +2488,9 @@ function saveBooking() {
     const docType = document.getElementById('docType').value;
     const docNumber = document.getElementById('docNumber').value.trim();
     const nationality = document.getElementById('guestNationality').value.trim();
+    const birthDate = document.getElementById('guestBirthDate').value;
+    const supportNumber = document.getElementById('guestSupportNumber').value.trim();
+    const address = document.getElementById('guestAddress').value.trim();
 
     const isRural = ROOMS.find(r => r.number === room)?.bedType === 'rural';
 
@@ -2463,6 +2514,8 @@ function saveBooking() {
         id: id || generateId(),
         guestName: name,
         phone, email, docType, docNumber, nationality,
+        birthDate, supportNumber, address,
+        companions: currentCompanions,
         room, roomType, extraBeds, lateCheckout,
         extraRooms: getAssignedRoomsDetail().slice(1),
         checkin, checkout, status, pricePerNight: price,
@@ -2488,6 +2541,8 @@ function saveBooking() {
         if (booking.groupId) {
             bookings.filter(b => b.groupId === booking.groupId && b.id !== booking.id).forEach(b => {
                 b.guestName = name; b.phone = phone; b.email = email;
+                b.birthDate = birthDate; b.supportNumber = supportNumber; b.address = address;
+                b.companions = JSON.parse(JSON.stringify(currentCompanions));
                 b.checkin = checkin; b.checkout = checkout; b.status = status;
                 b.updatedAt = now; b.updatedBy = userName;
             });
@@ -2605,6 +2660,142 @@ function handleImport(event) {
     };
     reader.readAsText(file);
     event.target.value = '';
+}
+
+// ==================== COMPANIONS (ACOMPAÑANTES) ====================
+
+function renderCompanions() {
+    const container = document.getElementById('companionsList');
+    if (!container) return;
+    if (currentCompanions.length === 0) {
+        container.innerHTML = '<div style="color:#999;font-size:0.8rem;padding:4px 0;">Sin acompañantes</div>';
+        return;
+    }
+    let html = '';
+    currentCompanions.forEach((comp, idx) => {
+        html += `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:10px;margin-bottom:8px;position:relative;">
+            <button type="button" onclick="removeCompanion(${idx})" style="position:absolute;top:6px;right:8px;background:none;border:none;color:#e74c3c;font-size:1.1rem;cursor:pointer;" title="Eliminar">×</button>
+            <div style="font-weight:600;font-size:0.78rem;margin-bottom:6px;color:#555;">Acompañante ${idx + 1}</div>
+            <div class="form-row">
+                <div class="form-group" style="flex:1.5;">
+                    <label style="font-size:0.72rem;">Nombre *</label>
+                    <input type="text" value="${escapeAttr(comp.name || '')}" onchange="updateCompanion(${idx},'name',this.value)" placeholder="Nombre completo">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label style="font-size:0.72rem;">DNI/NIE/Pasaporte *</label>
+                    <input type="text" value="${escapeAttr(comp.docNumber || '')}" onchange="updateCompanion(${idx},'docNumber',this.value)" placeholder="12345678A">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label style="font-size:0.72rem;">Fecha nacimiento</label>
+                    <input type="date" value="${comp.birthDate || ''}" onchange="updateCompanion(${idx},'birthDate',this.value)">
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.72rem;">Nº soporte</label>
+                    <input type="text" value="${escapeAttr(comp.supportNumber || '')}" onchange="updateCompanion(${idx},'supportNumber',this.value)" placeholder="Nº soporte">
+                </div>
+            </div>
+            <div class="form-group">
+                <label style="font-size:0.72rem;">Dirección</label>
+                <input type="text" value="${escapeAttr(comp.address || '')}" onchange="updateCompanion(${idx},'address',this.value)" placeholder="Dirección completa">
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function escapeAttr(str) {
+    return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addCompanion() {
+    currentCompanions.push({ name: '', docNumber: '', birthDate: '', supportNumber: '', address: '' });
+    renderCompanions();
+}
+
+function removeCompanion(idx) {
+    currentCompanions.splice(idx, 1);
+    renderCompanions();
+}
+
+function updateCompanion(idx, field, value) {
+    if (currentCompanions[idx]) {
+        currentCompanions[idx][field] = value;
+    }
+}
+
+// ==================== XML EXPORT (GUARDIA CIVIL) ====================
+
+function exportGuestXML(dateStr) {
+    // Find all bookings active on this date (checkin <= date < checkout)
+    const activeBookings = bookings.filter(b => b.checkin <= dateStr && b.checkout > dateStr);
+
+    if (activeBookings.length === 0) {
+        alert('No hay huéspedes registrados para el ' + dateStr);
+        return;
+    }
+
+    // Avoid duplicates from grouped bookings (multi-room): use groupId to deduplicate
+    const seen = new Set();
+    const uniqueBookings = [];
+    for (const b of activeBookings) {
+        const key = b.groupId || b.id;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueBookings.push(b);
+        }
+    }
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<huespedes fecha="' + escapeXml(dateStr) + '">\n';
+
+    for (const b of uniqueBookings) {
+        const phone = b.phone || '';
+        // Main guest
+        xml += '  <huesped>\n';
+        xml += '    <nombre>' + escapeXml(b.guestName || '') + '</nombre>\n';
+        xml += '    <dni>' + escapeXml(b.docNumber || '') + '</dni>\n';
+        xml += '    <fecha_nacimiento>' + escapeXml(b.birthDate || '') + '</fecha_nacimiento>\n';
+        xml += '    <numero_soporte>' + escapeXml(b.supportNumber || '') + '</numero_soporte>\n';
+        xml += '    <direccion>' + escapeXml(b.address || '') + '</direccion>\n';
+        xml += '    <telefono>' + escapeXml(phone) + '</telefono>\n';
+        xml += '    <habitacion>' + escapeXml(String(b.room || '')) + '</habitacion>\n';
+        xml += '    <checkin>' + escapeXml(b.checkin || '') + '</checkin>\n';
+        xml += '    <checkout>' + escapeXml(b.checkout || '') + '</checkout>\n';
+        xml += '  </huesped>\n';
+
+        // Companions (same phone as main guest)
+        if (b.companions && b.companions.length > 0) {
+            for (const comp of b.companions) {
+                xml += '  <huesped>\n';
+                xml += '    <nombre>' + escapeXml(comp.name || '') + '</nombre>\n';
+                xml += '    <dni>' + escapeXml(comp.docNumber || '') + '</dni>\n';
+                xml += '    <fecha_nacimiento>' + escapeXml(comp.birthDate || '') + '</fecha_nacimiento>\n';
+                xml += '    <numero_soporte>' + escapeXml(comp.supportNumber || '') + '</numero_soporte>\n';
+                xml += '    <direccion>' + escapeXml(comp.address || '') + '</direccion>\n';
+                xml += '    <telefono>' + escapeXml(phone) + '</telefono>\n';
+                xml += '    <habitacion>' + escapeXml(String(b.room || '')) + '</habitacion>\n';
+                xml += '    <checkin>' + escapeXml(b.checkin || '') + '</checkin>\n';
+                xml += '    <checkout>' + escapeXml(b.checkout || '') + '</checkout>\n';
+                xml += '  </huesped>\n';
+            }
+        }
+    }
+
+    xml += '</huespedes>\n';
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `huespedes_${dateStr}.xml`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function escapeXml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
 // ==================== PAYMENT MANAGEMENT ====================
@@ -3041,6 +3232,11 @@ function bookFromSearch(room, checkin, checkout) {
     document.getElementById('docType').value = 'dni';
     document.getElementById('docNumber').value = '';
     document.getElementById('guestNationality').value = '';
+    document.getElementById('guestBirthDate').value = '';
+    document.getElementById('guestSupportNumber').value = '';
+    document.getElementById('guestAddress').value = '';
+    currentCompanions = [];
+    renderCompanions();
     document.getElementById('guestCount').value = '2';
     document.getElementById('bookingStatus').value = 'confirmed';
     document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
@@ -4099,6 +4295,11 @@ function wizardBook() {
     document.getElementById('docType').value = 'dni';
     document.getElementById('docNumber').value = '';
     document.getElementById('guestNationality').value = '';
+    document.getElementById('guestBirthDate').value = '';
+    document.getElementById('guestSupportNumber').value = '';
+    document.getElementById('guestAddress').value = '';
+    currentCompanions = [];
+    renderCompanions();
     document.getElementById('roomCount').value = wizRoomCount;
     document.getElementById('roomType').value = persMap[wizPersons] || 'doble';
     document.getElementById('extraBeds').value = '0';
@@ -4768,6 +4969,7 @@ function saveNewClient() {
 // ==================== MULTIPLE ROOMS PER BOOKING ====================
 
 let currentExtraRooms = []; // [{room: number, roomType: 'individual'|'doble'|'triple'|'cuadruple'}]
+let currentCompanions = []; // [{name, docNumber, birthDate, supportNumber, address}]
 
 function addExtraRoom() {
     currentExtraRooms.push({ room: '', roomType: 'doble' });
@@ -4828,18 +5030,27 @@ function switchProperty(prop) {
 // ==================== VIEW RANGE (WEEKLY/MONTHLY) ====================
 
 function setViewRange(days) {
-    document.getElementById('daysToShow').value = days;
-    document.getElementById('viewWeek').classList.toggle('active', days === 7);
-    document.getElementById('viewMonth').classList.toggle('active', days === 30);
-    const current = document.getElementById('startDate').value;
-    const d = current ? parseDate(current) : new Date();
-    if (days <= 7) {
-        // Start from Monday of that week
-        const dow = (d.getDay() + 6) % 7;
-        document.getElementById('startDate').value = dateStr(addDays(d, -dow));
+    if (days === 'fromToday') {
+        document.getElementById('daysToShow').value = 30;
+        document.getElementById('startDate').value = todayStr();
+        document.getElementById('viewWeek').classList.remove('active');
+        document.getElementById('viewMonth').classList.remove('active');
+        document.getElementById('viewFromToday').classList.add('active');
     } else {
-        // Start from 1st of that month
-        document.getElementById('startDate').value = dateStr(new Date(d.getFullYear(), d.getMonth(), 1));
+        document.getElementById('daysToShow').value = days;
+        document.getElementById('viewWeek').classList.toggle('active', days === 7);
+        document.getElementById('viewMonth').classList.toggle('active', days === 30);
+        document.getElementById('viewFromToday').classList.remove('active');
+        const current = document.getElementById('startDate').value;
+        const d = current ? parseDate(current) : new Date();
+        if (days <= 7) {
+            // Start from Monday of that week
+            const dow = (d.getDay() + 6) % 7;
+            document.getElementById('startDate').value = dateStr(addDays(d, -dow));
+        } else {
+            // Start from 1st of that month
+            document.getElementById('startDate').value = dateStr(new Date(d.getFullYear(), d.getMonth(), 1));
+        }
     }
     renderGrid();
 }
