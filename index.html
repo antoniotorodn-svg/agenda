@@ -1168,6 +1168,7 @@
         </div>
     </div>
     <div style="display:flex; align-items:center; gap:16px; font-size:0.8rem;">
+        <button onclick="openTutorialVideo()" style="display:flex;align-items:center;gap:6px;padding:7px 16px;border:1px solid #ccc;background:#f5f5f5;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;color:#222;white-space:nowrap;" onmouseover="this.style.background='#222';this.style.color='#fff';this.style.borderColor='#222'" onmouseout="this.style.background='#f5f5f5';this.style.color='#222';this.style.borderColor='#ccc'">&#9654; Tutorial</button>
         <div style="display:flex; gap:8px; font-size:0.6rem; align-items:center; flex-wrap:wrap;">
             <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f0f0f0;vertical-align:middle;"></span> Confirmada</span>
             <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#bbdefb;vertical-align:middle;"></span> Check-in</span>
@@ -1224,6 +1225,19 @@
 </div><!-- /main-content -->
 
 <div class="tooltip" id="tooltip"></div>
+
+<!-- Modal Tutorial Video -->
+<div class="modal-overlay" id="tutorialModal" onclick="if(event.target===this)closeTutorialVideo()">
+    <div class="modal" style="width:800px;max-width:95vw;padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h2 style="margin:0;">Tutorial</h2>
+            <button onclick="closeTutorialVideo()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#717171;padding:4px 8px;">&times;</button>
+        </div>
+        <div style="position:relative;padding-top:56.25%;border-radius:8px;overflow:hidden;background:#000;">
+            <iframe id="tutorialIframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Buscar Disponibilidad -->
 <div class="modal-overlay" id="searchModal">
@@ -5697,6 +5711,16 @@ function onGlobalSearch(query) {
 function closeGlobalSearch() {
     document.getElementById('globalSearchResults').classList.remove('active');
     document.getElementById('globalSearch').value = '';
+}
+
+function openTutorialVideo() {
+    document.getElementById('tutorialIframe').src = 'https://player.vimeo.com/video/1180067674?h=e152d5ded8&autoplay=1';
+    document.getElementById('tutorialModal').classList.add('active');
+}
+
+function closeTutorialVideo() {
+    document.getElementById('tutorialModal').classList.remove('active');
+    document.getElementById('tutorialIframe').src = '';
 }
 
 // Close search dropdown when clicking outside
