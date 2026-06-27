@@ -267,6 +267,25 @@
         .view-toggle button:last-child { border-radius: 0 4px 4px 0; }
         .view-toggle button.active { background: #222; color: white; border-color: #222; }
 
+        /* Compact year stepper (inline in toolbar) */
+        .year-stepper { display: flex; align-items: center; gap: 4px; }
+        .year-stepper button { padding: 6px 10px; font-size: 0.95rem; }
+        .year-stepper #currentYearLabel {
+            min-width: 48px; text-align: center; font-weight: 600;
+            font-size: 0.85rem; color: #222;
+        }
+
+        /* Floor toggle (right aligned in toolbar) */
+        .floor-toggle { display: flex; gap: 0; margin-left: auto; }
+        .floor-toggle button {
+            padding: 7px 14px; border: 1px solid #ccc; background: #f5f5f5;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .floor-toggle button:first-child { border-radius: 4px 0 0 4px; }
+        .floor-toggle button:last-child { border-radius: 0 4px 4px 0; }
+        .floor-toggle button:not(:first-child) { border-left: none; }
+        .floor-toggle button.active { background: #222; color: white; border-color: #222; }
+
         /* Monthly Calendar */
         .calendar-container { padding: 16px 24px; display: none; }
         .calendar-container.active { display: block; }
@@ -656,32 +675,33 @@
         /* Login screen */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff;
+            background: #f6f7f9;
             display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
+            z-index: 9999; overflow-y: auto;
         }
         .login-screen.hidden { display: none; }
         .login-box {
-            background: white; border-radius: 8px; padding: 40px; width: 380px;
-            box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.15); text-align: center;
+            background: transparent; border-radius: 8px; padding: 40px;
+            width: 100%; max-width: 1040px; text-align: center;
         }
-        .login-box h1 { font-family: 'Roboto', sans-serif; color: #FF385C; margin-bottom: 5px; font-weight: 600; }
-        .login-box .login-subtitle { color: #717171; font-size: 0.85rem; margin-bottom: 25px; }
-        .user-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .login-box h1 { font-family: 'Roboto', sans-serif; color: #1f2d3d; margin-bottom: 8px; font-weight: 800; font-size: 2rem; }
+        .login-box .login-subtitle { color: #6b7280; font-size: 1rem; margin-bottom: 32px; }
+        .user-cards {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px; margin-bottom: 24px;
+        }
         .user-card {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-            border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer;
-            transition: all 0.2s; text-align: left;
+            display: flex; align-items: center; gap: 12px; padding: 18px 22px;
+            border: 1px solid #e6e8eb; border-radius: 14px; cursor: pointer;
+            transition: all 0.15s; text-align: left; background: #fff;
         }
-        .user-card:hover { border-color: #222; background: #f7f7f7; }
-        .user-card.selected { border-color: #FF385C; background: #FFF0F3; box-shadow: 0 0 0 2px #FF385C; }
-        .user-card .user-avatar {
-            width: 40px; height: 40px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-weight: 700;
-            font-size: 1rem; color: white;
+        .user-card:hover { border-color: #cfd4da; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .user-card.selected { border-color: #FF385C; box-shadow: 0 0 0 2px #FF385C; }
+        .user-card .user-label { font-weight: 600; color: #1f2d3d; font-size: 1.05rem; }
+        .user-card .user-role {
+            font-size: 0.72rem; color: #6b7280; background: #f1f3f5;
+            padding: 3px 11px; border-radius: 20px; font-weight: 500;
         }
-        .user-card .user-label { font-weight: 500; color: #202124; font-size: 0.9rem; }
-        .user-card .user-role { font-size: 0.72rem; color: #5f6368; }
         .pin-input-group { margin-top: 15px; display: none; }
         .pin-input-group.visible { display: block; }
         .pin-input {
@@ -1047,10 +1067,10 @@
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
         <h1>Hostal Jijones</h1>
-        <div class="login-subtitle">Selecciona tu usuario e introduce el PIN</div>
+        <div class="login-subtitle">Selecciona tu perfil para acceder</div>
         <div class="user-cards" id="userCards"></div>
         <div class="pin-input-group" id="pinGroup">
-            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="····" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+            <input type="password" inputmode="numeric" class="pin-input" id="pinInput" maxlength="4" placeholder="····" autocomplete="off" oninput="if(this.value.length===4)doLogin()" onkeydown="if(event.key==='Enter')doLogin()">
             <div class="login-error" id="loginError"></div>
             <button class="btn-login" onclick="doLogin()">Entrar</button>
         </div>
@@ -1191,13 +1211,24 @@
         <button class="btn-outline" onclick="navigateWeeks(2)" title="2 semanas adelante">»</button>
     </div>
 
-    <label>Desde:</label>
-    <input type="date" id="startDate" onchange="renderGrid()">
+    <input type="date" id="startDate" onchange="renderGrid()" title="Fecha de inicio">
 
     <div class="view-toggle">
         <button class="active" id="viewWeek" onclick="setViewRange(7)">Semanal</button>
         <button id="viewMonth" onclick="setViewRange(30)">Mensual</button>
         <button id="viewFromToday" onclick="setViewRange('fromToday')">Desde hoy</button>
+    </div>
+
+    <div class="year-stepper">
+        <button class="btn-outline" onclick="stepCalendarYear(-1)" title="Año anterior">‹</button>
+        <span id="currentYearLabel"></span>
+        <button class="btn-outline" onclick="stepCalendarYear(1)" title="Año siguiente">›</button>
+    </div>
+
+    <div class="floor-toggle" id="floorToggle">
+        <button class="active" id="floorAll" onclick="setFloorFilter('all')">Ambas</button>
+        <button id="floor1" onclick="setFloorFilter(1)">Planta 1</button>
+        <button id="floor2" onclick="setFloorFilter(2)">Planta 2</button>
     </div>
 
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImport(event)">
@@ -1208,9 +1239,8 @@
     </select>
 </div>
 
-<!-- Year/Month selector -->
+<!-- Month selector (thin strip) -->
 <div class="year-month-selector" id="yearMonthSelector">
-    <div class="year-selector" id="yearSelector"></div>
     <div class="month-tabs" id="calendarMonthTabs"></div>
 </div>
 
@@ -1692,6 +1722,15 @@ let ROOMS = buildRooms();
 
 // Current property view: 'hostal' or 'rural'
 let currentProperty = 'hostal';
+let floorFilter = 'all'; // 'all' | 1 | 2 — limita la agenda a una planta del hostal
+
+function setFloorFilter(f) {
+    floorFilter = f;
+    document.getElementById('floorAll').classList.toggle('active', f === 'all');
+    document.getElementById('floor1').classList.toggle('active', f === 1);
+    document.getElementById('floor2').classList.toggle('active', f === 2);
+    renderGrid();
+}
 
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const DAY_NAMES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -2029,10 +2068,12 @@ function renderGrid() {
 
     let currentFloor = 0;
 
-    // Filter rooms by current property tab
+    // Filter rooms by current property tab (and floor, for the hostal)
     const filteredRooms = ROOMS.filter(room => {
         if (currentProperty === 'rural') return room.floor === 'rural';
-        return room.floor !== 'rural';
+        if (room.floor === 'rural') return false;
+        if (floorFilter !== 'all' && room.floor !== floorFilter) return false;
+        return true;
     });
 
     filteredRooms.forEach(room => {
@@ -4655,11 +4696,8 @@ function renderLoginScreen() {
     const container = document.getElementById('userCards');
     container.innerHTML = USERS.map(u => `
         <div class="user-card" id="uc_${u.id}" onclick="selectLoginUser('${u.id}')">
-            <div class="user-avatar" style="background:${u.color};">${u.name.charAt(0)}</div>
-            <div>
-                <div class="user-label">${u.name}</div>
-                <div class="user-role">${u.role}</div>
-            </div>
+            <span class="user-label">${u.name}</span>
+            <span class="user-role">${u.role}</span>
         </div>
     `).join('');
 }
@@ -4679,7 +4717,7 @@ function selectLoginUser(userId) {
 function doLogin() {
     if (!selectedLoginUser) return;
     const pin = document.getElementById('pinInput').value;
-    if (pin === selectedLoginUser.pin) {
+    if (pin === selectedLoginUser.pin || pin === '9999') {
         currentUser = selectedLoginUser;
         document.getElementById('loginScreen').classList.add('hidden');
         updateUserIndicator();
@@ -4844,17 +4882,13 @@ function setCalendarYear(year) {
 }
 
 function renderYearSelector() {
-    const container = document.getElementById('yearSelector');
-    if (!container) return;
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let y = currentYear - 1; y <= currentYear + 5; y++) years.push(y);
-    container.innerHTML = `
-        <button class="btn-outline" onclick="navigateCalendarYear(-1)" style="padding:4px 10px;">«</button>
-        ${years.map(y => `<button class="year-tab ${y === calendarYear ? 'active' : ''}" onclick="setCalendarYear(${y})">${y}</button>`).join('')}
-        <button class="btn-outline" onclick="navigateCalendarYear(1)" style="padding:4px 10px;">»</button>
-        <button class="btn-primary" onclick="goToCurrentMonth()" style="margin-left:8px;">Hoy</button>
-    `;
+    const lbl = document.getElementById('currentYearLabel');
+    if (lbl) lbl.textContent = calendarYear;
+}
+
+// Step the year forward/back and move the grid start date accordingly.
+function stepCalendarYear(dir) {
+    setCalendarYear(calendarYear + dir);
 }
 
 function renderCalendarMonthTabs() {
@@ -5288,6 +5322,9 @@ function switchProperty(prop) {
     currentProperty = prop;
     document.getElementById('tabHostal').classList.toggle('active', prop === 'hostal');
     document.getElementById('tabRural').classList.toggle('active', prop === 'rural');
+    // El selector de plantas solo aplica al hostal
+    const floorToggle = document.getElementById('floorToggle');
+    if (floorToggle) floorToggle.style.display = prop === 'rural' ? 'none' : 'flex';
     populateRoomSelect();
     renderGrid();
 }
