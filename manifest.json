@@ -1,0 +1,18 @@
+{
+  "name": "Hostal Jijones - Sistema de Reservas",
+  "short_name": "Hostal Jijones",
+  "description": "Agenda de reservas del Hostal Jijones y Casa Rural Villarrubia",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF385C",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
