@@ -6,11 +6,10 @@
     <title>Hostal Jijones - Sistema de Reservas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #222; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #fff; color: #222; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
         header {
             background: #fff;
@@ -286,41 +285,6 @@
         .floor-toggle button:not(:first-child) { border-left: none; }
         .floor-toggle button.active { background: #222; color: white; border-color: #222; }
 
-        /* Monthly Calendar */
-        .calendar-container { padding: 16px 24px; display: none; }
-        .calendar-container.active { display: block; }
-        .calendar-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .calendar-nav h3 { font-family: 'Google Sans', 'Roboto', sans-serif; font-size: 1.1rem; color: #3c4043; min-width: 180px; text-align: center; font-weight: 500; }
-        .calendar-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
-            background: #ebebeb; border-radius: 12px; overflow: hidden;
-            border: 1px solid #ebebeb;
-        }
-        .calendar-grid .cal-header {
-            background: #f7f7f7; color: #717171; padding: 8px; text-align: center;
-            font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .calendar-grid .cal-day {
-            background: white; min-height: 90px; padding: 4px; cursor: pointer;
-            transition: background 0.15s; position: relative;
-        }
-        .calendar-grid .cal-day:hover { background: #f8f9fa; }
-        .calendar-grid .cal-day.other-month { background: #f8f9fa; opacity: 0.5; }
-        .calendar-grid .cal-day.today { box-shadow: inset 0 0 0 2px #1a73e8; }
-        .calendar-grid .cal-day.weekend { background: #fffdf7; }
-        .calendar-grid .cal-day .day-num {
-            font-size: 0.8rem; font-weight: 500; color: #3c4043; margin-bottom: 2px;
-        }
-        .calendar-grid .cal-day .cal-booking {
-            font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; margin-bottom: 1px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            cursor: pointer; font-weight: 500;
-        }
-        .calendar-grid .cal-day .cal-more {
-            font-size: 0.6rem; color: #1a73e8; font-weight: 500; cursor: pointer;
-        }
-        .cal-booking.status-blocked { background: #ddd; color: #717171; }
-
         /* Year-Month-Day Calendar Selector */
         .year-month-selector {
             background: #fff; padding: 12px 24px; border-bottom: 1px solid #ebebeb;
@@ -345,28 +309,6 @@
         }
         .month-tab:hover { color: #222; background: #f7f7f7; }
         .month-tab.active { color: #FF385C; border-bottom-color: #FF385C; font-weight: 600; }
-        .day-numbers-bar {
-            display: flex; gap: 0; margin-bottom: 0; background: #fff;
-            overflow: hidden;
-        }
-        .day-num-cell {
-            flex: 1; min-width: 0; text-align: center; padding: 6px 1px; background: #fff;
-            font-size: 0.68rem; font-weight: 500; color: #222; cursor: pointer;
-            transition: all 0.15s; position: relative; border-bottom: 2px solid transparent;
-        }
-        .day-num-cell:hover { background: #f7f7f7; }
-        .day-num-cell.today { background: #FF385C; color: white; font-weight: 700; border-radius: 4px; }
-        .day-num-cell.weekend { color: #FF385C; }
-        .day-num-cell.has-bookings::after {
-            content: ''; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px; border-radius: 50%; background: #FF385C;
-        }
-        .day-num-cell .day-label {
-            display: block; font-size: 0.52rem; color: #717171; text-transform: uppercase;
-        }
-        .day-num-cell.today .day-label { color: rgba(255,255,255,0.8); }
-        .day-num-cell.weekend .day-label { color: #FF385C; }
-
         /* Blocked dates */
         .status-blocked { background: #ddd; color: #717171; }
 
@@ -414,7 +356,7 @@
             background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px;
             padding: 15px; margin-bottom: 15px;
         }
-        .client-header-card h3 { font-size: 1rem; color: #2c3e50; margin-bottom: 8px; font-family: 'Playfair Display', Georgia, serif; }
+        .client-header-card h3 { font-size: 1rem; color: #2c3e50; margin-bottom: 8px; }
         .client-detail-row { display: flex; gap: 20px; font-size: 0.82rem; flex-wrap: wrap; }
         .client-detail-row .detail { color: #666; }
         .client-detail-row .detail strong { color: #2c3e50; }
@@ -462,12 +404,6 @@
             border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
         }
         .btn-email:hover { background: #357abd; }
-        .btn-copy-confirm {
-            padding: 6px 14px; background: #E6D8C3; color: #5a4a3a; border: none;
-            border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-        }
-        .btn-copy-confirm:hover { background: #D4C5AD; }
-
         /* Casa Rural specific */
         .rural-section {
             background: #fef7e0; border: 1px solid #fdd663; border-radius: 8px;
@@ -515,7 +451,7 @@
         .rules-modal { width: 550px; }
         .rules-textarea {
             width: 100%; height: 300px; padding: 12px; border: 1px solid #ccc;
-            border-radius: 6px; font-size: 0.85rem; font-family: 'Inter', sans-serif;
+            border-radius: 6px; font-size: 0.85rem; font-family: inherit;
             resize: vertical; line-height: 1.5;
         }
         .rules-preview {
@@ -640,7 +576,7 @@
         .invoice-modal { width: 650px; }
         .invoice-preview {
             background: white; border: 1px solid #ccc; padding: 30px; font-size: 0.82rem;
-            font-family: 'Inter', sans-serif; line-height: 1.6;
+            font-family: 'Roboto', sans-serif; line-height: 1.6;
         }
         .invoice-preview .inv-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
         .invoice-preview .inv-company { font-weight: 700; font-size: 0.95rem; color: #2c3e50; }
@@ -1047,7 +983,6 @@
             .login-subtitle { margin-bottom: 10px !important; }
             .user-cards { flex-direction: row; flex-wrap: wrap; }
             .user-card { flex: 1; min-width: 120px; }
-            .calendar-grid .cal-day { min-height: 50px; }
         }
 
         /* Print styles */
@@ -1247,9 +1182,6 @@
 <div class="grid-container" id="gridContainer">
     <table class="booking-grid" id="bookingGrid"></table>
 </div>
-
-<!-- Day Detail for day click -->
-<div id="dayBookingsDetail" style="display:none; padding:0 24px 12px;"></div>
 
 <div class="stats-bar" id="statsBar"></div>
 </div><!-- /main-content -->
@@ -1767,9 +1699,9 @@ const BUSINESS_DATA = {
 const USERS = [
     { id: 'ricardo', name: 'Ricardo', pin: '2601', role: 'admin', color: '#FF385C' },
     { id: 'rosa', name: 'Rosa', pin: '1609', role: 'recepción', color: '#6B4FA0' },
-    { id: 'alba', name: 'Alba', pin: '100A', role: 'recepción', color: '#008A05' },
-    { id: 'laura', name: 'Laura', pin: '100L', role: 'recepción', color: '#F5A623' },
-    { id: 'carmen', name: 'Carmen', pin: '100C', role: 'recepción', color: '#1a73e8' }
+    { id: 'alba', name: 'Alba', pin: '1001', role: 'recepción', color: '#008A05' },
+    { id: 'laura', name: 'Laura', pin: '1002', role: 'recepción', color: '#F5A623' },
+    { id: 'carmen', name: 'Carmen', pin: '1003', role: 'recepción', color: '#1a73e8' }
 ];
 let currentUser = null;
 
@@ -1852,7 +1784,6 @@ let customers = [];
 let currentPayments = []; // temp payments for modal editing
 let currentChecklist = { checkin: [], checkout: [] };
 let currentChecklistTab = 'checkin';
-let currentView = 'grid';
 let calendarMonth = new Date().getMonth();
 let calendarYear = new Date().getFullYear();
 
@@ -1868,6 +1799,7 @@ function loadBookings() {
     try {
         customers = JSON.parse(localStorage.getItem('hostal_jijones_customers') || '[]');
     } catch { customers = []; }
+    migrateGroupChildren();
 }
 
 function saveBookings() {
@@ -1921,21 +1853,32 @@ function generateId() {
     return 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
 }
 
+// Room numbers can be int (101) or string ('CR1', or '101' from imported data):
+// always compare as strings to avoid silently missing bookings.
+function sameRoom(a, b) {
+    return String(a) === String(b);
+}
+
+function findRoom(roomNumber) {
+    return ROOMS.find(r => sameRoom(r.number, roomNumber));
+}
+
 function getBookingsForRoomAndDate(roomNumber, date) {
     return bookings.filter(b =>
-        b.room === roomNumber && date >= b.checkin && date < b.checkout
+        sameRoom(b.room, roomNumber) && date >= b.checkin && date < b.checkout
     );
 }
 
-function hasConflict(roomNumber, checkin, checkout, excludeId) {
+function hasConflict(roomNumber, checkin, checkout, excludeId, excludeGroupId) {
     const bookingConflict = bookings.some(b =>
-        b.room === roomNumber &&
+        sameRoom(b.room, roomNumber) &&
         b.id !== excludeId &&
+        (!excludeGroupId || b.groupId !== excludeGroupId) &&
         b.checkin < checkout &&
         b.checkout > checkin
     );
     const blockConflict = blocks.some(bl =>
-        bl.room === roomNumber &&
+        sameRoom(bl.room, roomNumber) &&
         bl.id !== excludeId &&
         bl.from < checkout &&
         bl.to > checkin
@@ -1945,12 +1888,72 @@ function hasConflict(roomNumber, checkin, checkout, excludeId) {
 
 function getBlocksForRoomAndDate(roomNumber, date) {
     return blocks.filter(bl =>
-        bl.room === roomNumber && date >= bl.from && date < bl.to
+        sameRoom(bl.room, roomNumber) && date >= bl.from && date < bl.to
     );
 }
 
-function isRoomAvailable(roomNumber, checkin, checkout, excludeId) {
-    return !hasConflict(roomNumber, checkin, checkout, excludeId || null);
+function isRoomAvailable(roomNumber, checkin, checkout, excludeId, excludeGroupId) {
+    return !hasConflict(roomNumber, checkin, checkout, excludeId || null, excludeGroupId || null);
+}
+
+// ==================== BOOKING GROUPS (multi-room) ====================
+// A multi-room reservation is stored as a "main" booking (holds payments,
+// extraRooms detail and the group total) plus one "child" booking per extra
+// room so each room shows on the grid. Children never hold money.
+
+function isGroupChild(b) {
+    if (b.groupChild) return true;
+    // Legacy data: children were full copies without a flag
+    if (!b.groupId) return false;
+    if (b.extraRooms && b.extraRooms.length > 0) return false;
+    return bookings.some(m => m.groupId === b.groupId && m.id !== b.id && m.extraRooms && m.extraRooms.length > 0);
+}
+
+// Bookings that represent a reservation (excludes group children) — use for
+// income, counters and anything that must not double-count multi-room groups.
+function mainBookings() {
+    return bookings.filter(b => !isGroupChild(b));
+}
+
+// Total agreed for the whole reservation, frozen at save time.
+function getBookingFrozenTotal(b) {
+    if (b.totalPrice != null) return b.totalPrice;
+    return nightsBetween(b.checkin, b.checkout) * (b.pricePerNight || 0);
+}
+
+// Revenue attributable to this booking's own room.
+function getBookingRoomRevenue(b) {
+    if (b.roomTotal != null) return b.roomTotal;
+    return nightsBetween(b.checkin, b.checkout) * (b.pricePerNight || 0);
+}
+
+function getRoomNightRate(b) {
+    const n = nightsBetween(b.checkin, b.checkout);
+    if (b.roomTotal != null && n > 0) return b.roomTotal / n;
+    return b.pricePerNight || 0;
+}
+
+// One-time migration for legacy multi-room groups: children were exact copies
+// of the main booking (payments included), which double-counted income. Mark
+// them, move any payment the child has and the main doesn't, and empty them.
+function migrateGroupChildren() {
+    let changed = false;
+    bookings.forEach(b => {
+        if (b.groupChild || !b.groupId) return;
+        if (b.extraRooms && b.extraRooms.length > 0) return;
+        const main = bookings.find(m => m.groupId === b.groupId && m.id !== b.id && m.extraRooms && m.extraRooms.length > 0);
+        if (!main) return;
+        (b.payments || []).forEach(p => {
+            if (!(main.payments || []).some(mp => mp.id === p.id)) {
+                main.payments = main.payments || [];
+                main.payments.push(p);
+            }
+        });
+        b.groupChild = true;
+        b.payments = [];
+        changed = true;
+    });
+    if (changed) saveBookings();
 }
 
 // ==================== ROOM CLEANING STATUS ====================
@@ -2112,7 +2115,7 @@ function renderGrid() {
 
                 const extraBadge = (b.extraRooms && b.extraRooms.length > 0 && isStart) ? `<span style="font-size:0.55rem;opacity:0.8;">+${b.extraRooms.length}</span>` : '';
                 const bookingBadge = (b.source === 'booking' && isStart) ? '<span style="background:#003580;color:#fff;font-size:0.45rem;padding:0 2px;border-radius:2px;margin-left:1px;font-weight:700;">B</span>' : '';
-                const label = isStart ? b.guestName.split(' ')[0] + bookingBadge + extraBadge : '';
+                const label = isStart ? escapeHtml(b.guestName.split(' ')[0]) + bookingBadge + extraBadge : '';
                 const pDotClass = b.paymentStatus === 'paid' ? 'paid' : (b.paymentStatus === 'deposit_paid' ? 'deposit' : 'unpaid');
                 const payDot = isEnd || isSingle ? `<span class="payment-dot ${pDotClass}"></span>` : '';
                 const clickAction = ds === today ? `showQuickActions(event,'${b.id}')` : `editBooking('${b.id}')`;
@@ -2153,21 +2156,22 @@ function renderGrid() {
 
 function updateStats() {
     const today = todayStr();
-    const availableRooms = ROOMS;
-    const occupied = availableRooms.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
-    const total = availableRooms.length;
+    const statRooms = ROOMS.filter(r => currentProperty === 'rural' ? r.floor === 'rural' : r.floor !== 'rural');
+    const occupied = statRooms.filter(r => getBookingsForRoomAndDate(r.number, today).length > 0).length;
+    const total = statRooms.length;
     const free = total - occupied;
-    const occupancy = Math.round((occupied / total) * 100);
+    const occupancy = total > 0 ? Math.round((occupied / total) * 100) : 0;
 
-    const todayCheckins = bookings.filter(b => b.checkin === today).length;
-    const todayCheckouts = bookings.filter(b => b.checkout === today).length;
+    const mains = mainBookings();
+    const todayCheckins = mains.filter(b => b.checkin === today).length;
+    const todayCheckouts = mains.filter(b => b.checkout === today).length;
 
     document.getElementById('statsBar').innerHTML = `
         <div class="stat">Ocupación hoy: <strong>${occupied}/${total} (${occupancy}%)</strong></div>
         <div class="stat">Libres: <strong>${free}</strong></div>
         <div class="stat">Check-ins hoy: <strong>${todayCheckins}</strong></div>
         <div class="stat">Check-outs hoy: <strong>${todayCheckouts}</strong></div>
-        <div class="stat">Total reservas: <strong>${bookings.length}</strong></div>
+        <div class="stat">Total reservas: <strong>${mains.length}</strong></div>
     `;
 }
 
@@ -2177,19 +2181,19 @@ function showTooltip(event, bookingId) {
     const b = bookings.find(x => x.id === bookingId);
     if (!b) return;
     const nights = nightsBetween(b.checkin, b.checkout);
-    const totalPrice = (nights * b.pricePerNight).toFixed(2);
+    const totalPrice = getBookingFrozenTotal(b).toFixed(2);
     const tip = document.getElementById('tooltip');
     const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
     const paymentLabel = PAYMENT_STATUS_LABELS[b.paymentStatus || 'pending_payment'];
-    const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${b.docNumber}` : '';
-    const isRural = ROOMS.find(r => r.number === b.room)?.bedType === 'rural';
+    const docInfo = b.docNumber ? `<br>${(b.docType || 'doc').toUpperCase()}: ${escapeHtml(b.docNumber)}` : '';
+    const isRural = findRoom(b.room)?.bedType === 'rural';
     const depositInfo = isRural && b.ruralDeposit ? `<br>Fianza: ${b.ruralDeposit} € (${DEPOSIT_STATUS_LABELS[b.ruralDepositStatus] || 'Pendiente'})` : '';
     const ROOM_TYPE_LABELS = { individual: 'Individual', doble: 'Doble', triple: 'Triple (+suplet.)', cuadruple: 'Cuádruple (+2 suplet.)' };
-    const roomTypeInfo = b.roomType ? `<br>Tipo: ${ROOM_TYPE_LABELS[b.roomType] || b.roomType}` : '';
+    const roomTypeInfo = b.roomType ? `<br>Tipo: ${ROOM_TYPE_LABELS[b.roomType] || escapeHtml(b.roomType)}` : '';
     const extraRoomsInfo = (b.extraRooms && b.extraRooms.length > 0) ? `<br>+ ${b.extraRooms.length} hab. adicional(es)` : '';
-    const createdByInfo = b.createdBy ? `<br>Profesional: <strong>${b.createdBy}</strong>` : '';
+    const createdByInfo = b.createdBy ? `<br>Profesional: <strong>${escapeHtml(b.createdBy)}</strong>` : '';
     const auditLine = b.updatedAt ? `<br><span style="opacity:0.7">${formatAuditDate(b.updatedAt || b.createdAt)}</span>` : '';
-    tip.innerHTML = `<strong>${b.guestName}</strong>${docInfo}<br>
+    tip.innerHTML = `<strong>${escapeHtml(b.guestName)}</strong>${docInfo}<br>
         ${isRural ? 'Casa Rural' : 'Hab. ' + b.room} · ${nights} noche(s)${roomTypeInfo}${extraRoomsInfo}<br>
         ${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)}<br>
         Estado: ${STATUS_LABELS[b.status]}<br>
@@ -2223,7 +2227,7 @@ function showQuickActions(event, bookingId) {
 
     const statusLabel = STATUS_LABELS[b.status] || b.status;
     popup.innerHTML = `
-        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">${b.guestName}</div>
+        <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">${escapeHtml(b.guestName)}</div>
         <div style="font-size:0.75rem;color:#717171;margin-bottom:12px;">Hab. ${b.room} · Estado: ${statusLabel}</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
             ${b.status === 'confirmed' ? `<button class="btn-success" onclick="quickCheckIn('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;">Check-in</button>` : ''}
@@ -2256,11 +2260,17 @@ function closeQuickActionsOutside(e) {
 function quickCheckIn(bookingId) {
     const b = bookings.find(x => x.id === bookingId);
     if (!b) return;
-    b.status = 'checkedin';
-    b.updatedAt = new Date().toISOString();
-    b.updatedBy = currentUser ? currentUser.name : 'Sistema';
-    if (!b.history) b.history = [];
-    b.history.push({ action: 'check-in rápido', user: b.updatedBy, date: b.updatedAt });
+    const now = new Date().toISOString();
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    // Status applies to the whole reservation, not just the clicked room
+    const members = b.groupId ? bookings.filter(x => x.groupId === b.groupId) : [b];
+    members.forEach(m => {
+        m.status = 'checkedin';
+        m.updatedAt = now;
+        m.updatedBy = userName;
+        if (!m.history) m.history = [];
+        m.history.push({ action: 'check-in rápido', user: userName, date: now });
+    });
     saveBookings();
     closeQuickActions();
     renderGrid();
@@ -2269,18 +2279,18 @@ function quickCheckIn(bookingId) {
 function quickCheckOut(bookingId) {
     const b = bookings.find(x => x.id === bookingId);
     if (!b) return;
-    b.status = 'checkedout';
-    b.updatedAt = new Date().toISOString();
-    b.updatedBy = currentUser ? currentUser.name : 'Sistema';
-    if (!b.history) b.history = [];
-    b.history.push({ action: 'check-out rápido', user: b.updatedBy, date: b.updatedAt });
-    // Set room to dirty after checkout
-    roomStatusData[b.room] = { status: 'dirty', date: todayStr() };
-    if (b.extraRooms) {
-        b.extraRooms.forEach(er => {
-            roomStatusData[er.room] = { status: 'dirty', date: todayStr() };
-        });
-    }
+    const now = new Date().toISOString();
+    const userName = currentUser ? currentUser.name : 'Sistema';
+    const members = b.groupId ? bookings.filter(x => x.groupId === b.groupId) : [b];
+    members.forEach(m => {
+        m.status = 'checkedout';
+        m.updatedAt = now;
+        m.updatedBy = userName;
+        if (!m.history) m.history = [];
+        m.history.push({ action: 'check-out rápido', user: userName, date: now });
+        // Every room of the reservation needs cleaning after checkout
+        roomStatusData[m.room] = { status: 'dirty', date: todayStr() };
+    });
     saveRoomStatus();
     saveBookings();
     closeQuickActions();
@@ -2320,29 +2330,11 @@ function goToToday() {
 
 // ==================== MODAL ====================
 
-function populateRoomSelect() {
-    const sel = document.getElementById('bookingRoom');
-    sel.innerHTML = '';
-    ROOMS.filter(r => {
-        if (currentProperty === 'rural') return r.floor === 'rural';
-        return r.floor !== 'rural';
-    }).forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r.number;
-        opt.textContent = r.label;
-        sel.appendChild(opt);
-    });
-    sel.addEventListener('change', function() {
-        const room = ROOMS.find(r => String(r.number) === sel.value);
-        updateRuralSection(room);
-    });
-
-    // Deposit status toggle
-    document.getElementById('depositStatus').addEventListener('change', function() {
-        document.getElementById('depositReturnGroup').style.display =
-            this.value === 'partial_return' ? 'block' : 'none';
-    });
-}
+// Deposit status toggle (registered once)
+document.getElementById('depositStatus').addEventListener('change', function() {
+    document.getElementById('depositReturnGroup').style.display =
+        this.value === 'partial_return' ? 'block' : 'none';
+});
 
 function updateRuralSection(room) {
     const isRural = room && room.bedType === 'rural';
@@ -2365,7 +2357,8 @@ function isCurrentRoomRural() {
     return room && room.bedType === 'rural';
 }
 
-function openNewBooking(room, date) {
+// Clears every field of the booking modal (shared by all "new booking" entry points)
+function resetBookingForm() {
     document.getElementById('modalTitle').textContent = 'Nueva Reserva';
     document.getElementById('swapRoomBtn').style.display = 'none';
     document.getElementById('bookingId').value = '';
@@ -2388,37 +2381,33 @@ function openNewBooking(room, date) {
     document.getElementById('confirmActions').style.display = 'none';
     document.getElementById('priceTotal').textContent = '';
     document.getElementById('auditInfo').style.display = 'none';
-    hideAutocomplete();
-
-    // Reset rural fields
     document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
     document.getElementById('depositStatus').value = 'pending';
     document.getElementById('depositReturned').value = '0';
     document.getElementById('depositReturnGroup').style.display = 'none';
     currentChecklist = { checkin: [], checkout: [] };
-
-    if (room) document.getElementById('bookingRoom').value = room;
-    if (date) {
-        document.getElementById('bookingCheckin').value = date;
-        document.getElementById('bookingCheckout').value = dateStr(addDays(parseDate(date), 1));
-    } else {
-        document.getElementById('bookingCheckin').value = todayStr();
-        document.getElementById('bookingCheckout').value = dateStr(addDays(new Date(), 1));
-    }
-
-    // Show/hide rural section
-    const selectedRoom = ROOMS.find(r => String(r.number) === document.getElementById('bookingRoom').value);
-    updateRuralSection(selectedRoom);
-
     currentPayments = [];
-    currentExtraRooms = [];
     document.getElementById('roomCount').value = '1';
     document.getElementById('roomType').value = 'doble';
     document.getElementById('extraBeds').value = '0';
     document.getElementById('lateCheckout').value = '0';
-    renderRoomAssignments();
     document.getElementById('paymentStatus').value = 'pending_payment';
     document.getElementById('paymentDate').value = todayStr();
+    hideAutocomplete();
+}
+
+// Renders room assignments, honours the requested room and opens the modal
+function finishBookingFormSetup(room) {
+    renderRoomAssignments();
+    if (room != null && room !== '') {
+        const sel0 = document.getElementById('roomAssign_0');
+        if (sel0) {
+            sel0.value = String(room);
+            updateMainRoom();
+        }
+    }
+    const selectedRoom = findRoom(document.getElementById('bookingRoom').value);
+    updateRuralSection(selectedRoom);
     setPaymentStatus('pending_payment');
     updatePaymentBadgesVisibility();
     renderPayments();
@@ -2427,9 +2416,26 @@ function openNewBooking(room, date) {
     document.getElementById('guestName').focus();
 }
 
+function openNewBooking(room, date) {
+    resetBookingForm();
+    if (date) {
+        document.getElementById('bookingCheckin').value = date;
+        document.getElementById('bookingCheckout').value = dateStr(addDays(parseDate(date), 1));
+    } else {
+        document.getElementById('bookingCheckin').value = todayStr();
+        document.getElementById('bookingCheckout').value = dateStr(addDays(new Date(), 1));
+    }
+    finishBookingFormSetup(room);
+}
+
 function editBooking(id) {
-    const b = bookings.find(x => x.id === id);
+    let b = bookings.find(x => x.id === id);
     if (!b) return;
+    // If this is a child room of a multi-room reservation, edit the main booking
+    if (b.groupId && (!b.extraRooms || b.extraRooms.length === 0)) {
+        const main = bookings.find(m => m.groupId === b.groupId && m.id !== b.id && m.extraRooms && m.extraRooms.length > 0);
+        if (main) b = main;
+    }
 
     document.getElementById('modalTitle').textContent = 'Editar Reserva';
     document.getElementById('swapRoomBtn').style.display = 'inline-block';
@@ -2467,7 +2473,7 @@ function editBooking(id) {
         (b.ruralDepositStatus === 'partial_return') ? 'block' : 'none';
     currentChecklist = b.ruralChecklist ? JSON.parse(JSON.stringify(b.ruralChecklist)) : { checkin: [], checkout: [] };
 
-    const selectedRoom = ROOMS.find(r => String(r.number) === String(b.room));
+    const selectedRoom = findRoom(b.room);
     updateRuralSection(selectedRoom);
 
     // Room type, extra beds and extra rooms
@@ -2476,11 +2482,10 @@ function editBooking(id) {
     document.getElementById('lateCheckout').value = b.lateCheckout || '0';
     const extraCount = (b.extraRooms && b.extraRooms.length > 0) ? b.extraRooms.length + 1 : 1;
     document.getElementById('roomCount').value = extraCount;
-    currentExtraRooms = b.extraRooms ? JSON.parse(JSON.stringify(b.extraRooms)) : [];
     renderRoomAssignments();
     // Set room values after rendering (room 0 = main room)
     const mainSel = document.getElementById('roomAssign_0');
-    if (mainSel) mainSel.value = b.room;
+    if (mainSel) mainSel.value = String(b.room);
     const mainOcc = document.getElementById('roomOcc_0');
     if (mainOcc) mainOcc.value = b.roomType || 'doble';
     const mainExt = document.getElementById('roomExt_0');
@@ -2489,13 +2494,16 @@ function editBooking(id) {
     if (b.extraRooms) {
         b.extraRooms.forEach((er, idx) => {
             const sel = document.getElementById('roomAssign_' + (idx + 1));
-            if (sel) sel.value = er.room;
+            if (sel) sel.value = String(er.room);
             const occ = document.getElementById('roomOcc_' + (idx + 1));
             if (occ) occ.value = er.roomType || 'doble';
             const ext = document.getElementById('roomExt_' + (idx + 1));
             if (ext) ext.value = er.extraBeds || '0';
         });
     }
+    // Keep the hidden main-room field in sync with the select just restored
+    // (renderRoomAssignments auto-assigns and would otherwise leave a stale value)
+    updateMainRoom();
     updateGuestCount();
 
     currentPayments = JSON.parse(JSON.stringify(b.payments || []));
@@ -2583,25 +2591,24 @@ function saveBooking() {
     if (!checkin || !checkout) return alert('Introduce las fechas de check-in y check-out.');
     if (checkout <= checkin) return alert('La fecha de check-out debe ser posterior al check-in.');
 
-    if (hasConflict(room, checkin, checkout, id)) {
+    const existingBookingCheck = id ? bookings.find(b => b.id === id) : null;
+    const groupId = (existingBookingCheck && existingBookingCheck.groupId)
+        ? existingBookingCheck.groupId
+        : 'g_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+    // Validate all assigned rooms (main + extras); rooms of this same group
+    // are excluded from the conflict check so they can be reassigned freely.
+    const assignedRooms = getAssignedRoomsDetail();
+    const assignedKeys = assignedRooms.map(rd => String(rd.room));
+    if (new Set(assignedKeys).size !== assignedKeys.length) {
+        return alert('Has asignado la misma habitación más de una vez.');
+    }
+    if (hasConflict(room, checkin, checkout, id, groupId)) {
         return alert('La habitación principal ya está ocupada en esas fechas.');
     }
-
-    // Validate extra rooms for conflicts
-    const validExtraRooms = currentExtraRooms.filter(er => er.room);
-    const existingExtraRooms = id ? (bookings.find(b => b.id === id)?.extraRooms || []).map(er => String(er.room)) : [];
-    const existingMainRoom = id ? String(bookings.find(b => b.id === id)?.room) : '';
-    const existingCheckin = id ? bookings.find(b => b.id === id)?.checkin : '';
-    const existingCheckout = id ? bookings.find(b => b.id === id)?.checkout : '';
-    for (const er of validExtraRooms) {
-        const erRoom = isNaN(er.room) ? er.room : parseInt(er.room);
-        if (erRoom === room) {
-            return alert(`La habitación ${erRoom} no puede ser habitación principal y adicional a la vez.`);
-        }
-        // Skip conflict check if room, dates haven't changed (already validated when first added)
-        const roomUnchanged = existingExtraRooms.includes(String(erRoom)) && checkin === existingCheckin && checkout === existingCheckout;
-        if (!roomUnchanged && hasConflict(erRoom, checkin, checkout, id)) {
-            return alert(`La habitación adicional ${erRoom} ya está ocupada en esas fechas.`);
+    for (const rd of assignedRooms.slice(1)) {
+        if (hasConflict(rd.room, checkin, checkout, id, groupId)) {
+            return alert(`La habitación adicional ${rd.room} ya está ocupada en esas fechas.`);
         }
     }
 
@@ -2614,9 +2621,9 @@ function saveBooking() {
     const supportNumber = document.getElementById('guestSupportNumber').value.trim();
     const address = document.getElementById('guestAddress').value.trim();
 
-    const isRural = ROOMS.find(r => r.number === room)?.bedType === 'rural';
+    const isRural = findRoom(room)?.bedType === 'rural';
 
-    const existingBooking = id ? bookings.find(b => b.id === id) : null;
+    const existingBooking = existingBookingCheck;
     const userName = currentUser ? currentUser.name : 'Sistema';
     const now = new Date().toISOString();
 
@@ -2631,16 +2638,29 @@ function saveBooking() {
     const roomType = document.getElementById('roomType').value;
     const extraBeds = parseInt(document.getElementById('extraBeds').value) || 0;
     const lateCheckout = parseInt(document.getElementById('lateCheckout').value) || 0;
+    const nights = nightsBetween(checkin, checkout);
+
+    // Freeze the agreed amounts at save time so invoices and reports don't
+    // drift if the pricing calendar changes later.
+    const totalPrice = getBookingTotal();
+    const mainRoomTotal = isRural
+        ? totalPrice
+        : getBasePrice(checkin, checkout, roomType) + extraBeds * 15 * nights + lateCheckout * 5;
 
     const booking = {
         id: id || generateId(),
+        groupId,
         guestName: name,
         phone, email, docType, docNumber, nationality,
         birthDate, supportNumber, address,
         companions: currentCompanions,
         room, roomType, extraBeds, lateCheckout,
-        extraRooms: getAssignedRoomsDetail().slice(1),
+        extraRooms: assignedRooms.slice(1),
         checkin, checkout, status, pricePerNight: price,
+        totalPrice,
+        roomTotal: mainRoomTotal,
+        source: existingBooking ? existingBooking.source : undefined,
+        icalUid: existingBooking ? existingBooking.icalUid : undefined,
         guests: parseInt(document.getElementById('guestCount').value),
         notes: document.getElementById('bookingNotes').value.trim(),
         paymentStatus: document.getElementById('paymentStatus').value,
@@ -2659,36 +2679,30 @@ function saveBooking() {
     if (id) {
         const idx = bookings.findIndex(b => b.id === id);
         if (idx >= 0) bookings[idx] = booking;
-        // Also update linked extra room bookings
-        if (booking.groupId) {
-            bookings.filter(b => b.groupId === booking.groupId && b.id !== booking.id).forEach(b => {
-                b.guestName = name; b.phone = phone; b.email = email;
-                b.birthDate = birthDate; b.supportNumber = supportNumber; b.address = address;
-                b.companions = JSON.parse(JSON.stringify(currentCompanions));
-                b.checkin = checkin; b.checkout = checkout; b.status = status;
-                b.updatedAt = now; b.updatedBy = userName;
-            });
-        }
     } else {
-        const groupId = 'g_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-        booking.groupId = groupId;
         bookings.push(booking);
-        // Create a booking for each extra room
-        const extraDetail = getAssignedRoomsDetail().slice(1);
-        extraDetail.forEach(rd => {
-            const erRoom = rd.room;
-            const erBooking = {
-                ...JSON.parse(JSON.stringify(booking)),
-                id: generateId(),
-                room: erRoom,
-                roomType: rd.roomType,
-                extraBeds: rd.extraBeds || 0,
-                extraRooms: [],
-                groupId
-            };
-            bookings.push(erBooking);
-        });
     }
+
+    // Rebuild the child bookings of the group from the current form: one per
+    // extra room, without payments (all money lives on the main booking).
+    bookings = bookings.filter(b => !(b.groupId === groupId && b.id !== booking.id));
+    assignedRooms.slice(1).forEach(rd => {
+        const childTotal = getBasePrice(checkin, checkout, rd.roomType) + (rd.extraBeds || 0) * 15 * nights;
+        bookings.push({
+            ...JSON.parse(JSON.stringify(booking)),
+            id: generateId(),
+            room: rd.room,
+            roomType: rd.roomType,
+            extraBeds: rd.extraBeds || 0,
+            extraRooms: [],
+            groupChild: true,
+            payments: [],
+            guests: (rd.roomType === 'individual' ? 1 : 2) + (rd.extraBeds || 0),
+            pricePerNight: nights > 0 ? +(childTotal / nights).toFixed(2) : 0,
+            totalPrice: childTotal,
+            roomTotal: childTotal
+        });
+    });
 
     // Update or create customer record
     upsertCustomer(name, phone, email, docType, docNumber, nationality);
@@ -2696,8 +2710,7 @@ function saveBooking() {
     // Auto-generate invoice for card payments
     const cardPayments = currentPayments.filter(p => p.method === 'card');
     if (cardPayments.length > 0) {
-        const invoiceTotal = getBookingTotal();
-        saveInvoiceRecord(booking, invoiceTotal > 0 ? invoiceTotal : cardPayments.reduce((s,p) => s + p.amount, 0), 'card');
+        saveInvoiceRecord(booking, totalPrice > 0 ? totalPrice : cardPayments.reduce((s,p) => s + p.amount, 0), 'card');
     }
 
     saveBookings();
@@ -2709,23 +2722,31 @@ function deleteBooking() {
     const id = document.getElementById('bookingId').value;
     if (!id) return;
     const b = bookings.find(x => x.id === id);
+    if (!b) return;
     const userName = currentUser ? currentUser.name : 'Sistema';
-    if (!confirm(`¿Seguro que quieres eliminar esta reserva?\n(Acción registrada a nombre de: ${userName})`)) return;
+    // A multi-room reservation is removed as a whole (main + child rooms)
+    const groupMembers = b.groupId ? bookings.filter(x => x.groupId === b.groupId) : [b];
+    const roomList = groupMembers.map(x => x.room).join(', ');
+    const multiMsg = groupMembers.length > 1
+        ? `\nSe eliminarán las ${groupMembers.length} habitaciones de la reserva (${roomList}).`
+        : '';
+    if (!confirm(`¿Seguro que quieres eliminar esta reserva?${multiMsg}\n(Acción registrada a nombre de: ${userName})`)) return;
 
     // Log cancellation before removing
     const cancelLog = JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]');
     cancelLog.push({
         bookingId: id,
-        guestName: b ? b.guestName : '?',
-        room: b ? b.room : '?',
-        checkin: b ? b.checkin : '?',
-        checkout: b ? b.checkout : '?',
+        guestName: b.guestName,
+        room: roomList,
+        checkin: b.checkin,
+        checkout: b.checkout,
         cancelledBy: userName,
         cancelledAt: new Date().toISOString()
     });
     localStorage.setItem('hostal_jijones_cancel_log', JSON.stringify(cancelLog));
 
-    bookings = bookings.filter(x => x.id !== id);
+    const removeIds = new Set(groupMembers.map(x => x.id));
+    bookings = bookings.filter(x => !removeIds.has(x.id));
     saveBookings();
     closeModal();
     renderGrid();
@@ -2796,14 +2817,36 @@ function openSwapRoom() {
 // ==================== EXPORT / IMPORT ====================
 
 function exportData() {
-    const data = JSON.stringify({ bookings, blocks, customers }, null, 2);
+    // Full backup: everything the app stores, not just bookings
+    const data = JSON.stringify({
+        bookings, blocks, customers,
+        invoices: JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]'),
+        cancelLog: JSON.parse(localStorage.getItem('hostal_jijones_cancel_log') || '[]'),
+        pricing: loadPricing(),
+        roomConfig: loadRoomConfig(),
+        icalLinks: loadIcalLinks(),
+        ineConfig: loadIneConfig(),
+        houseRules: loadHouseRules(),
+        roomStatus: roomStatusData,
+        invoiceSeq: JSON.parse(localStorage.getItem('hostal_jijones_invoice_seq') || 'null'),
+        exportedAt: new Date().toISOString()
+    }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `hostal_jijones_reservas_${todayStr()}.json`;
+    a.download = `hostal_jijones_backup_${todayStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Downloads a full backup automatically once per day (first login of the day)
+function autoBackup() {
+    if (bookings.length === 0 && customers.length === 0) return;
+    const today = todayStr();
+    if (localStorage.getItem('hostal_jijones_last_backup') === today) return;
+    exportData();
+    localStorage.setItem('hostal_jijones_last_backup', today);
 }
 
 function importData() {
@@ -2822,6 +2865,7 @@ function handleImport(event) {
                 if (!confirm(`Se importarán ${raw.length} reservas. ¿Los datos actuales se reemplazarán?`)) return;
                 bookings = raw;
                 saveBookings();
+                migrateGroupChildren();
             } else if (raw.bookings) {
                 const blockCount = (raw.blocks || []).length;
                 const custCount = (raw.customers || []).length;
@@ -2832,11 +2876,21 @@ function handleImport(event) {
                 saveBookings();
                 saveBlocks();
                 saveCustomers();
+                migrateGroupChildren();
+                // Restore the rest of the backup if present
+                if (raw.invoices) localStorage.setItem('hostal_jijones_invoices', JSON.stringify(raw.invoices));
+                if (raw.cancelLog) localStorage.setItem('hostal_jijones_cancel_log', JSON.stringify(raw.cancelLog));
+                if (raw.pricing) savePricingData(raw.pricing);
+                if (raw.roomConfig) { saveRoomConfig(raw.roomConfig); ROOMS = buildRooms(); }
+                if (raw.icalLinks) saveIcalLinks(raw.icalLinks);
+                if (raw.ineConfig) localStorage.setItem('hostal_jijones_ine_config', JSON.stringify(raw.ineConfig));
+                if (raw.houseRules) saveHouseRules(raw.houseRules);
+                if (raw.roomStatus) { roomStatusData = raw.roomStatus; saveRoomStatus(); }
+                if (raw.invoiceSeq) localStorage.setItem('hostal_jijones_invoice_seq', JSON.stringify(raw.invoiceSeq));
             } else {
                 throw new Error('Formato inválido');
             }
             renderGrid();
-            if (currentView === 'calendar') renderCalendar();
             alert('Importación completada.');
         } catch {
             alert('Error al importar el archivo. Verifica que sea un JSON válido.');
@@ -2889,9 +2943,11 @@ function renderCompanions() {
     container.innerHTML = html;
 }
 
-function escapeAttr(str) {
-    return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function escapeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+const escapeAttr = escapeHtml;
 
 function addCompanion() {
     currentCompanions.push({ name: '', docNumber: '', birthDate: '', supportNumber: '', address: '' });
@@ -2911,12 +2967,12 @@ function updateCompanion(idx, field, value) {
 
 // ==================== XML EXPORT (GUARDIA CIVIL) ====================
 
-function exportGuestXML(dateStr) {
+function exportGuestXML(ds) {
     // Find all bookings active on this date (checkin <= date < checkout)
-    const activeBookings = bookings.filter(b => b.checkin <= dateStr && b.checkout > dateStr);
+    const activeBookings = bookings.filter(b => b.checkin <= ds && b.checkout > ds);
 
     if (activeBookings.length === 0) {
-        alert('No hay huéspedes registrados para el ' + dateStr);
+        alert('No hay huéspedes registrados para el ' + ds);
         return;
     }
 
@@ -2932,7 +2988,7 @@ function exportGuestXML(dateStr) {
     }
 
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    xml += '<huespedes fecha="' + escapeXml(dateStr) + '">\n';
+    xml += '<huespedes fecha="' + escapeXml(ds) + '">\n';
 
     for (const b of uniqueBookings) {
         const phone = b.phone || '';
@@ -2973,7 +3029,7 @@ function exportGuestXML(dateStr) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `huespedes_${dateStr}.xml`;
+    a.download = `huespedes_${ds}.xml`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -3019,16 +3075,8 @@ function addPayment() {
 
     document.getElementById('paymentAmount').value = '';
 
-    // Auto-generate invoice if card payment
-    if (method === 'card') {
-        const bookingId = document.getElementById('bookingId').value;
-        if (bookingId) {
-            const b = bookings.find(x => x.id === bookingId);
-            if (b) {
-                saveInvoiceRecord(b, amount, 'card');
-            }
-        }
-    }
+    // Card invoices are generated on save (saveBooking), so cancelling the
+    // modal doesn't leave invoices for bookings that were never saved.
 
     // Auto-update payment status
     autoUpdatePaymentStatus();
@@ -3044,12 +3092,11 @@ function removePayment(paymentId) {
 function autoUpdatePaymentStatus() {
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
 
     if (!checkin || !checkout || checkout <= checkin) return;
 
-    const nights = nightsBetween(checkin, checkout);
-    const total = nights * price;
+    // Same total as the payment summary (includes extra rooms, beds and late checkout)
+    const total = getBookingTotal();
     const paid = currentPayments.reduce((s, p) => s + p.amount, 0);
 
     if (paid >= total && total > 0) {
@@ -3116,29 +3163,30 @@ function switchIncomeTab(tab) {
     renderIncomeSummary();
 }
 
-function getWeekNumber(d) {
+// ISO week key (uses the ISO year, so Dec 29-31 / Jan 1-3 group correctly)
+function getWeekKey(d) {
     const date = new Date(d.getTime());
     date.setHours(0, 0, 0, 0);
     date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
     const week1 = new Date(date.getFullYear(), 0, 4);
-    return Math.round(((date - week1) / 86400000 + (week1.getDay() + 6) % 7 + 1) / 7);
+    const week = Math.round(((date - week1) / 86400000 + (week1.getDay() + 6) % 7 + 1) / 7);
+    return date.getFullYear() + '-W' + String(week).padStart(2, '0');
 }
 
 function renderIncomeSummary() {
-    // Collect all payments from all bookings
+    // Collect payments from main bookings only (children of a multi-room
+    // reservation never hold money — avoids double counting)
+    const mains = mainBookings();
     const allPayments = [];
-    bookings.forEach(b => {
+    mains.forEach(b => {
         (b.payments || []).forEach(p => {
             allPayments.push({ ...p, bookingId: b.id, guestName: b.guestName, room: b.room });
         });
     });
 
-    // Calculate totals
+    // Calculate totals (frozen at booking time)
     const totalIncome = allPayments.reduce((s, p) => s + p.amount, 0);
-    const totalExpected = bookings.reduce((s, b) => {
-        const nights = nightsBetween(b.checkin, b.checkout);
-        return s + (nights * (b.pricePerNight || 0));
-    }, 0);
+    const totalExpected = mains.reduce((s, b) => s + getBookingFrozenTotal(b), 0);
     const totalPending = Math.max(0, totalExpected - totalIncome);
 
     document.getElementById('incomeTotals').innerHTML = `
@@ -3196,10 +3244,7 @@ function renderIncomeByMonth(allPayments) {
 function renderIncomeByWeek(allPayments) {
     const grouped = {};
     allPayments.forEach(p => {
-        const d = parseDate(p.date);
-        const weekNum = getWeekNumber(d);
-        const year = d.getFullYear();
-        const key = `${year}-W${String(weekNum).padStart(2, '0')}`;
+        const key = getWeekKey(parseDate(p.date));
         if (!grouped[key]) grouped[key] = { payments: 0, count: 0 };
         grouped[key].payments += p.amount;
         grouped[key].count++;
@@ -3222,114 +3267,6 @@ function renderIncomeByWeek(allPayments) {
 
     html += '</tbody></table>';
     document.getElementById('incomeTableContainer').innerHTML = html;
-}
-
-// ==================== VIEW TOGGLE ====================
-
-function switchView(view) {
-    currentView = view;
-    document.getElementById('viewGrid').classList.toggle('active', view === 'grid');
-    document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
-    document.getElementById('gridContainer').style.display = view === 'grid' ? 'block' : 'none';
-    document.getElementById('calendarContainer').classList.toggle('active', view === 'calendar');
-    // Update sidebar active
-    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-    const sidebarSection = view === 'grid' ? 'grid' : 'calendar';
-    const sItem = document.querySelector(`.sidebar-item[data-section="${sidebarSection}"]`);
-    if (sItem) sItem.classList.add('active');
-    if (view === 'calendar') renderCalendar();
-}
-
-// ==================== MONTHLY CALENDAR ====================
-
-function navigateMonth(dir) {
-    calendarMonth += dir;
-    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-    renderCalendar();
-}
-
-function goToCurrentMonth() {
-    const now = new Date();
-    calendarMonth = now.getMonth();
-    calendarYear = now.getFullYear();
-    renderCalendar();
-}
-
-function renderCalendar() {
-    // Year/month/day selectors are now rendered by renderGrid too (always visible)
-    renderYearSelector();
-    renderCalendarMonthTabs();
-
-    const firstDay = new Date(calendarYear, calendarMonth, 1);
-    const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
-    const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
-    const today = todayStr();
-
-    const dayLabels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-    let html = dayLabels.map(d => `<div class="cal-header">${d}</div>`).join('');
-
-    // Fill leading empty days
-    const prevMonth = new Date(calendarYear, calendarMonth, 0);
-    for (let i = startDow - 1; i >= 0; i--) {
-        const day = prevMonth.getDate() - i;
-        const d = new Date(calendarYear, calendarMonth - 1, day);
-        html += buildCalendarDay(d, today, true);
-    }
-
-    // Fill current month days
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const d = new Date(calendarYear, calendarMonth, day);
-        html += buildCalendarDay(d, today, false);
-    }
-
-    // Fill trailing days
-    const totalCells = startDow + lastDay.getDate();
-    const remaining = (7 - (totalCells % 7)) % 7;
-    for (let i = 1; i <= remaining; i++) {
-        const d = new Date(calendarYear, calendarMonth + 1, i);
-        html += buildCalendarDay(d, today, true);
-    }
-
-    document.getElementById('calendarGrid').innerHTML = html;
-}
-
-function buildCalendarDay(d, today, otherMonth) {
-    const ds = dateStr(d);
-    const isToday = ds === today;
-    const isWe = d.getDay() === 0 || d.getDay() === 6;
-    let cls = 'cal-day';
-    if (otherMonth) cls += ' other-month';
-    if (isToday) cls += ' today';
-    if (isWe && !otherMonth) cls += ' weekend';
-
-    // Find bookings and blocks for this date across all rooms
-    const dayBookings = bookings.filter(b => ds >= b.checkin && ds < b.checkout);
-    const dayBlocks = blocks.filter(bl => ds >= bl.from && ds < bl.to);
-
-    let items = '';
-    const maxShow = 3;
-    const all = [];
-
-    dayBookings.forEach(b => {
-        const room = ROOMS.find(r => r.number === b.room);
-        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : b.room) : b.room;
-        all.push(`<div class="cal-booking status-${b.status}" onclick="event.stopPropagation();editBooking('${b.id}')" title="${b.guestName} - Hab.${roomLabel}">${roomLabel} ${b.guestName.split(' ')[0]}</div>`);
-    });
-    dayBlocks.forEach(bl => {
-        const room = ROOMS.find(r => r.number === bl.room);
-        const roomLabel = room ? (room.bedType === 'rural' ? 'CR1' : bl.room) : bl.room;
-        all.push(`<div class="cal-booking status-blocked" onclick="event.stopPropagation();editBlock('${bl.id}')" title="Bloqueado - ${BLOCK_REASON_LABELS[bl.reason]}">${roomLabel} ${BLOCK_REASON_LABELS[bl.reason]}</div>`);
-    });
-
-    if (all.length <= maxShow) {
-        items = all.join('');
-    } else {
-        items = all.slice(0, maxShow - 1).join('');
-        items += `<div class="cal-more">+${all.length - maxShow + 1} más</div>`;
-    }
-
-    return `<div class="${cls}" onclick="openNewBooking(null,'${ds}')"><div class="day-num">${d.getDate()}</div>${items}</div>`;
 }
 
 // ==================== AVAILABILITY SEARCH ====================
@@ -3404,52 +3341,10 @@ function searchAvailability() {
 
 function bookFromSearch(room, checkin, checkout) {
     closeSearchModal();
-    document.getElementById('modalTitle').textContent = 'Nueva Reserva';
-    document.getElementById('swapRoomBtn').style.display = 'none';
-    document.getElementById('bookingId').value = '';
-    document.getElementById('guestName').value = '';
-    document.getElementById('guestPhone').value = '';
-    document.getElementById('guestEmail').value = '';
-    document.getElementById('docType').value = 'dni';
-    document.getElementById('docNumber').value = '';
-    document.getElementById('guestNationality').value = '';
-    document.getElementById('guestBirthDate').value = '';
-    document.getElementById('guestSupportNumber').value = '';
-    document.getElementById('guestAddress').value = '';
-    currentCompanions = [];
-    renderCompanions();
-    document.getElementById('guestCount').value = '2';
-    document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
-    document.getElementById('bookingNotes').value = '';
-    document.getElementById('deleteBtn').style.display = 'none';
-    document.getElementById('confirmActions').style.display = 'none';
-    document.getElementById('priceTotal').textContent = '';
-    // Reset rural fields
-    document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
-    document.getElementById('depositStatus').value = 'pending';
-    document.getElementById('depositReturned').value = '0';
-    document.getElementById('depositReturnGroup').style.display = 'none';
-    currentChecklist = { checkin: [], checkout: [] };
-
-    document.getElementById('bookingRoom').value = room;
+    resetBookingForm();
     document.getElementById('bookingCheckin').value = checkin;
     document.getElementById('bookingCheckout').value = checkout;
-
-    const selectedRoom = ROOMS.find(r => String(r.number) === String(room));
-    updateRuralSection(selectedRoom);
-
-    currentPayments = [];
-    currentExtraRooms = [];
-    document.getElementById('roomType').value = 'doble';
-    renderExtraRooms();
-    document.getElementById('paymentStatus').value = 'pending_payment';
-    document.getElementById('paymentDate').value = todayStr();
-    setPaymentStatus('pending_payment');
-    renderPayments();
-    calculatePrice();
-    document.getElementById('bookingModal').classList.add('active');
-    document.getElementById('guestName').focus();
+    finishBookingFormSetup(room);
 }
 
 // ==================== BLOCK MANAGEMENT ====================
@@ -3518,12 +3413,12 @@ function saveBlock() {
 
     // Check conflicts (with bookings only, not other blocks when editing)
     const bookingConflict = bookings.some(b =>
-        b.room === room && b.checkin < to && b.checkout > from
+        sameRoom(b.room, room) && b.checkin < to && b.checkout > from
     );
     if (bookingConflict) return alert('Ya hay reservas en esas fechas para esa habitación.');
 
     const blockConflict = blocks.some(bl =>
-        bl.room === room && bl.id !== id && bl.from < to && bl.to > from
+        sameRoom(bl.room, room) && bl.id !== id && bl.from < to && bl.to > from
     );
     if (blockConflict) return alert('Ya hay un bloqueo en esas fechas para esa habitación.');
 
@@ -3543,7 +3438,6 @@ function saveBlock() {
     saveBlocks();
     closeBlockModal();
     renderGrid();
-    if (currentView === 'calendar') renderCalendar();
 }
 
 function deleteBlock() {
@@ -3554,7 +3448,6 @@ function deleteBlock() {
     saveBlocks();
     closeBlockModal();
     renderGrid();
-    if (currentView === 'calendar') renderCalendar();
 }
 
 function showBlockTooltip(event, blockId) {
@@ -3565,7 +3458,7 @@ function showBlockTooltip(event, blockId) {
     tip.innerHTML = `<strong>BLOQUEADO</strong><br>
         Hab. ${bl.room} · ${nights} día(s)<br>
         ${bl.from} → ${bl.to}<br>
-        Motivo: ${BLOCK_REASON_LABELS[bl.reason] || bl.reason}${bl.notes ? '<br>' + bl.notes : ''}`;
+        Motivo: ${BLOCK_REASON_LABELS[bl.reason] || escapeHtml(bl.reason)}${bl.notes ? '<br>' + escapeHtml(bl.notes) : ''}`;
     tip.classList.add('active');
     tip.style.left = (event.pageX + 12) + 'px';
     tip.style.top = (event.pageY - 10) + 'px';
@@ -3604,7 +3497,7 @@ function upsertCustomer(name, phone, email, docType, docNumber, nationality) {
 }
 
 function getCustomerStays(customer) {
-    return bookings.filter(b => {
+    return mainBookings().filter(b => {
         if (customer.docNumber && b.docNumber) {
             if (b.docNumber.toUpperCase() === customer.docNumber.toUpperCase()) return true;
         }
@@ -3633,10 +3526,10 @@ function onGuestNameInput(value) {
     }
 
     list.innerHTML = matches.map(c => {
-        const docInfo = c.docNumber ? ` · ${c.docType ? c.docType.toUpperCase() : 'DOC'}: ${c.docNumber}` : '';
+        const docInfo = c.docNumber ? ` · ${c.docType ? c.docType.toUpperCase() : 'DOC'}: ${escapeHtml(c.docNumber)}` : '';
         return `<div class="autocomplete-item" onmousedown="selectCustomer('${c.id}')">
-            <div class="ac-name">${c.name}</div>
-            <div class="ac-detail">${c.phone || ''}${docInfo}</div>
+            <div class="ac-name">${escapeHtml(c.name)}</div>
+            <div class="ac-detail">${escapeHtml(c.phone)}${docInfo}</div>
         </div>`;
     }).join('');
     list.style.display = 'block';
@@ -3705,15 +3598,15 @@ function renderClientList() {
     container.innerHTML = filtered.map(c => {
         const stays = getCustomerStays(c);
         const stayCount = stays.length;
-        const docInfo = c.docNumber ? `${(c.docType || 'doc').toUpperCase()}: ${c.docNumber}` : 'Sin documento';
+        const docInfo = c.docNumber ? `${(c.docType || 'doc').toUpperCase()}: ${escapeHtml(c.docNumber)}` : 'Sin documento';
         return `<div class="client-card" onclick="openClientDetail('${c.id}')">
             <div>
-                <div class="client-name">${c.name}</div>
-                <div class="client-info">${c.phone || 'Sin teléfono'} · ${docInfo}</div>
+                <div class="client-name">${escapeHtml(c.name)}</div>
+                <div class="client-info">${escapeHtml(c.phone) || 'Sin teléfono'} · ${docInfo}</div>
             </div>
             <div style="text-align:right;">
                 <div class="client-stays">${stayCount} estancia${stayCount !== 1 ? 's' : ''}</div>
-                <div class="client-info">${c.email || ''}</div>
+                <div class="client-info">${escapeHtml(c.email)}</div>
             </div>
         </div>`;
     }).join('');
@@ -3724,15 +3617,14 @@ function openClientDetail(customerId) {
     if (!c) return;
 
     const docLabel = { dni: 'DNI', nie: 'NIE', passport: 'Pasaporte' };
-    const docInfo = c.docNumber ? `${docLabel[c.docType] || 'Documento'}: ${c.docNumber}` : 'Sin documento registrado';
 
     document.getElementById('clientDetailCard').innerHTML = `
-        <h3>${c.name}</h3>
+        <h3>${escapeHtml(c.name)}</h3>
         <div class="client-detail-row">
-            <div class="detail"><strong>Teléfono:</strong> ${c.phone || '-'}</div>
-            <div class="detail"><strong>Email:</strong> ${c.email || '-'}</div>
-            <div class="detail"><strong>${docLabel[c.docType] || 'Documento'}:</strong> ${c.docNumber || '-'}</div>
-            <div class="detail"><strong>Nacionalidad:</strong> ${c.nationality || '-'}</div>
+            <div class="detail"><strong>Teléfono:</strong> ${escapeHtml(c.phone) || '-'}</div>
+            <div class="detail"><strong>Email:</strong> ${escapeHtml(c.email) || '-'}</div>
+            <div class="detail"><strong>${docLabel[c.docType] || 'Documento'}:</strong> ${escapeHtml(c.docNumber) || '-'}</div>
+            <div class="detail"><strong>Nacionalidad:</strong> ${escapeHtml(c.nationality) || '-'}</div>
         </div>
         <div class="client-detail-row" style="margin-top:6px;">
             <div class="detail" style="font-size:0.72rem;color:#999;">Registrado: ${c.createdAt ? c.createdAt.substring(0,10) : '-'}</div>
@@ -3748,10 +3640,10 @@ function openClientDetail(customerId) {
         let totalSpent = 0;
         historyHtml += stays.map(b => {
             const nights = nightsBetween(b.checkin, b.checkout);
-            const total = nights * (b.pricePerNight || 0);
+            const total = getBookingFrozenTotal(b);
             const paid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
             totalSpent += paid;
-            const room = ROOMS.find(r => r.number === b.room);
+            const room = findRoom(b.room);
             const roomLabel = room ? room.label : b.room;
             return `<div class="stay-item">
                 <div>
@@ -3816,25 +3708,6 @@ function sendEmail() {
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_self');
 }
 
-function copyConfirmation() {
-    const text = buildConfirmationText();
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector('.btn-copy-confirm');
-        const orig = btn.textContent;
-        btn.textContent = 'Copiado!';
-        setTimeout(() => btn.textContent = orig, 2000);
-    }).catch(() => {
-        // Fallback
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        alert('Texto de confirmación copiado al portapapeles.');
-    });
-}
-
 // ==================== INVENTORY CHECKLIST ====================
 
 function openChecklist() {
@@ -3890,7 +3763,7 @@ function renderChecklist() {
             <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem(${idx}, this.checked)">
             <span class="item-name">${item.name}</span>
             <span class="item-qty">x${item.qty}</span>
-            <input type="text" class="item-note" placeholder="Nota..." value="${item.note || ''}" onchange="setChecklistNote(${idx}, this.value)">
+            <input type="text" class="item-note" placeholder="Nota..." value="${escapeAttr(item.note || '')}" onchange="setChecklistNote(${idx}, this.value)">
         </div>`;
     });
 
@@ -4022,7 +3895,16 @@ function renderReport() {
 }
 
 function renderOccupancyReport(container) {
-    const totalRooms = ROOMS.length; // 32
+    // Occupancy % over hostal rooms only (mixing in the 16-person casa rural skews the rate)
+    const hostalRooms = ROOMS.filter(r => r.floor !== 'rural');
+    const totalRooms = hostalRooms.length;
+    // Index bookings by room to avoid rescanning the whole list per day
+    const byRoom = {};
+    bookings.forEach(b => {
+        const k = String(b.room);
+        (byRoom[k] = byRoom[k] || []).push(b);
+    });
+    const mains = mainBookings();
     const monthData = [];
 
     for (let m = 0; m < 12; m++) {
@@ -4031,17 +3913,15 @@ function renderOccupancyReport(container) {
 
         for (let d = 1; d <= daysInMonth; d++) {
             const ds = dateStr(new Date(reportYear, m, d));
-            ROOMS.forEach(room => {
-                const hasBooking = bookings.some(b =>
-                    b.room === room.number && ds >= b.checkin && ds < b.checkout
-                );
-                if (hasBooking) occupiedDays++;
+            hostalRooms.forEach(room => {
+                const roomBookings = byRoom[String(room.number)] || [];
+                if (roomBookings.some(b => ds >= b.checkin && ds < b.checkout)) occupiedDays++;
             });
         }
 
         const totalSlots = daysInMonth * totalRooms;
         const occupancy = totalSlots > 0 ? Math.round((occupiedDays / totalSlots) * 100) : 0;
-        const bookingsInMonth = bookings.filter(b => b.checkin.startsWith(reportYear + '-' + String(m + 1).padStart(2, '0'))).length;
+        const bookingsInMonth = mains.filter(b => b.checkin.startsWith(reportYear + '-' + String(m + 1).padStart(2, '0'))).length;
         monthData.push({ month: m, occupancy, bookingsInMonth, occupiedDays, totalSlots });
     }
 
@@ -4091,20 +3971,20 @@ function renderOccupancyReport(container) {
 function renderIncomeReport(container) {
     const monthData = [];
     let yearActual = 0, yearExpected = 0, yearCash = 0, yearCard = 0;
+    const mains = mainBookings();
 
     for (let m = 0; m < 12; m++) {
         const prefix = reportYear + '-' + String(m + 1).padStart(2, '0');
 
         let expected = 0;
-        bookings.forEach(b => {
+        mains.forEach(b => {
             if (b.checkin.startsWith(prefix)) {
-                const nights = nightsBetween(b.checkin, b.checkout);
-                expected += nights * (b.pricePerNight || 0);
+                expected += getBookingFrozenTotal(b);
             }
         });
 
         let actual = 0, cash = 0, card = 0;
-        bookings.forEach(b => {
+        mains.forEach(b => {
             (b.payments || []).forEach(p => {
                 if (p.date.startsWith(prefix)) {
                     actual += p.amount;
@@ -4208,7 +4088,7 @@ function renderIncomeReport(container) {
 function renderRoomsReport(container) {
     const roomStats = ROOMS.map(room => {
         const roomBookings = bookings.filter(b => {
-            if (b.room !== room.number) return false;
+            if (!sameRoom(b.room, room.number)) return false;
             return b.checkin.startsWith(String(reportYear));
         });
 
@@ -4217,7 +4097,9 @@ function renderRoomsReport(container) {
         roomBookings.forEach(b => {
             const nights = nightsBetween(b.checkin, b.checkout);
             totalNights += nights;
-            totalRevenue += nights * (b.pricePerNight || 0);
+            // Revenue attributable to this room only (multi-room groups store
+            // their own room share in roomTotal)
+            totalRevenue += getBookingRoomRevenue(b);
         });
 
         const daysInYear = ((reportYear % 4 === 0 && reportYear % 100 !== 0) || reportYear % 400 === 0) ? 366 : 365;
@@ -4468,74 +4350,28 @@ function wizardBook() {
     if (wizSelectedRooms.length === 0) return;
     const checkin = document.getElementById('wizCheckin').value;
     const checkout = document.getElementById('wizCheckout').value;
-    const mainRoom = wizSelectedRooms[0];
-    const mainPers = wizPersonsPerRoom[0] || 2;
-    const persMap = { 1: 'individual', 2: 'doble', 3: 'triple', 4: 'cuadruple' };
-    const mainRoomType = persMap[mainPers] || 'doble';
-    const mainExtraBeds = mainPers > 2 ? mainPers - 2 : 0;
-    const nightPrice = currentProperty === 'rural' ? RURAL_DEFAULT_PRICE : 48;
     closeWizard();
 
     // Open the full booking form pre-filled
-    document.getElementById('modalTitle').textContent = 'Nueva Reserva';
-    document.getElementById('swapRoomBtn').style.display = 'none';
-    document.getElementById('bookingId').value = '';
-    document.getElementById('guestName').value = '';
-    document.getElementById('guestPhone').value = '';
-    document.getElementById('guestEmail').value = '';
-    document.getElementById('docType').value = 'dni';
-    document.getElementById('docNumber').value = '';
-    document.getElementById('guestNationality').value = '';
-    document.getElementById('guestBirthDate').value = '';
-    document.getElementById('guestSupportNumber').value = '';
-    document.getElementById('guestAddress').value = '';
-    currentCompanions = [];
-    renderCompanions();
-    document.getElementById('roomCount').value = wizRoomCount;
-    document.getElementById('roomType').value = mainRoomType;
-    document.getElementById('extraBeds').value = String(mainExtraBeds);
-    document.getElementById('lateCheckout').value = '0';
-    const totalPersons = wizPersonsPerRoom.slice(0, wizRoomCount).reduce((s, p) => s + p, 0);
-    document.getElementById('guestCount').value = totalPersons;
-    document.getElementById('bookingStatus').value = 'confirmed';
-    document.getElementById('pricePerNight').value = nightPrice;
-    document.getElementById('bookingNotes').value = '';
-    document.getElementById('deleteBtn').style.display = 'none';
-    document.getElementById('confirmActions').style.display = 'none';
-    document.getElementById('priceTotal').textContent = '';
-    document.getElementById('depositAmount').value = RURAL_DEFAULT_DEPOSIT;
-    document.getElementById('depositStatus').value = 'pending';
-    document.getElementById('depositReturned').value = '0';
-    document.getElementById('depositReturnGroup').style.display = 'none';
-    currentChecklist = { checkin: [], checkout: [] };
-    hideAutocomplete();
-
-    document.getElementById('bookingRoom').value = mainRoom.number;
+    resetBookingForm();
     document.getElementById('bookingCheckin').value = checkin;
     document.getElementById('bookingCheckout').value = checkout;
-
-    const selectedRoom = ROOMS.find(r => r.number === mainRoom.number);
-    updateRuralSection(selectedRoom);
-
-    currentPayments = [];
-    currentExtraRooms = wizSelectedRooms.slice(1).map((r, idx) => {
-        const pers = wizPersonsPerRoom[idx + 1] || 2;
-        return { room: r.number, roomType: persMap[pers] || 'doble', extraBeds: pers > 2 ? pers - 2 : 0 };
-    });
+    document.getElementById('roomCount').value = wizRoomCount;
     renderRoomAssignments();
     // Set the assigned rooms with per-room occupancy
     wizSelectedRooms.forEach((r, idx) => {
         const sel = document.getElementById('roomAssign_' + idx);
-        if (sel) sel.value = r.number;
+        if (sel) sel.value = String(r.number);
         const pers = wizPersonsPerRoom[idx] || 2;
         const occ = document.getElementById('roomOcc_' + idx);
-        if (occ) occ.value = persMap[pers] || 'doble';
+        if (occ) occ.value = pers === 1 ? 'individual' : 'doble';
         const ext = document.getElementById('roomExt_' + idx);
         if (ext) ext.value = pers > 2 ? String(pers - 2) : '0';
     });
     updateMainRoom();
-    document.getElementById('paymentStatus').value = 'pending_payment';
-    document.getElementById('paymentDate').value = todayStr();
+    updateGuestCount();
+    const selectedRoom = findRoom(document.getElementById('bookingRoom').value);
+    updateRuralSection(selectedRoom);
     setPaymentStatus('pending_payment');
     updatePaymentBadgesVisibility();
     renderPayments();
@@ -4552,12 +4388,15 @@ function generateInvoice() {
     if (!b) return alert('Guarda la reserva primero para generar la factura.');
 
     const nights = nightsBetween(b.checkin, b.checkout);
-    const room = ROOMS.find(r => r.number === b.room);
+    const room = findRoom(b.room);
     const roomLabel = room ? room.label : b.room;
-    // Calculate real total using getBookingTotal logic but from saved booking data
-    let total = 0;
-    const isRuralBooking = room && room.bedType === 'rural';
-    if (isRuralBooking) {
+    const isRural = room && room.bedType === 'rural';
+    // Amount frozen when the booking was saved; legacy bookings without it
+    // fall back to recomputing from the saved per-room data.
+    let total;
+    if (b.totalPrice != null) {
+        total = b.totalPrice;
+    } else if (isRural) {
         total = nights * b.pricePerNight;
     } else {
         const mainRoomType = b.roomType || 'doble';
@@ -4573,11 +4412,14 @@ function generateInvoice() {
         const lateHours = parseInt(b.lateCheckout) || 0;
         total += lateHours * 5;
     }
-    const isRural = room && room.bedType === 'rural';
-    const invoiceNum = 'F-' + b.checkin.replace(/-/g, '') + '-' + String(b.room).replace(/[^a-zA-Z0-9]/g, '');
     const totalPaid = (b.payments || []).reduce((s, p) => s + p.amount, 0);
     const cashTotal = (b.payments || []).filter(p => p.method !== 'card').reduce((s, p) => s + p.amount, 0);
     const cardTotal = (b.payments || []).filter(p => p.method === 'card').reduce((s, p) => s + p.amount, 0);
+
+    // Save (or update) the invoice record first: the sequential number lives there
+    const mainMethod = cardTotal >= cashTotal ? 'card' : 'cash';
+    const invoiceRec = saveInvoiceRecord(b, total, mainMethod);
+    const invoiceNum = invoiceRec.invoiceNum;
 
     let paymentsHtml = '';
     if ((b.payments || []).length > 0) {
@@ -4624,11 +4466,11 @@ function generateInvoice() {
 
             <div style="background:#f8f9fa;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
                 <div style="font-size:0.72rem;color:#717171;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cliente</div>
-                <div style="font-weight:600;font-size:0.95rem;color:#222;">${b.guestName}</div>
+                <div style="font-weight:600;font-size:0.95rem;color:#222;">${escapeHtml(b.guestName)}</div>
                 <div style="font-size:0.82rem;color:#555;margin-top:2px;">
-                ${b.docNumber ? `${(b.docType || 'DNI').toUpperCase()}: ${b.docNumber}<br>` : ''}
-                ${b.phone ? `Tel: ${b.phone}<br>` : ''}
-                ${b.email ? `Email: ${b.email}` : ''}
+                ${b.docNumber ? `${(b.docType || 'DNI').toUpperCase()}: ${escapeHtml(b.docNumber)}<br>` : ''}
+                ${b.phone ? `Tel: ${escapeHtml(b.phone)}<br>` : ''}
+                ${b.email ? `Email: ${escapeHtml(b.email)}` : ''}
                 </div>
             </div>
 
@@ -4661,10 +4503,6 @@ function generateInvoice() {
             </div>
         </div>`;
 
-    // Save invoice record when manually generating
-    const mainMethod = cardTotal >= cashTotal ? 'card' : 'cash';
-    saveInvoiceRecord(b, total, mainMethod);
-
     document.getElementById('invoiceModal').classList.add('active');
 }
 
@@ -4676,9 +4514,9 @@ function printInvoice() {
     const content = document.getElementById('invoicePrintArea').innerHTML;
     const win = window.open('', '_blank');
     win.document.write(`<!DOCTYPE html><html><head><title>Factura</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
-            body { font-family: 'Inter', sans-serif; padding: 30px 40px; color: #222; font-size: 14px; line-height: 1.5; }
+            body { font-family: 'Roboto', sans-serif; padding: 30px 40px; color: #222; font-size: 14px; line-height: 1.5; }
             table { width: 100%; border-collapse: collapse; }
             th { padding: 10px 12px; text-align: left; font-size: 0.8rem; }
             td { padding: 12px; font-size: 0.88rem; }
@@ -4717,7 +4555,7 @@ function selectLoginUser(userId) {
 function doLogin() {
     if (!selectedLoginUser) return;
     const pin = document.getElementById('pinInput').value;
-    if (pin === selectedLoginUser.pin || pin === '9999') {
+    if (pin === selectedLoginUser.pin) {
         currentUser = selectedLoginUser;
         document.getElementById('loginScreen').classList.add('hidden');
         updateUserIndicator();
@@ -4788,7 +4626,15 @@ function formatAuditDate(isoStr) {
 // ==================== KEYBOARD ====================
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); closeBookingSyncModal(); }
+    if (e.key === 'Escape') {
+        // The booking form can hold a lot of typed data: ask before discarding
+        const bookingOpen = document.getElementById('bookingModal').classList.contains('active');
+        if (bookingOpen) {
+            if (confirm('¿Cerrar la reserva sin guardar los cambios?')) closeModal();
+            return;
+        }
+        closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); closeBookingSyncModal();
+    }
 });
 
 // ==================== INIT ====================
@@ -4850,11 +4696,6 @@ function updateSidebarUser() {
 
 // ==================== CALENDAR YEAR/MONTH TABS ====================
 
-function navigateCalendarYear(dir) {
-    calendarYear += dir;
-    renderCalendar();
-}
-
 function goToCalendarMonth(month) {
     calendarMonth = month;
     const days = parseInt(document.getElementById('daysToShow').value);
@@ -4900,66 +4741,6 @@ function renderCalendarMonthTabs() {
     ).join('');
 }
 
-function renderDayNumbersBar() {
-    const container = document.getElementById('dayNumbersBar');
-    if (!container) return;
-    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-    const today = todayStr();
-    const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    let html = '';
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(calendarYear, calendarMonth, d);
-        const ds = dateStr(date);
-        const isToday = ds === today;
-        const isWe = date.getDay() === 0 || date.getDay() === 6;
-        const hasBookings = bookings.some(b => ds >= b.checkin && ds < b.checkout);
-        let cls = 'day-num-cell';
-        if (isToday) cls += ' today';
-        else if (isWe) cls += ' weekend';
-        if (hasBookings) cls += ' has-bookings';
-        html += `<div class="${cls}" onclick="showDayBookings('${ds}')" title="${ds}">
-            <span class="day-label">${dayNames[date.getDay()]}</span>
-            ${d}
-        </div>`;
-    }
-    container.innerHTML = html;
-}
-
-function showDayBookings(ds) {
-    const container = document.getElementById('dayBookingsDetail');
-    const dayBookings = bookings.filter(b => ds >= b.checkin && ds < b.checkout);
-    const dayBlocks = blocks.filter(bl => ds >= bl.from && ds < bl.to);
-
-    if (dayBookings.length === 0 && dayBlocks.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
-
-    let html = `<div style="background:#fff; border:1px solid #dadce0; border-radius:8px; padding:12px; box-shadow:0 1px 2px rgba(60,64,67,0.3);">
-        <h4 style="font-size:0.85rem; color:#202124; margin-bottom:8px; font-weight:500;">Reservas del ${ds}</h4>`;
-
-    dayBookings.forEach(b => {
-        const room = ROOMS.find(r => r.number === b.room);
-        const roomLabel = room ? room.label : b.room;
-        const nights = nightsBetween(b.checkin, b.checkout);
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid #e8eaed; cursor:pointer; font-size:0.8rem;" onclick="editBooking('${b.id}')">
-            <div><strong>${b.guestName}</strong> - ${roomLabel}
-            <span style="color:#5f6368; font-size:0.72rem;"> · ${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)} (${nights}n) · ${STATUS_LABELS[b.status]}${b.createdBy ? ' · por ' + b.createdBy : ''}</span></div>
-            <div style="font-weight:500; color:#1a73e8;">${(nights * b.pricePerNight).toFixed(2)} €</div>
-        </div>`;
-    });
-
-    dayBlocks.forEach(bl => {
-        html += `<div style="padding:6px 8px; border-bottom:1px solid #e8eaed; font-size:0.8rem; color:#80868b;">
-            BLOQUEADO - Hab. ${bl.room} · ${BLOCK_REASON_LABELS[bl.reason] || bl.reason}
-        </div>`;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
-    container.style.display = 'block';
-}
-
 // ==================== CANCELLATIONS MODAL ====================
 
 function openCancellationsModal() {
@@ -4982,17 +4763,17 @@ function renderCancellationsList() {
 
     const sorted = [...cancelLog].sort((a, b) => (b.cancelledAt || '').localeCompare(a.cancelledAt || ''));
     container.innerHTML = sorted.map(c => {
-        const room = ROOMS.find(r => String(r.number) === String(c.room));
-        const roomLabel = room ? room.label : ('Hab. ' + c.room);
+        const room = findRoom(c.room);
+        const roomLabel = room ? room.label : ('Hab. ' + escapeHtml(c.room));
         const cancelDate = c.cancelledAt ? formatAuditDate(c.cancelledAt) : '-';
         return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid #e8eaed; border-radius:6px; margin-bottom:6px; background:#fff;">
             <div>
-                <div style="font-weight:500; color:#202124; font-size:0.88rem;">${c.guestName}</div>
+                <div style="font-weight:500; color:#202124; font-size:0.88rem;">${escapeHtml(c.guestName)}</div>
                 <div style="font-size:0.78rem; color:#5f6368;">${roomLabel} · ${formatDateDMY(c.checkin)} → ${formatDateDMY(c.checkout)}</div>
             </div>
             <div style="text-align:right;">
                 <div style="font-size:0.72rem; color:#d93025; font-weight:500;">Cancelada</div>
-                <div style="font-size:0.72rem; color:#80868b;">por ${c.cancelledBy} · ${cancelDate}</div>
+                <div style="font-size:0.72rem; color:#80868b;">por ${escapeHtml(c.cancelledBy)} · ${cancelDate}</div>
             </div>
         </div>`;
     }).join('');
@@ -5050,8 +4831,8 @@ function exportInvoicesPDF() {
     let rows = filtered.map(inv => `<tr>
         <td>${inv.invoiceNum}</td>
         <td>${formatDateDMY(inv.date)}</td>
-        <td>${inv.guestName}</td>
-        <td>${inv.roomLabel || ''}</td>
+        <td>${escapeHtml(inv.guestName)}</td>
+        <td>${escapeHtml(inv.roomLabel)}</td>
         <td style="text-align:right;">${inv.amount.toFixed(2)} €</td>
     </tr>`).join('');
 
@@ -5088,23 +4869,11 @@ function exportInvoicesZipPDF() {
         const b = bookings.find(x => x.id === inv.bookingId);
         if (!b) return;
         const nights = nightsBetween(b.checkin, b.checkout);
-        const room = ROOMS.find(r => r.number === b.room);
+        const room = findRoom(b.room);
         const roomLabel = room ? room.label : b.room;
         const isRural = room && room.bedType === 'rural';
-        let total = 0;
-        if (isRural) {
-            total = nights * b.pricePerNight;
-        } else {
-            const mainRoomType = b.roomType || 'doble';
-            total = getBasePrice(b.checkin, b.checkout, mainRoomType) + ((parseInt(b.extraBeds)||0) * 15 * nights);
-            if (b.extraRooms) b.extraRooms.forEach(er => {
-                total += getBasePrice(b.checkin, b.checkout, er.roomType||'doble') + ((parseInt(er.extraBeds)||0) * 15 * nights);
-            });
-            total += (parseInt(b.lateCheckout)||0) * 5;
-        }
-        const totalPaid = (b.payments||[]).reduce((s,p) => s + p.amount, 0);
-        const cashTotal = (b.payments||[]).filter(p => p.method !== 'card').reduce((s,p) => s + p.amount, 0);
-        const cardTotal = (b.payments||[]).filter(p => p.method === 'card').reduce((s,p) => s + p.amount, 0);
+        // Use the amount frozen in the invoice record, not today's prices
+        const total = inv.amount;
 
         let paymentsRows = '';
         (b.payments||[]).forEach(p => {
@@ -5124,8 +4893,8 @@ function exportInvoicesZipPDF() {
             </div>
             <div style="background:#f8f9fa;padding:10px 14px;border-radius:6px;margin-bottom:15px;">
                 <div style="font-size:0.7rem;color:#717171;text-transform:uppercase;">Cliente</div>
-                <div style="font-weight:600;">${b.guestName}</div>
-                <div style="font-size:0.8rem;color:#555;">${b.docNumber ? (b.docType||'DNI').toUpperCase()+': '+b.docNumber : ''} ${b.phone ? '· Tel: '+b.phone : ''}</div>
+                <div style="font-weight:600;">${escapeHtml(b.guestName)}</div>
+                <div style="font-size:0.8rem;color:#555;">${b.docNumber ? (b.docType||'DNI').toUpperCase()+': '+escapeHtml(b.docNumber) : ''} ${b.phone ? '· Tel: '+escapeHtml(b.phone) : ''}</div>
             </div>
             <table><thead><tr style="background:#f7f7f7;"><th>Concepto</th><th style="text-align:center;">Uds.</th><th style="text-align:right;">Importe</th></tr></thead>
             <tbody><tr>
@@ -5143,9 +4912,9 @@ function exportInvoicesZipPDF() {
 
     const win = window.open('', '_blank');
     win.document.write(`<!DOCTYPE html><html><head><title>Facturas</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
-            body { font-family: 'Inter', sans-serif; padding: 20px 30px; color: #222; font-size: 13px; line-height: 1.5; }
+            body { font-family: 'Roboto', sans-serif; padding: 20px 30px; color: #222; font-size: 13px; line-height: 1.5; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
             th { padding: 8px 10px; text-align: left; font-size: 0.8rem; border-bottom: 1px solid #ddd; }
             td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 0.82rem; }
@@ -5177,8 +4946,8 @@ function renderInvoicesList() {
     sorted.map(inv => `<tr style="border-bottom:1px solid #e8eaed;">
         <td style="padding:8px 10px; font-weight:500;">${inv.invoiceNum}</td>
         <td style="padding:8px 10px;">${formatDateDMY(inv.date)}</td>
-        <td style="padding:8px 10px;">${inv.guestName}</td>
-        <td style="padding:8px 10px;">${inv.roomLabel || ''}</td>
+        <td style="padding:8px 10px;">${escapeHtml(inv.guestName)}</td>
+        <td style="padding:8px 10px;">${escapeHtml(inv.roomLabel)}</td>
         <td style="padding:8px 10px; text-align:right; font-weight:500; color:#1a73e8;">${inv.amount.toFixed(2)} €</td>
         <td style="padding:8px 10px; text-align:center;"><span class="pm-badge ${inv.method || 'card'}">${inv.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</span></td>
         <td style="padding:8px 10px; text-align:center;"><button class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="viewSavedInvoice('${inv.bookingId}')">Ver</button></td>
@@ -5194,23 +4963,44 @@ function viewSavedInvoice(bookingId) {
     }
 }
 
+// Sequential invoice numbering (F-YYYY-0001, resets each year). Spanish
+// invoicing requires correlative numbers, so never derive them from dates/rooms.
+function nextInvoiceNumber(invoices) {
+    const year = new Date().getFullYear();
+    let seq = null;
+    try { seq = JSON.parse(localStorage.getItem('hostal_jijones_invoice_seq') || 'null'); } catch { seq = null; }
+    if (!seq || seq.year !== year) {
+        // Start after the highest existing number of the year (covers imports)
+        let max = 0;
+        invoices.forEach(inv => {
+            const m = /^F-(\d{4})-(\d+)$/.exec(inv.invoiceNum || '');
+            if (m && parseInt(m[1]) === year) max = Math.max(max, parseInt(m[2]));
+        });
+        seq = { year, n: max };
+    }
+    seq.n++;
+    localStorage.setItem('hostal_jijones_invoice_seq', JSON.stringify(seq));
+    return 'F-' + year + '-' + String(seq.n).padStart(4, '0');
+}
+
 function saveInvoiceRecord(booking, amount, method) {
     const invoices = JSON.parse(localStorage.getItem('hostal_jijones_invoices') || '[]');
-    const room = ROOMS.find(r => r.number === booking.room);
+    const room = findRoom(booking.room);
     const roomLabel = room ? room.label : String(booking.room);
-    const invoiceNum = 'F-' + booking.checkin.replace(/-/g, '') + '-' + String(booking.room).replace(/[^a-zA-Z0-9]/g, '');
 
-    // Don't duplicate - update if exists
-    const existingIdx = invoices.findIndex(inv => inv.invoiceNum === invoiceNum);
+    // One invoice per booking - update if exists (keeps its original number)
+    const existingIdx = invoices.findIndex(inv => inv.bookingId === booking.id);
     if (existingIdx >= 0) {
         invoices[existingIdx].amount = amount;
         invoices[existingIdx].method = method || invoices[existingIdx].method;
+        invoices[existingIdx].checkin = booking.checkin;
+        invoices[existingIdx].checkout = booking.checkout;
         localStorage.setItem('hostal_jijones_invoices', JSON.stringify(invoices));
-        return;
+        return invoices[existingIdx];
     }
 
     invoices.push({
-        invoiceNum,
+        invoiceNum: nextInvoiceNumber(invoices),
         date: todayStr(),
         bookingId: booking.id,
         guestName: booking.guestName,
@@ -5231,6 +5021,7 @@ function saveInvoiceRecord(booking, amount, method) {
     });
 
     localStorage.setItem('hostal_jijones_invoices', JSON.stringify(invoices));
+    return invoices[invoices.length - 1];
 }
 
 // ==================== ADD CLIENT MANUALLY ====================
@@ -5267,54 +5058,7 @@ function saveNewClient() {
 
 // ==================== MULTIPLE ROOMS PER BOOKING ====================
 
-let currentExtraRooms = []; // [{room: number, roomType: 'individual'|'doble'|'triple'|'cuadruple'}]
 let currentCompanions = []; // [{name, docNumber, birthDate, supportNumber, address}]
-
-function addExtraRoom() {
-    currentExtraRooms.push({ room: '', roomType: 'doble' });
-    renderExtraRooms();
-}
-
-function removeExtraRoom(idx) {
-    currentExtraRooms.splice(idx, 1);
-    renderExtraRooms();
-}
-
-function updateExtraRoom(idx, field, value) {
-    if (currentExtraRooms[idx]) {
-        currentExtraRooms[idx][field] = field === 'room' ? (isNaN(value) ? value : parseInt(value)) : value;
-    }
-}
-
-function renderExtraRooms() {
-    const container = document.getElementById('extraRoomsList');
-    if (!container) return;
-    if (currentExtraRooms.length === 0) {
-        container.innerHTML = '<div style="font-size:0.75rem; color:#80868b; padding:4px 0;">Sin habitaciones adicionales</div>';
-        return;
-    }
-    const mainRoom = document.getElementById('bookingRoom').value;
-    const filteredRooms = ROOMS.filter(r => {
-        if (String(r.number) === String(mainRoom)) return false;
-        if (currentProperty === 'rural') return r.floor === 'rural';
-        return r.floor !== 'rural';
-    });
-    container.innerHTML = currentExtraRooms.map((er, idx) => {
-        const roomOptions = filteredRooms.map(r => `<option value="${r.number}" ${String(r.number) === String(er.room) ? 'selected' : ''}>${r.label}</option>`).join('');
-        return `<div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-            <select onchange="updateExtraRoom(${idx},'room',this.value)" style="flex:1; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.78rem; font-family:inherit;">
-                <option value="">-- Seleccionar --</option>${roomOptions}
-            </select>
-            <select onchange="updateExtraRoom(${idx},'roomType',this.value)" style="flex:0.8; padding:5px 8px; border:1px solid #dadce0; border-radius:4px; font-size:0.78rem; font-family:inherit;">
-                <option value="individual" ${er.roomType === 'individual' ? 'selected' : ''}>Individual</option>
-                <option value="doble" ${er.roomType === 'doble' ? 'selected' : ''}>Doble</option>
-                <option value="triple" ${er.roomType === 'triple' ? 'selected' : ''}>Triple</option>
-                <option value="cuadruple" ${er.roomType === 'cuadruple' ? 'selected' : ''}>Cuádruple</option>
-            </select>
-            <button onclick="removeExtraRoom(${idx})" style="background:none; border:none; color:#d93025; cursor:pointer; font-size:1rem; padding:0 4px;">✕</button>
-        </div>`;
-    }).join('');
-}
 
 // ==================== PROPERTY TAB SWITCHING ====================
 
@@ -5325,7 +5069,6 @@ function switchProperty(prop) {
     // El selector de plantas solo aplica al hostal
     const floorToggle = document.getElementById('floorToggle');
     if (floorToggle) floorToggle.style.display = prop === 'rural' ? 'none' : 'flex';
-    populateRoomSelect();
     renderGrid();
 }
 
@@ -5387,14 +5130,27 @@ function updateGuestCount() {
 function renderRoomAssignments() {
     const count = parseInt(document.getElementById('roomCount').value) || 1;
     const container = document.getElementById('roomAssignmentsList');
+    // Remember current selections so changing the room count doesn't lose them
+    const prev = [];
+    for (let i = 0; ; i++) {
+        const sel = document.getElementById('roomAssign_' + i);
+        if (!sel) break;
+        prev.push({
+            room: sel.value,
+            occ: document.getElementById('roomOcc_' + i)?.value,
+            ext: document.getElementById('roomExt_' + i)?.value
+        });
+    }
     const checkin = document.getElementById('bookingCheckin').value;
     const checkout = document.getElementById('bookingCheckout').value;
     const editId = document.getElementById('bookingId').value;
+    // When editing, rooms held by this reservation's own group must stay selectable
+    const editGroupId = editId ? (bookings.find(b => b.id === editId)?.groupId || null) : null;
     const availableRooms = ROOMS.filter(r => {
         if (currentProperty === 'rural') return r.floor === 'rural';
         return r.floor !== 'rural';
     }).filter(r => {
-        if (checkin && checkout) return isRoomAvailable(r.number, checkin, checkout, editId);
+        if (checkin && checkout) return isRoomAvailable(r.number, checkin, checkout, editId, editGroupId);
         return true;
     });
 
@@ -5427,9 +5183,25 @@ function renderRoomAssignments() {
     }
     container.innerHTML = html;
 
-    // Auto-assign different rooms
+    // First pass: restore previous selections where still available
     const usedRooms = new Set();
+    const restored = new Set();
     for (let i = 0; i < count; i++) {
+        const sel = document.getElementById('roomAssign_' + i);
+        const p = prev[i];
+        if (!sel || !p || !p.room) continue;
+        const optionExists = Array.from(sel.options).some(o => o.value === p.room);
+        if (optionExists && !usedRooms.has(p.room)) {
+            sel.value = p.room;
+            usedRooms.add(p.room);
+            restored.add(i);
+            if (p.occ) document.getElementById('roomOcc_' + i).value = p.occ;
+            if (p.ext) document.getElementById('roomExt_' + i).value = p.ext;
+        }
+    }
+    // Second pass: auto-assign a distinct free room to the remaining slots
+    for (let i = 0; i < count; i++) {
+        if (restored.has(i)) continue;
         const sel = document.getElementById('roomAssign_' + i);
         if (!sel) continue;
         for (let j = 0; j < sel.options.length; j++) {
@@ -5522,7 +5294,7 @@ function renderSavedIcalLinks() {
         return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f7f7f7; font-size:0.75rem;">
             <div>
                 <strong>${roomLabel}</strong>
-                <div style="color:#717171; font-size:0.68rem; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${l.url}</div>
+                <div style="color:#717171; font-size:0.68rem; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(l.url)}</div>
                 ${l.lastSync ? '<div style="color:#008A05; font-size:0.65rem;">Última sync: ' + formatDateDMY(l.lastSync) + '</div>' : ''}
             </div>
             <div style="display:flex; gap:4px;">
@@ -5549,6 +5321,27 @@ function resyncIcalLink(idx) {
     syncBookingICal();
 }
 
+// Fetches the iCal feed through our own Vercel serverless proxy (/api/ical),
+// falling back to a direct fetch. No third-party proxies: the iCal URL
+// contains a secret token that must not leave our infrastructure.
+async function fetchIcalText(url) {
+    try {
+        const resp = await fetch('/api/ical?url=' + encodeURIComponent(url));
+        if (resp.ok) {
+            const text = await resp.text();
+            if (text.includes('BEGIN:VCALENDAR')) return text;
+        }
+    } catch { /* proxy unavailable (e.g. local file) */ }
+    try {
+        const resp = await fetch(url);
+        if (resp.ok) {
+            const text = await resp.text();
+            if (text.includes('BEGIN:VCALENDAR')) return text;
+        }
+    } catch { /* CORS or network error */ }
+    return null;
+}
+
 async function syncBookingICal() {
     const url = document.getElementById('bookingIcalUrl').value.trim();
     const roomVal = document.getElementById('bookingIcalRoom').value;
@@ -5561,27 +5354,15 @@ async function syncBookingICal() {
     resultDiv.innerHTML = '<div style="text-align:center; padding:12px; color:#717171;">Importando reservas...</div>';
 
     try {
-        // Use a CORS proxy since Booking iCal URLs don't allow direct browser access
-        // Try direct first, then fallback
-        let icalText = '';
-        try {
-            const resp = await fetch(url);
-            icalText = await resp.text();
-        } catch {
-            // Try with allorigins proxy
-            try {
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-                const resp = await fetch(proxyUrl);
-                icalText = await resp.text();
-            } catch {
-                resultDiv.innerHTML = `<div style="padding:12px; color:#C13515; background:#FFF0F0; border-radius:8px; font-size:0.82rem;">
-                    <strong>Error de conexión.</strong> No se pudo acceder al enlace iCal.<br>
-                    <span style="font-size:0.75rem; color:#717171;">Puedes copiar el contenido del archivo .ics y pegarlo manualmente abajo:</span><br>
-                    <textarea id="manualIcalPaste" style="width:100%; height:80px; margin-top:6px; font-size:0.72rem; border:1px solid #b0b0b0; border-radius:6px; padding:6px;" placeholder="Pega aquí el contenido del archivo .ics"></textarea>
-                    <button class="btn-primary" onclick="parseManualIcal()" style="margin-top:6px; font-size:0.75rem; padding:6px 14px;">Importar texto</button>
-                </div>`;
-                return;
-            }
+        const icalText = await fetchIcalText(url);
+        if (!icalText) {
+            resultDiv.innerHTML = `<div style="padding:12px; color:#C13515; background:#FFF0F0; border-radius:8px; font-size:0.82rem;">
+                <strong>Error de conexión.</strong> No se pudo acceder al enlace iCal.<br>
+                <span style="font-size:0.75rem; color:#717171;">Puedes copiar el contenido del archivo .ics y pegarlo manualmente abajo:</span><br>
+                <textarea id="manualIcalPaste" style="width:100%; height:80px; margin-top:6px; font-size:0.72rem; border:1px solid #b0b0b0; border-radius:6px; padding:6px;" placeholder="Pega aquí el contenido del archivo .ics"></textarea>
+                <button class="btn-primary" onclick="parseManualIcal()" style="margin-top:6px; font-size:0.75rem; padding:6px 14px;">Importar texto</button>
+            </div>`;
+            return;
         }
 
         const imported = parseICalAndImport(icalText, room);
@@ -5666,7 +5447,7 @@ function parseICalAndImport(icalText, room) {
         // Check if already imported (by UID or matching guest+dates+room)
         const alreadyExists = bookings.some(b =>
             (b.icalUid && b.icalUid === evt.uid) ||
-            (b.source === 'booking' && b.room === room && b.checkin === evt.checkin && b.checkout === evt.checkout)
+            (b.source === 'booking' && sameRoom(b.room, room) && b.checkin === evt.checkin && b.checkout === evt.checkout)
         );
         if (alreadyExists) { skipped++; return; }
 
@@ -5676,6 +5457,7 @@ function parseICalAndImport(icalText, room) {
         // Extract guest name from summary (Booking format: "Guest Name" or "CLOSED - ...")
         const guestName = evt.summary.replace(/^(Booking\.com|CLOSED)\s*[-:]\s*/i, '').trim() || evt.summary;
 
+        const icalNights = nightsBetween(evt.checkin, evt.checkout);
         bookings.push({
             id: generateId(),
             guestName,
@@ -5688,6 +5470,8 @@ function parseICalAndImport(icalText, room) {
             checkout: evt.checkout,
             status: 'confirmed',
             pricePerNight: 48,
+            totalPrice: icalNights * 48,
+            roomTotal: icalNights * 48,
             guests: 2,
             notes: evt.description || 'Reserva importada de Booking.com',
             paymentStatus: 'pending_payment',
@@ -5714,6 +5498,32 @@ function parseICalDate(val) {
     return clean.substring(0, 4) + '-' + clean.substring(4, 6) + '-' + clean.substring(6, 8);
 }
 
+// Re-syncs all saved iCal links silently, at most once per day (runs at login)
+async function autoSyncIcalLinks() {
+    const links = loadIcalLinks();
+    if (links.length === 0) return;
+    const today = todayStr();
+    if (localStorage.getItem('hostal_jijones_last_ical_sync') === today) return;
+
+    let totalCreated = 0;
+    let anySuccess = false;
+    for (const link of links) {
+        const text = await fetchIcalText(link.url);
+        if (!text) continue;
+        try {
+            const room = isNaN(link.room) ? link.room : parseInt(link.room);
+            totalCreated += parseICalAndImport(text, room).created;
+            link.lastSync = today;
+            anySuccess = true;
+        } catch { /* keep going with the rest of the links */ }
+    }
+    if (anySuccess) {
+        localStorage.setItem('hostal_jijones_last_ical_sync', today);
+        saveIcalLinks(links);
+        if (totalCreated > 0) renderGrid();
+    }
+}
+
 // ==================== GLOBAL SEARCH ====================
 
 function onGlobalSearch(query) {
@@ -5733,12 +5543,12 @@ function onGlobalSearch(query) {
         container.innerHTML = '<div style="padding:16px; text-align:center; color:#717171; font-size:0.8rem;">No se encontraron reservas</div>';
     } else {
         container.innerHTML = results.map(b => {
-            const room = ROOMS.find(r => r.number === b.room);
-            const roomLabel = room ? room.label : b.room;
+            const room = findRoom(b.room);
+            const roomLabel = room ? room.label : escapeHtml(b.room);
             const nights = nightsBetween(b.checkin, b.checkout);
             return `<div class="search-result-row" onclick="closeGlobalSearch();editBooking('${b.id}')">
-                <div class="sr-name">${b.guestName}</div>
-                <div class="sr-detail">${roomLabel} · ${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)} (${nights}n) · ${STATUS_LABELS[b.status] || b.status}</div>
+                <div class="sr-name">${escapeHtml(b.guestName)}</div>
+                <div class="sr-detail">${roomLabel} · ${formatDateDMY(b.checkin)} → ${formatDateDMY(b.checkout)} (${nights}n) · ${STATUS_LABELS[b.status] || escapeHtml(b.status)}</div>
             </div>`;
         }).join('');
     }
@@ -5773,13 +5583,20 @@ document.addEventListener('click', function(e) {
 let pricingMonth = new Date().getMonth();
 let pricingYear = new Date().getFullYear();
 
+// In-memory cache: getPriceForDate runs once per night per room while typing
+// in the booking form, so parsing localStorage on every call is wasteful.
+let pricingCache = null;
+
 function loadPricing() {
+    if (pricingCache) return pricingCache;
     try {
-        return JSON.parse(localStorage.getItem('hostal_jijones_pricing') || '{}');
-    } catch { return {}; }
+        pricingCache = JSON.parse(localStorage.getItem('hostal_jijones_pricing') || '{}');
+    } catch { pricingCache = {}; }
+    return pricingCache;
 }
 
 function savePricingData(data) {
+    pricingCache = data;
     localStorage.setItem('hostal_jijones_pricing', JSON.stringify(data));
 }
 
@@ -5855,7 +5672,8 @@ function getPriceForDate(ds, roomType) {
 function getSuggestedPrice(ds, roomType) {
     const basePrice = getPriceForDate(ds, roomType);
     const d = parseDate(ds);
-    const isWe = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;
+    // Pricing weekend = Friday & Saturday nights (same as "Aplicar por mes")
+    const isWe = d.getDay() === 5 || d.getDay() === 6;
     if (isWe) {
         const occupancy = getOccupancyForDate(ds);
         if (occupancy >= 0.8) {
@@ -5889,7 +5707,7 @@ function renderPricingCalendar() {
         const date = new Date(pricingYear, pricingMonth, d);
         const ds = dateStr(date);
         const dayName = dayNames[date.getDay()];
-        const isWe = date.getDay() === 0 || date.getDay() === 5 || date.getDay() === 6;
+        const isWe = date.getDay() === 5 || date.getDay() === 6;
         const occ = getOccupancyForDate(ds);
         const occPct = Math.round(occ * 100);
         const surge = isWe && occ >= 0.8;
@@ -6172,9 +5990,10 @@ function generateIneReport() {
     dias.forEach(dia => {
         const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
-        // Entries: check-ins on this day
+        // Entries: check-ins on this day (main bookings only: a multi-room
+        // group already counts all its guests once)
         const entryByCountry = {};
-        bookings.filter(b => b.checkin === ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+        bookings.filter(b => !isGroupChild(b) && b.checkin === ds && b.status !== 'cancelled' && hostalRooms.some(r => sameRoom(r.number, b.room))).forEach(b => {
             getGuestsFromBooking(b).forEach(g => {
                 const code = getNationalityCode(g.nationality);
                 entryByCountry[code] = (entryByCountry[code] || 0) + 1;
@@ -6184,7 +6003,7 @@ function generateIneReport() {
 
         // Exits: check-outs on this day
         const exitByCountry = {};
-        bookings.filter(b => b.checkout === ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+        bookings.filter(b => !isGroupChild(b) && b.checkout === ds && b.status !== 'cancelled' && hostalRooms.some(r => sameRoom(r.number, b.room))).forEach(b => {
             getGuestsFromBooking(b).forEach(g => {
                 const code = getNationalityCode(g.nationality);
                 exitByCountry[code] = (exitByCountry[code] || 0) + 1;
@@ -6194,7 +6013,7 @@ function generateIneReport() {
 
         // Overnight stays: active bookings (checkin <= day && checkout > day)
         const overnightByCountry = {};
-        bookings.filter(b => b.checkin <= ds && b.checkout > ds && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room))).forEach(b => {
+        bookings.filter(b => !isGroupChild(b) && b.checkin <= ds && b.checkout > ds && b.status !== 'cancelled' && hostalRooms.some(r => sameRoom(r.number, b.room))).forEach(b => {
             getGuestsFromBooking(b).forEach(g => {
                 const code = getNationalityCode(g.nationality);
                 overnightByCountry[code] = (overnightByCountry[code] || 0) + 1;
@@ -6225,13 +6044,15 @@ function generateIneReport() {
     // ADR & REVPAR
     const monthStart = `${y}-${String(m + 1).padStart(2, '0')}-01`;
     const monthEnd = `${y}-${String(m + 2 > 12 ? 1 : m + 2).padStart(2, '0')}-01`;
-    const monthBookings = bookings.filter(b => b.checkin < monthEnd && b.checkout > monthStart && b.status !== 'cancelled' && hostalRooms.some(r => String(r.number) === String(b.room)));
+    const monthBookings = bookings.filter(b => b.checkin < monthEnd && b.checkout > monthStart && b.status !== 'cancelled' && hostalRooms.some(r => sameRoom(r.number, b.room)));
     let totalRevenue = 0, totalRoomNights = 0;
     monthBookings.forEach(b => {
         const ci = b.checkin < monthStart ? monthStart : b.checkin;
         const co = b.checkout > monthEnd ? monthEnd : b.checkout;
         const nights = nightsBetween(ci, co);
-        totalRevenue += nights * (b.pricePerNight || 0);
+        // Per-room nightly rate (a group's main booking would otherwise
+        // contribute the whole group price to a single room)
+        totalRevenue += nights * getRoomNightRate(b);
         totalRoomNights += nights;
     });
     const totalAvailableRoomNights = hostalRooms.length * diasAbierto;
@@ -6267,13 +6088,13 @@ function renderIneTab() {
             <table class="ine-table">
                 <tr><td style="width:40%; font-weight:500;">Mes/Año</td><td>${MONTH_NAMES_FULL[d.m]} ${d.y}</td></tr>
                 <tr><td style="font-weight:500;">Días abierto</td><td>${d.diasAbierto}</td></tr>
-                <tr><td style="font-weight:500;">Razón Social</td><td>${c.razonSocial || BUSINESS_DATA.name}</td></tr>
-                <tr><td style="font-weight:500;">Nombre</td><td>${c.nombreEstab || BUSINESS_DATA.tradeName}</td></tr>
-                <tr><td style="font-weight:500;">NIF</td><td>${c.nif || BUSINESS_DATA.nif}</td></tr>
-                <tr><td style="font-weight:500;">N.º Registro</td><td>${c.numRegistro || '-'}</td></tr>
-                <tr><td style="font-weight:500;">Dirección</td><td>${c.direccion || BUSINESS_DATA.address}, ${c.cp || ''} ${c.localidad || ''}</td></tr>
-                <tr><td style="font-weight:500;">Municipio / Provincia</td><td>${c.municipio || ''} / ${c.provincia || ''}</td></tr>
-                <tr><td style="font-weight:500;">Categoría</td><td>${c.categoria || 'HS1'}</td></tr>
+                <tr><td style="font-weight:500;">Razón Social</td><td>${escapeHtml(c.razonSocial || BUSINESS_DATA.name)}</td></tr>
+                <tr><td style="font-weight:500;">Nombre</td><td>${escapeHtml(c.nombreEstab || BUSINESS_DATA.tradeName)}</td></tr>
+                <tr><td style="font-weight:500;">NIF</td><td>${escapeHtml(c.nif || BUSINESS_DATA.nif)}</td></tr>
+                <tr><td style="font-weight:500;">N.º Registro</td><td>${escapeHtml(c.numRegistro) || '-'}</td></tr>
+                <tr><td style="font-weight:500;">Dirección</td><td>${escapeHtml(c.direccion || BUSINESS_DATA.address)}, ${escapeHtml(c.cp)} ${escapeHtml(c.localidad)}</td></tr>
+                <tr><td style="font-weight:500;">Municipio / Provincia</td><td>${escapeHtml(c.municipio)} / ${escapeHtml(c.provincia)}</td></tr>
+                <tr><td style="font-weight:500;">Categoría</td><td>${escapeHtml(c.categoria) || 'HS1'}</td></tr>
                 <tr><td style="font-weight:500;">N.º habitaciones</td><td>${c.numHab || ROOMS.filter(r=>r.floor!=='rural').length}</td></tr>
                 <tr><td style="font-weight:500;">Plazas sin supletorias</td><td>${c.numPlazas || '-'}</td></tr>
                 <tr><td style="font-weight:500;">Días muestrales</td><td>${d.dias.join(', ')}</td></tr>
@@ -6567,7 +6388,6 @@ function init() {
     loadBookings();
     loadRoomStatus();
     ROOMS = buildRooms(); // Rebuild with saved config
-    populateRoomSelect();
     populateBlockRoomSelect();
 
     const today = new Date();
@@ -6580,6 +6400,11 @@ function init() {
 
     updateSidebarUser();
     renderGrid();
+
+    // Daily safety net while data lives only in this browser
+    autoBackup();
+    // Refresh Booking.com calendars in the background (once per day)
+    autoSyncIcalLinks();
 }
 
 // Show login screen on startup
