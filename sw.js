@@ -26,8 +26,11 @@ self.addEventListener('fetch', e => {
         e.respondWith(
             fetch(e.request)
                 .then(resp => {
-                    const copy = resp.clone();
-                    caches.open(CACHE).then(c => c.put(e.request, copy));
+                    // No pisar la copia buena de la caché con una respuesta de error
+                    if (resp.ok) {
+                        const copy = resp.clone();
+                        caches.open(CACHE).then(c => c.put(e.request, copy));
+                    }
                     return resp;
                 })
                 .catch(() => caches.match(e.request))
@@ -36,8 +39,12 @@ self.addEventListener('fetch', e => {
     }
     e.respondWith(
         caches.match(e.request).then(hit => hit || fetch(e.request).then(resp => {
-            const copy = resp.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy));
+            // Cachear solo respuestas correctas: un 404/500 cacheado en
+            // cache-first se serviría para siempre
+            if (resp.ok) {
+                const copy = resp.clone();
+                caches.open(CACHE).then(c => c.put(e.request, copy));
+            }
             return resp;
         }))
     );
