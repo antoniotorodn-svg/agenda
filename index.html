@@ -1316,6 +1316,8 @@
                     <option value="any">Cualquiera</option>
                     <option value="double">Matrimonio</option>
                     <option value="twin">Dos camas</option>
+                    <option value="triple">Triple</option>
+                    <option value="quadruple">Cuádruple</option>
                     <option value="rural">Casa Rural</option>
                 </select>
             </div>
@@ -2507,6 +2509,7 @@ function printDayReport() {
     </tr>`).join('') || '<tr><td colspan="5" style="color:#999;">—</td></tr>';
 
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>Parte del día ${formatDateDMY(ds)}</title>
         <style>body{font-family:Arial,sans-serif;padding:24px;color:#222;font-size:13px;}
         h1{font-size:1.1rem;margin-bottom:2px;}h2{font-size:0.9rem;margin:16px 0 6px;}
@@ -2594,6 +2597,7 @@ function printCashReport() {
     const cash = rows.filter(r => r.p.method !== 'card').reduce((s, r) => s + r.p.amount, 0);
     const card = rows.filter(r => r.p.method === 'card').reduce((s, r) => s + r.p.amount, 0);
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>Arqueo ${formatDateDMY(ds)}</title>
         <style>body{font-family:Arial,sans-serif;padding:24px;color:#222;font-size:13px;}
         table{width:100%;border-collapse:collapse;margin-top:10px;}th{background:#f2f2f2;text-align:left;padding:6px 8px;font-size:0.75rem;}
@@ -2733,6 +2737,25 @@ function moveBookingToRoom(bookingId, targetRoomVal, interactive) {
         tb.checkin < b.checkout && tb.checkout > b.checkin
     );
 
+    // Las reservas intercambiadas pueden tener fechas más largas que la que se
+    // mueve: comprobar que caben en la habitación de origen sin pisar otras
+    // reservas ni bloqueos (fuera del rango de la reserva movida).
+    const swappedIds = new Set(targetBookings.map(tb => tb.id));
+    for (const tb of targetBookings) {
+        const bookingClash = bookings.some(x =>
+            x.id !== b.id && !swappedIds.has(x.id) &&
+            sameRoom(x.room, b.room) &&
+            x.checkin < tb.checkout && x.checkout > tb.checkin
+        );
+        const blockClash = blocks.some(bl =>
+            sameRoom(bl.room, b.room) && bl.from < tb.checkout && bl.to > tb.checkin
+        );
+        if (bookingClash || blockClash) {
+            showToast(`No se puede intercambiar: la reserva de ${tb.guestName} (${formatDateDMY(tb.checkin)} → ${formatDateDMY(tb.checkout)}) chocaría con otra reserva o bloqueo en la habitación ${b.room}.`, 'error');
+            return false;
+        }
+    }
+
     if (interactive) {
         let msg;
         if (targetBookings.length > 0) {
@@ -2788,7 +2811,7 @@ function showQuickActions(event, bookingId) {
     const statusLabel = STATUS_LABELS[b.status] || b.status;
     popup.innerHTML = `
         <div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">${escapeHtml(b.guestName)}</div>
-        <div style="font-size:0.75rem;color:#717171;margin-bottom:12px;">Hab. ${b.room} · Estado: ${statusLabel}</div>
+        <div style="font-size:0.75rem;color:#717171;margin-bottom:12px;">Hab. ${escapeHtml(b.room)} · Estado: ${statusLabel}</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
             ${b.status === 'confirmed' ? `<button class="btn-success" onclick="quickCheckIn('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;">Check-in</button>` : ''}
             ${b.status === 'checkedin' ? `<button class="btn-primary" onclick="quickCheckOut('${b.id}')" style="width:100%;padding:8px;font-size:0.82rem;">Check-out</button>` : ''}
@@ -2902,7 +2925,11 @@ function updateRuralSection(room) {
     const isRural = room && room.bedType === 'rural';
     document.getElementById('ruralSection').classList.toggle('visible', isRural);
     if (isRural) {
-        document.getElementById('guestCount').value = '16';
+        // Solo proponer la capacidad completa en reservas nuevas; al editar
+        // se conserva el número de huéspedes guardado en la reserva.
+        if (!document.getElementById('bookingId').value) {
+            document.getElementById('guestCount').value = '16';
+        }
         // Only change price if it's the default hostel price
         const priceEl = document.getElementById('pricePerNight');
         if (parseFloat(priceEl.value) === 48) {
@@ -3508,7 +3535,7 @@ function renderCompanions() {
             <div class="form-row">
                 <div class="form-group">
                     <label style="font-size:0.72rem;">Fecha nacimiento</label>
-                    <input type="date" value="${comp.birthDate || ''}" onchange="updateCompanion(${idx},'birthDate',this.value)">
+                    <input type="date" value="${escapeAttr(comp.birthDate || '')}" onchange="updateCompanion(${idx},'birthDate',this.value)">
                 </div>
                 <div class="form-group">
                     <label style="font-size:0.72rem;">Nº soporte</label>
@@ -3885,13 +3912,15 @@ function searchAvailability() {
         // Filter by bed type
         if (bedType !== 'any' && room.bedType !== bedType) return;
 
-        // Filter by capacity
-        const capacity = room.bedType === 'rural' ? 16 : (room.bedType === 'double' ? 2 : 2);
+        // Filter by capacity (según el tipo de cama configurado)
+        const CAPACITIES = { rural: 16, triple: 3, quadruple: 4 };
+        const capacity = CAPACITIES[room.bedType] || 2;
         if (guests > capacity) return;
 
         // Check availability
         if (isRoomAvailable(room.number, from, checkout)) {
-            const totalPrice = room.bedType === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(from, checkout, 'doble');
+            const RATE_TYPES = { triple: 'triple', quadruple: 'cuadruple' };
+            const totalPrice = room.bedType === 'rural' ? nights * RURAL_DEFAULT_PRICE : getBasePrice(from, checkout, RATE_TYPES[room.bedType] || 'doble');
             results.push({
                 room,
                 checkin: from,
@@ -5102,6 +5131,7 @@ function closeInvoiceModal() {
 function printInvoice() {
     const content = document.getElementById('invoicePrintArea').innerHTML;
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>Factura</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
@@ -5216,16 +5246,18 @@ function formatAuditDate(isoStr) {
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        // Secondary modals that can sit on top of the booking form
+        // Secondary modals that can sit on top of another modal
         const swapOpen = document.getElementById('swapRoomModal').classList.contains('active');
         if (swapOpen) { closeSwapRoomModal(); return; }
+        const ineConfig = document.getElementById('ineConfigModal');
+        if (ineConfig.classList.contains('active')) { ineConfig.classList.remove('active'); return; }
         // The booking form can hold a lot of typed data: ask before discarding
         const bookingOpen = document.getElementById('bookingModal').classList.contains('active');
         if (bookingOpen) {
             if (confirm('¿Cerrar la reserva sin guardar los cambios?')) closeModal();
             return;
         }
-        closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); closeBookingSyncModal(); closeCashModal();
+        closeIncomeModal(); closeSearchModal(); closeBlockModal(); closeClientsModal(); closeClientDetail(); closeChecklist(); closeRulesModal(); closeReportsModal(); closeWizard(); closeInvoiceModal(); closeCancellationsModal(); closeInvoicesListModal(); closeAddClientModal(); closePricingModal(); closeRoomConfigModal(); closeBookingSyncModal(); closeCashModal(); closeIneModal(); closeTutorialVideo();
     }
 });
 
@@ -5455,6 +5487,7 @@ function exportInvoicesPDF() {
     </tr>`).join('');
 
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>Facturas</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
         <style>
@@ -5529,6 +5562,7 @@ function exportInvoicesZipPDF() {
     });
 
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>Facturas</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
@@ -5737,7 +5771,11 @@ function updateGuestCount() {
         const extra = ext ? parseInt(ext.value) || 0 : 0;
         total += base + extra;
     }
-    document.getElementById('guestCount').value = total;
+    // En la casa rural los huéspedes no se derivan de la ocupación por
+    // habitación (los selects no aplican): se mantiene el valor guardado.
+    if (!isCurrentRoomRural()) {
+        document.getElementById('guestCount').value = total;
+    }
     // Sync hidden fields with first room
     const occ0 = document.getElementById('roomOcc_0');
     const ext0 = document.getElementById('roomExt_0');
@@ -6910,6 +6948,7 @@ function exportInePDF() {
     content += `<div style="margin-top:16px;font-weight:600;">ADR: ${d.adr.toFixed(2)} € · REVPAR: ${d.revpar.toFixed(2)} €</div>`;
 
     const win = window.open('', '_blank');
+    if (!win) return showToast('El navegador ha bloqueado la ventana emergente. Permite los pop-ups para imprimir.', 'error');
     win.document.write(`<!DOCTYPE html><html><head><title>INE ${MONTH_NAMES_FULL[d.m]} ${d.y}</title>
         <style>body{font-family:'Segoe UI',system-ui,sans-serif;padding:20px 30px;color:#222;font-size:13px;}
         table{width:100%;border-collapse:collapse;margin-bottom:12px;}th{background:#f7f7f7;padding:6px 8px;text-align:left;font-size:0.75rem;border-bottom:2px solid #ddd;}
